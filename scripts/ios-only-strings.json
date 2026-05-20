@@ -16,5 +16,10 @@
   "common.retry":          { "en": "Retry",              "ar": "إعادة المحاولة" },
   "common.edit":           { "en": "Edit",               "ar": "تعديل" },
   "common.save":           { "en": "Save",               "ar": "حفظ" },
-  "common.cancel":         { "en": "Cancel",             "ar": "إلغاء" }
+  "common.cancel":         { "en": "Cancel",             "ar": "إلغاء" },
+
+  "brand.ssam_full": {
+    "en": "Saudi Students Association in Melbourne",
+    "ar": "نادي الطلبة السعوديين في ملبورن"
+  }
 }

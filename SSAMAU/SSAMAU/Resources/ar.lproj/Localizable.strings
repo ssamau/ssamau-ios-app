@@ -939,6 +939,7 @@
 "apply.thanks.review" = "سيراجع فريق النادي طلبك ويتواصل معك قريباً عبر بريدك أو رقم جوالك.";
 "apply.thanks.title" = "تم استلام طلبك!";
 "brand.logo_alt" = "شعار النادي";
+"brand.ssam_full" = "نادي الطلبة السعوديين في ملبورن";  // ios-only
 "brand.ssam_full_ar" = "نادي الطلبة السعوديين في ملبورن";
 "brand.ssam_full_en" = "Saudi Students Association in Melbourne";
 "common.cancel" = "إلغاء";  // ios-only

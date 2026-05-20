@@ -939,6 +939,7 @@
 "apply.thanks.review" = "The club team will review your application and contact you soon via email or phone.";
 "apply.thanks.title" = "Application received!";
 "brand.logo_alt" = "SSAM logo";
+"brand.ssam_full" = "Saudi Students Association in Melbourne";  // ios-only
 "brand.ssam_full_ar" = "نادي الطلبة السعوديين في ملبورن";
 "brand.ssam_full_en" = "Saudi Students Association in Melbourne";
 "common.cancel" = "Cancel";  // ios-only

@@ -37,7 +37,7 @@ struct LoginView: View {
                 .resizable()
                 .scaledToFit()
                 .frame(width: 96, height: 96)
-            Text(LocalizedStringKey("brand.ssam_full_en"))
+            Text(LocalizedStringKey("brand.ssam_full"))
                 .font(.title3.weight(.semibold))
                 .foregroundStyle(Color("Ink"))
                 .multilineTextAlignment(.center)
