@@ -104,6 +104,10 @@ struct APIClient {
         do {
             envelope = try JSONDecoder.api.decode(APIEnvelope<Response>.self, from: data)
         } catch {
+            #if DEBUG
+            let raw = String(data: data, encoding: .utf8) ?? "<non-utf8>"
+            print("⚠️ APIClient decode failed for action '\(action)':\n  error: \(error)\n  raw: \(raw.prefix(2000))")
+            #endif
             throw APIError.decoding(String(describing: error))
         }
 

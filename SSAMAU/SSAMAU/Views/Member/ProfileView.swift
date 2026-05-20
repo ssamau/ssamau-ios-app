@@ -59,7 +59,7 @@ struct ProfileView: View {
                     row("mp.profile.lbl_about", member.aboutSelf)
                 }
                 section(title: "mp.profile.section_account") {
-                    row("mp.profile.ro_full_name", member.fullName)
+                    row("mp.profile.ro_full_name", member.fullName ?? member.displayName)
                     row("mp.profile.ro_nid", member.nationalId)
                     row("mp.profile.ro_committee", member.committeeName)
                     row("mp.profile.ro_role", member.clubRole)
@@ -141,7 +141,7 @@ struct ProfileView: View {
                 labelKey: "mp.profile.stat_hours_label"
             )
             statCard(
-                value: member.status,
+                value: member.status ?? "Active",
                 labelKey: "mp.profile.stat_status_label",
                 valueColor: member.isActive ? Color("BrandGreen") : Color("InkMuted")
             )

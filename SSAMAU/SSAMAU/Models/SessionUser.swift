@@ -6,12 +6,14 @@ import Foundation
 struct SessionUser: Codable, Identifiable, Equatable {
     let id: Int
     let username: String
-    let name: String
+    let name: String?           // null for admin/superadmin accounts with no linked member
     let role: String
     let access: String
     let memberId: String?
     let committeeId: String?
     let email: String?
+
+    var displayName: String { name ?? username }
 
     var isMember: Bool { access == "member" || access == "volunteer" }
     var isHead: Bool { access == "head" }

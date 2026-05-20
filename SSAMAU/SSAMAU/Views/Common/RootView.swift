@@ -16,12 +16,12 @@ struct RootView: View {
             if user.hasAdminScope {
                 PlaceholderView(
                     title: "Admin",
-                    subtitle: "AdminTabView — signed in as \(user.name)"
+                    subtitle: "AdminTabView — signed in as \(user.displayName)"
                 )
             } else if user.isHead {
                 PlaceholderView(
                     title: "Head",
-                    subtitle: "HeadTabView — signed in as \(user.name)"
+                    subtitle: "HeadTabView — signed in as \(user.displayName)"
                 )
             } else {
                 MemberTabView()
