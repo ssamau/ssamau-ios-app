@@ -62,15 +62,24 @@ struct HeadTabView: View {
     /// path. Reset happens whenever the user was just on More — covers
     /// both "leaving More for another tab" AND "re-tapping More while
     /// already there". By resetting on LEAVE (not on entry), the next
-    /// visit lands on the More menu without the user seeing the old
-    /// sub-page slide in during the tab transition. Other tabs preserve
-    /// their state per iOS default.
+    /// visit lands on the More menu without seeing the old sub-page
+    /// slide in during the tab transition.
+    ///
+    /// The reset is wrapped in a non-animating transaction so the user
+    /// doesn't see the pop-to-root animation play out while the More tab
+    /// is still on screen. Combined with iOS's near-instant tab switch,
+    /// the change is effectively invisible — they tap Dashboard and just
+    /// see Dashboard.
     private var tabSelectionBinding: Binding<Tab> {
         Binding(
             get: { selection },
             set: { newValue in
                 if selection == .more {
-                    morePath = NavigationPath()
+                    var t = Transaction()
+                    t.disablesAnimations = true
+                    withTransaction(t) {
+                        morePath = NavigationPath()
+                    }
                 }
                 selection = newValue
             }
