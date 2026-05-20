@@ -38,8 +38,15 @@ final class ProfileViewModel: ObservableObject {
             self.errorMessage = nil
             await refreshFileURLs()
         } catch let apiError as APIError {
+            if apiError.isCancellation { return }
+            #if DEBUG
+            print("⚠️ ProfileViewModel.load APIError: \(apiError)")
+            #endif
             self.errorMessage = apiError.localizedMessage
         } catch {
+            #if DEBUG
+            print("⚠️ ProfileViewModel.load error: \(error)")
+            #endif
             self.errorMessage = ErrorLocalization.localize("err.unknown")
         }
     }

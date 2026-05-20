@@ -114,7 +114,7 @@ private struct HeadMoreView: View {
                 case .applications: ApplicationsView()
                 case .thanks:       ThanksView()
                 case .certs:        HeadCertsView()
-                case .profile:      ProfileView()
+                case .profile:      ProfileView(nestedInNavStack: true)
                 }
             }
         }

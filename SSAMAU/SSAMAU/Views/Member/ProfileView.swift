@@ -4,6 +4,13 @@ import UniformTypeIdentifiers
 
 /// Member-mode profile screen — spec §8.2, styled per SSAM Brand Identity Guide.
 struct ProfileView: View {
+    /// When this view is pushed inside another NavigationStack (e.g. the
+    /// head's More tab), DON'T wrap content in our own NavigationStack —
+    /// nesting them corrupts SwiftUI's navigationDestination registry on
+    /// the outer stack (next push silently fails with "no matching
+    /// navigationDestination" in the console).
+    var nestedInNavStack: Bool = false
+
     @EnvironmentObject var session: SessionStore
     @StateObject private var vm = ProfileViewModel()
     @State private var showSettingsFallback = false
@@ -13,24 +20,30 @@ struct ProfileView: View {
     @State private var showDeleteCVConfirm = false
 
     var body: some View {
-        NavigationStack {
-            content
-                .navigationTitle(LocalizedStringKey("mp.tabs.profile"))
-                .navigationBarTitleDisplayMode(.inline)
-                .background(Color.ssCream)
-                .toolbar { toolbarButtons }
-                .refreshable { if !vm.isEditing { await vm.load() } }
-                .task { await vm.load() }
-                .ssToast($vm.toast)
-                .alert(
-                    LocalizedStringKey("settings.cant_open.title"),
-                    isPresented: $showSettingsFallback
-                ) {
-                    Button(LocalizedStringKey("common.ok")) {}
-                } message: {
-                    Text(LocalizedStringKey("settings.cant_open.message"))
-                }
+        if nestedInNavStack {
+            decorated
+        } else {
+            NavigationStack { decorated }
         }
+    }
+
+    private var decorated: some View {
+        content
+            .navigationTitle(LocalizedStringKey("mp.tabs.profile"))
+            .navigationBarTitleDisplayMode(.inline)
+            .background(Color.ssCream)
+            .toolbar { toolbarButtons }
+            .refreshable { if !vm.isEditing { await vm.load() } }
+            .task { await vm.load() }
+            .ssToast($vm.toast)
+            .alert(
+                LocalizedStringKey("settings.cant_open.title"),
+                isPresented: $showSettingsFallback
+            ) {
+                Button(LocalizedStringKey("common.ok")) {}
+            } message: {
+                Text(LocalizedStringKey("settings.cant_open.message"))
+            }
     }
 
     @ViewBuilder
