@@ -4,6 +4,7 @@ import SwiftUI
 struct ProfileView: View {
     @EnvironmentObject var session: SessionStore
     @StateObject private var vm = ProfileViewModel()
+    @Environment(\.openURL) private var openURL
 
     var body: some View {
         NavigationStack {
@@ -419,8 +420,9 @@ struct ProfileView: View {
 
     private var languageButton: some View {
         Button {
-            guard let url = URL(string: UIApplication.openSettingsURLString) else { return }
-            UIApplication.shared.open(url)
+            if let url = URL(string: UIApplication.openSettingsURLString) {
+                openURL(url)
+            }
         } label: {
             HStack {
                 Image(systemName: "globe")

@@ -4,6 +4,7 @@ import SwiftUI
 struct LoginView: View {
     @StateObject private var vm = LoginViewModel()
     @FocusState private var focusedField: Field?
+    @Environment(\.openURL) private var openURL
 
     private enum Field: Hashable { case identifier, password }
 
@@ -75,7 +76,9 @@ struct LoginView: View {
                 .opacity(0.5)
 
                 Button {
-                    openAppSettings()
+                    if let url = URL(string: UIApplication.openSettingsURLString) {
+                        openURL(url)
+                    }
                 } label: {
                     HStack(spacing: 6) {
                         Image(systemName: "globe")
@@ -83,7 +86,11 @@ struct LoginView: View {
                     }
                     .font(.ssCaption)
                     .foregroundStyle(Color.ssGreen)
+                    .padding(.vertical, 8)
+                    .padding(.horizontal, 16)
+                    .contentShape(Rectangle())
                 }
+                .buttonStyle(.plain)
             }
             .padding(.top, 4)
         }
@@ -148,9 +155,14 @@ struct LoginView: View {
                 .foregroundStyle(Color.ssCharcoal)
                 .textInputAutocapitalization(.never)
                 .autocorrectionDisabled(true)
-                .submitLabel(.go)
+                .submitLabel(.done)
                 .focused($focusedField, equals: .password)
-                .onSubmit { Task { await vm.signIn() } }
+                // Intentionally NO onSubmit auto-sign-in: iOS AutoFill
+                // for saved passwords commits via Submit, which on a
+                // failed login re-triggers the sign-in attempt and
+                // creates an infinite loop with the AutoFill prompt.
+                // User must tap the Sign in button explicitly.
+                .onSubmit { focusedField = nil }
 
                 Button {
                     vm.isPasswordVisible.toggle()
@@ -190,11 +202,6 @@ struct LoginView: View {
         }
         .disabled(!vm.canSubmit)
     }
-}
-
-private func openAppSettings() {
-    guard let url = URL(string: UIApplication.openSettingsURLString) else { return }
-    UIApplication.shared.open(url)
 }
 
 #Preview {
