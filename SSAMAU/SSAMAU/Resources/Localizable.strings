@@ -941,8 +941,10 @@
 "brand.logo_alt" = "SSAM logo";
 "brand.ssam_full_ar" = "نادي الطلبة السعوديين في ملبورن";
 "brand.ssam_full_en" = "Saudi Students Association in Melbourne";
+"common.cancel" = "Cancel";  // ios-only
 "common.confirm_logout" = "Sign out of your account?";
 "common.connected" = "Connected";
+"common.edit" = "Edit";  // ios-only
 "common.generic_error" = "Something went wrong. Try again.";
 "common.loading" = "Loading...";
 "common.logout" = "Sign out";
@@ -951,6 +953,7 @@
 "common.refresh" = "Refresh";
 "common.refresh_success" = "✅ Refreshed.";
 "common.retry" = "Retry";  // ios-only
+"common.save" = "Save";  // ios-only
 "common.sending" = "Sending...";
 "common.skip_to_content" = "Skip to content";
 "err.access.admin_only" = "Admin access required.";

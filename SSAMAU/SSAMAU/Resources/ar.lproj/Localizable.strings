@@ -941,8 +941,10 @@
 "brand.logo_alt" = "شعار النادي";
 "brand.ssam_full_ar" = "نادي الطلبة السعوديين في ملبورن";
 "brand.ssam_full_en" = "Saudi Students Association in Melbourne";
+"common.cancel" = "إلغاء";  // ios-only
 "common.confirm_logout" = "هل تريد تسجيل الخروج؟";
 "common.connected" = "متصل";
+"common.edit" = "تعديل";  // ios-only
 "common.generic_error" = "حدث خطأ، حاول مجدداً";
 "common.loading" = "جاري التحميل...";
 "common.logout" = "خروج";
@@ -951,6 +953,7 @@
 "common.refresh" = "تحديث";
 "common.refresh_success" = "✅ تم التحديث";
 "common.retry" = "إعادة المحاولة";  // ios-only
+"common.save" = "حفظ";  // ios-only
 "common.sending" = "جاري الإرسال...";
 "common.skip_to_content" = "تجاوز إلى المحتوى";
 "err.access.admin_only" = "هذه العملية مقتصرة على الإدارة";

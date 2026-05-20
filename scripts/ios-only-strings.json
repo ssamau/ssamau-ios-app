@@ -13,5 +13,8 @@
   "mp.profile.stat_status_label": { "en": "Status",  "ar": "الحالة" },
   "mp.profile.section_account":   { "en": "Account", "ar": "الحساب" },
 
-  "common.retry":          { "en": "Retry",              "ar": "إعادة المحاولة" }
+  "common.retry":          { "en": "Retry",              "ar": "إعادة المحاولة" },
+  "common.edit":           { "en": "Edit",               "ar": "تعديل" },
+  "common.save":           { "en": "Save",               "ar": "حفظ" },
+  "common.cancel":         { "en": "Cancel",             "ar": "إلغاء" }
 }

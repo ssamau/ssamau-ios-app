@@ -23,6 +23,28 @@ For web entries:
 
 ---
 
+## [iOS] 2026-05-21 · Phase 1 — Profile enum labels + edit mode
+
+- `Utils/MemberFieldMaps`: ports the enum-key → label maps from the web's
+  `member/tabs/profile.js` (scholarship, university, study level, study
+  start, graduation). Resolves `apply.s3.opt.*` / `apply.s4.opt.*` via
+  NSLocalizedString; falls back to raw value if a server-side enum is
+  ahead of the iOS map. Also DOB formatter (ISO → locale medium) and
+  server-format parser for DatePicker.
+- `Member`: editable fields are now `var` so the draft can be mutated
+  in-place during editing.
+- `ProfileViewModel`: `draft: Member?` mirror for in-flight edits,
+  `startEditing` / `cancelEditing` / `save` actions. Save calls
+  `members.updateOwn` with a `{ data: { ... } }` payload of all
+  editable fields (server uses COALESCE on nulls). Toast on success/fail.
+- `ProfileView`: top-bar Edit / Save / Cancel buttons. Editable rows
+  swap labels for TextField / DatePicker / Menu-picker depending on
+  field type. Read-only rows use the new enum labels and the formatted
+  DOB.
+- ios-only-strings: `common.edit`, `common.save`, `common.cancel`.
+- Photo + CV upload still deferred to the next commit.
+- **Web impact:** none.
+
 ## [iOS] 2026-05-21 · Phase 1 — ProfileView (read-only) + MemberTabView
 
 - `Models/Member`: Codable mirror of `members.getOwn` response, covers

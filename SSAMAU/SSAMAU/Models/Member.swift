@@ -7,25 +7,25 @@ import Foundation
 struct Member: Codable, Identifiable, Equatable {
     let id: String                              // member_id, MBR_XXXX
     let fullName: String?                       // defensive — guard the spec, not the schema
-    let preferredName: String?
+    var preferredName: String?
     let nameEn: String?
-    let email: String?
-    let phone: String?
-    let whatsapp: String?
+    var email: String?
+    var phone: String?
+    var whatsapp: String?
     let gender: String?
     let nationalId: String?
-    let dateOfBirth: String?                    // YYYY-MM-DD
+    var dateOfBirth: String?                    // YYYY-MM-DD
     let profilePhotoUrl: String?
     let cvUrl: String?
-    let addressMelbourne: String?
-    let linkedinUrl: String?
-    let skillsHobbies: String?
-    let aboutSelf: String?
-    let scholarshipEntity: String?
+    var addressMelbourne: String?
+    var linkedinUrl: String?
+    var skillsHobbies: String?
+    var aboutSelf: String?
+    var scholarshipEntity: String?
     let scholarshipEntityOther: String?
-    let studyLevel: String?
-    let degreeField: String?
-    let university: String?
+    var studyLevel: String?
+    var degreeField: String?
+    var university: String?
     let universityOther: String?
     let studyStartedWindow: String?
     let expectedGraduationWindow: String?
