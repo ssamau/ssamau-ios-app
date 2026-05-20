@@ -40,4 +40,4 @@ fastlane/test_output
 
 # Spec + handoff (canonical copies live in ~/Desktop/SSAM-Demo-Output/pdfs/)
 ios-app-requirements.pdf
-ios-app-session-handoff.md
+ios-app-session-handoff*.md

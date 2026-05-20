@@ -14,8 +14,8 @@ struct HeadTabView: View {
     /// Bound to HeadMoreView's NavigationStack so we can pop it to root
     /// whenever the More tab is (re-)entered. iOS's default behaviour is
     /// to preserve per-tab navigation state across switches; for the
-    /// More menu specifically that feels wrong — the tab IS the menu, so
-    /// you expect the menu when you come back.
+    /// More menu specifically that feels wrong — the tab IS the menu,
+    /// so you expect the menu when you come back.
     @State private var morePath = NavigationPath()
 
     var body: some View {
@@ -77,6 +77,12 @@ struct HeadTabView: View {
 
 // MARK: - "More" tab — Projects, Attendance, Applications, Thanks, Certs, Profile
 
+/// File-scope (non-private) so the navigationDestination modifier and
+/// the NavigationLink value can both see the same type unambiguously.
+enum HeadMoreDestination: Hashable {
+    case projects, attendance, applications, thanks, certs, profile
+}
+
 private struct HeadMoreView: View {
     @Binding var path: NavigationPath
 
@@ -84,12 +90,12 @@ private struct HeadMoreView: View {
         NavigationStack(path: $path) {
             ScrollView {
                 VStack(spacing: 10) {
-                    row(icon: "folder.fill",         key: "hp.tabs.projects")     { HeadProjectsView() }
-                    row(icon: "checkmark.rectangle", key: "hp.tabs.attendance")   { AttendanceView() }
-                    row(icon: "doc.text.fill",       key: "hp.tabs.applications") { ApplicationsView() }
-                    row(icon: "envelope.badge",      key: "hp.tabs.thanks")       { ThanksView() }
-                    row(icon: "doc.badge.gearshape", key: "hp.tabs.certs")        { HeadCertsView() }
-                    row(icon: "person.circle",       key: "hp.tabs.profile")      { ProfileView() }
+                    row(.projects,     icon: "folder.fill",         key: "hp.tabs.projects")
+                    row(.attendance,   icon: "checkmark.rectangle", key: "hp.tabs.attendance")
+                    row(.applications, icon: "doc.text.fill",       key: "hp.tabs.applications")
+                    row(.thanks,       icon: "envelope.badge",      key: "hp.tabs.thanks")
+                    row(.certs,        icon: "doc.badge.gearshape", key: "hp.tabs.certs")
+                    row(.profile,      icon: "person.circle",       key: "hp.tabs.profile")
                 }
                 .padding(.horizontal, 20)
                 .padding(.vertical, 16)
@@ -97,20 +103,29 @@ private struct HeadMoreView: View {
             .background(Color.ssCream)
             .navigationTitle(LocalizedStringKey("hp.tabs.more"))
             .navigationBarTitleDisplayMode(.inline)
+            // Attached directly to the NavigationStack's immediate
+            // content. Must be on a view INSIDE the stack — the
+            // value-based NavigationLink writes into `path`, so
+            // resetting `path` to empty actually pops to root.
+            .navigationDestination(for: HeadMoreDestination.self) { dest in
+                switch dest {
+                case .projects:     HeadProjectsView()
+                case .attendance:   AttendanceView()
+                case .applications: ApplicationsView()
+                case .thanks:       ThanksView()
+                case .certs:        HeadCertsView()
+                case .profile:      ProfileView()
+                }
+            }
         }
     }
 
-    /// Direct-destination NavigationLink. Avoids the value/destination
-    /// dance which trips SwiftUI's "no matching navigationDestination"
-    /// warning when the .navigationDestination modifier sits on ScrollView.
-    private func row<Destination: View>(
-        icon: String,
-        key: String,
-        @ViewBuilder destination: @escaping () -> Destination
-    ) -> some View {
-        NavigationLink {
-            destination()
-        } label: {
+    /// Value-based NavigationLink so the push registers on the bound
+    /// NavigationPath. NavigationLink(destination:) wouldn't — it
+    /// pushes outside the path tracking, which made the
+    /// tab-reentry-pops-to-root logic a no-op.
+    private func row(_ dest: HeadMoreDestination, icon: String, key: String) -> some View {
+        NavigationLink(value: dest) {
             HStack(spacing: 14) {
                 Image(systemName: icon)
                     .font(.title3)
