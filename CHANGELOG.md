@@ -23,6 +23,23 @@ For web entries:
 
 ---
 
+## [iOS] 2026-05-21 · Phase 1 — ProfileView (read-only) + MemberTabView
+
+- `Models/Member`: Codable mirror of `members.getOwn` response, covers
+  the full self-update whitelist + joined `committee_name`.
+- `ViewModels/ProfileViewModel`: loads via `members.getOwn`, pull-to-refresh.
+- `Views/Member/ProfileView`: avatar + chips header, hours/status stat
+  cards, four sections (Personal / Study / About / Account), `ro_note`
+  helper, sign-out button.
+- `Views/Member/MemberTabView`: 5-tab bar (Opportunities, Tasks, Hours,
+  Certificates, Profile) — 4 are stubs until Phase 2; Profile is real.
+- `RootView` routes the member role → `MemberTabView`.
+- `scripts/strings-to-localizable.mjs` now merges
+  `scripts/ios-only-strings.json` on top of the web catalog so iOS-only
+  keys (tab labels, etc.) survive future regenerations. 10 keys added.
+- Editing, photo upload, CV upload deferred to the next Phase 1 commit.
+- **Web impact:** none.
+
 ## [iOS] 2026-05-21 · Phase 1 — AuthService + LoginView
 
 - `Services/AuthService`: three-path login (resolveIdentifier → supabase | legacy).

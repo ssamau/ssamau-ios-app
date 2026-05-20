@@ -24,10 +24,7 @@ struct RootView: View {
                     subtitle: "HeadTabView — signed in as \(user.name)"
                 )
             } else {
-                PlaceholderView(
-                    title: "Member",
-                    subtitle: "MemberTabView — signed in as \(user.name)"
-                )
+                MemberTabView()
             }
         }
     }

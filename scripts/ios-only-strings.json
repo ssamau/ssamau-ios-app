@@ -1,0 +1,17 @@
+{
+  "_comment": "Keys that exist in iOS only — never ported from the web's ar.js/en.js. Merged in by scripts/strings-to-localizable.mjs after the web catalog is written. Keep keys sorted by namespace.",
+
+  "mp.tabs.opportunities": { "en": "Opportunities",      "ar": "الفرص" },
+  "mp.tabs.tasks":         { "en": "My tasks",           "ar": "مهامي" },
+  "mp.tabs.hours":         { "en": "Hours",              "ar": "الساعات" },
+  "mp.tabs.certs":         { "en": "Certificates",       "ar": "الشهادات" },
+  "mp.tabs.profile":       { "en": "Profile",            "ar": "ملفي" },
+
+  "mp.tabs.coming_soon":   { "en": "Coming in Phase 2",  "ar": "قريباً في المرحلة الثانية" },
+
+  "mp.profile.stat_hours_label":  { "en": "Hours",   "ar": "ساعات" },
+  "mp.profile.stat_status_label": { "en": "Status",  "ar": "الحالة" },
+  "mp.profile.section_account":   { "en": "Account", "ar": "الحساب" },
+
+  "common.retry":          { "en": "Retry",              "ar": "إعادة المحاولة" }
+}
