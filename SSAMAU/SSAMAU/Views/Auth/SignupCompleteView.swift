@@ -28,7 +28,14 @@ struct SignupCompleteView: View {
         ScrollView {
             VStack(spacing: 28) {
                 header
+                // Force the entire form into LTR layout. Every input on
+                // this screen carries LTR-only data (hex token, digit
+                // NID/PIN, ASCII passwords). Without this, SwiftUI's
+                // RTL bug eats the first keystroke AND can sneak RTL
+                // marks into the submitted string — which is why the
+                // PIN was being rejected with "invalid credentials".
                 card
+                    .environment(\.layoutDirection, .leftToRight)
             }
             .padding(.horizontal, 24)
             .padding(.top, 32)
@@ -233,16 +240,12 @@ struct SignupCompleteView: View {
 
     // MARK: - Building blocks
 
-    /// All signup fields are LTR (token = hex, NID/PIN = digits,
-    /// password = ASCII). Force LTR layout to work around the SwiftUI
-    /// RTL cursor-jump bug.
     private func labeled<V: View>(_ label: LocalizedStringKey, @ViewBuilder content: () -> V) -> some View {
         VStack(alignment: .leading, spacing: 6) {
             Text(label)
                 .font(.ssCaption)
                 .foregroundStyle(Color.ssGrey)
             content()
-                .environment(\.layoutDirection, .leftToRight)
                 .multilineTextAlignment(.leading)
                 .padding(12)
                 .background(Color.ssCream)

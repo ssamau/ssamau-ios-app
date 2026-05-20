@@ -90,8 +90,14 @@ struct LoginView: View {
 
     private var card: some View {
         VStack(spacing: 18) {
-            identifierField
-            passwordField
+            // Identifier + password are LTR-only data. Force LTR on the
+            // whole input block to avoid the SwiftUI RTL cursor-jump bug
+            // + possible RTL-mark injection into the submitted string.
+            Group {
+                identifierField
+                passwordField
+            }
+            .environment(\.layoutDirection, .leftToRight)
 
             if let error = vm.errorMessage {
                 Text(error)
@@ -171,10 +177,6 @@ struct LoginView: View {
             .submitLabel(.next)
             .focused($focusedField, equals: .identifier)
             .onSubmit { focusedField = .password }
-            // Identifier is always LTR (email / NID / ASCII username).
-            // Forcing LTR also works around a SwiftUI RTL bug where the
-            // cursor jumps and the first keystroke is dropped.
-            .environment(\.layoutDirection, .leftToRight)
             .multilineTextAlignment(.leading)
             .padding(12)
             .background(Color.ssCream)
@@ -214,7 +216,6 @@ struct LoginView: View {
                 // Auto-submit only — gated in the VM against
                 // same-credentials loops (AutoFill rapid-fire).
                 .onSubmit { Task { await vm.signIn(trigger: .fieldSubmit) } }
-                .environment(\.layoutDirection, .leftToRight)
                 .multilineTextAlignment(.leading)
 
                 Button {

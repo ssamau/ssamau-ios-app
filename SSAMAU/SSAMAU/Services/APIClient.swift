@@ -95,26 +95,47 @@ struct APIClient {
             throw APIError.network(urlError)
         }
 
-        if let http = httpResponse as? HTTPURLResponse, http.statusCode == 401 {
-            SessionStore.shared.handleUnauthorized()
-            throw APIError.unauthorized
-        }
+        let http = httpResponse as? HTTPURLResponse
 
-        let envelope: APIEnvelope<Response>
+        // Try the envelope FIRST regardless of status code. Many actions
+        // (auth.signup.completeByPin, the legacy `auth`, etc.) return a
+        // typed err.* code with status 401 to mean "bad credentials" —
+        // not "session expired". Auto-logging-out on every 401 swallows
+        // those messages and creates confusing UX.
+        let envelope: APIEnvelope<Response>?
         do {
             envelope = try JSONDecoder.api.decode(APIEnvelope<Response>.self, from: data)
         } catch {
+            envelope = nil
             #if DEBUG
             let raw = String(data: data, encoding: .utf8) ?? "<non-utf8>"
             print("⚠️ APIClient decode failed for action '\(action)':\n  error: \(error)\n  raw: \(raw.prefix(2000))")
             #endif
-            throw APIError.decoding(String(describing: error))
+        }
+
+        // Authoritative session-expiry signal: 401 AND no decodable
+        // envelope (server bypassed our error helper, e.g. JWT verify
+        // threw before the dispatcher ran).
+        if http?.statusCode == 401, envelope == nil {
+            SessionStore.shared.handleUnauthorized()
+            throw APIError.unauthorized
+        }
+
+        guard let envelope else {
+            throw APIError.decoding("undecodable envelope (status \(http?.statusCode ?? -1))")
         }
 
         if !envelope.success {
             let code = envelope.error ?? "err.unknown"
             if code == "err.app.upgrade_required" {
                 throw APIError.upgradeRequired
+            }
+            // Real session-expiry / token-rejected codes still trigger
+            // a logout. Everything else (e.g. err.auth.invalid_credentials
+            // on signup-complete) surfaces as a normal server error.
+            if code == "err.auth.unauthorized" {
+                SessionStore.shared.handleUnauthorized()
+                throw APIError.unauthorized
             }
             throw APIError.server(code: code, params: envelope.errorParams)
         }
