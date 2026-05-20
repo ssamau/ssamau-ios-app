@@ -1427,6 +1427,7 @@
 "mp.logh.submitting" = "Submitting...";
 "mp.logh.success" = "Hours submitted. They’ll appear in the Hours tab pending your committee head’s approval.";
 "mp.logh.title" = "⏱️ Log hours";
+"mp.opps.any_role" = "Any role";  // ios-only
 "mp.opps.any_role_badge" = "Any role";
 "mp.opps.any_role_lead" = "Help wherever the committee needs — the head will decide where to place you.";
 "mp.opps.any_role_title" = "Any role";
@@ -1440,8 +1441,11 @@
 "mp.opps.col_opportunity" = "Opportunity";
 "mp.opps.col_project" = "Project";
 "mp.opps.col_role" = "Role";
+"mp.opps.comment_label" = "Comment (optional)";  // ios-only
+"mp.opps.comment_placeholder" = "Anything the head should know?";  // ios-only
 "mp.opps.committee_all" = "Open to all";
-"mp.opps.empty" = "No open opportunities match you right now.";
+"mp.opps.confirm_interest" = "Confirm";  // ios-only
+"mp.opps.empty" = "No opportunities match.";  // ios-only
 "mp.opps.err_load" = "Failed to load.";
 "mp.opps.err_no_session" = "You need to be signed in as a member to express interest.";
 "mp.opps.err_pick_role" = "Pick a role before continuing.";
@@ -1449,6 +1453,9 @@
 "mp.opps.err_withdraw" = "Failed to withdraw interest.";
 "mp.opps.express_btn" = "🙋 Interested";
 "mp.opps.expressed_badge" = "✓ Registered";
+"mp.opps.expressed_chip" = "Expressed";  // ios-only
+"mp.opps.expressed_ok" = "Interest recorded.";  // ios-only
+"mp.opps.filter_all" = "All";  // ios-only
 "mp.opps.filter_committee_all" = "My committee + open-to-all";
 "mp.opps.filter_committee_mine" = "My committee only";
 "mp.opps.filter_committee_open" = "Open to all";
@@ -1458,6 +1465,7 @@
 "mp.opps.filter_date_this_week" = "This week";
 "mp.opps.filter_date_today" = "Today";
 "mp.opps.filter_date_upcoming" = "Upcoming only";
+"mp.opps.filter_open" = "Open only";  // ios-only
 "mp.opps.interest_any_role_comment" = "Interested in any role — happy to help wherever the committee needs.";
 "mp.opps.interest_role_prefix" = "Interested in role:";
 "mp.opps.lead" = "Opportunities in your committee and those open to everyone. Click \"Interested\" to register your interest — the committee head will follow up to confirm.";
@@ -1467,11 +1475,16 @@
 "mp.opps.pick_role_cancel" = "Cancel";
 "mp.opps.pick_role_lead" = "Pick the role that suits you. If you're unsure or willing to help wherever needed, pick \"any role\".";
 "mp.opps.pick_role_submit" = "✓ Register interest";
-"mp.opps.pick_role_title" = "🎯 Pick a role";
+"mp.opps.pick_role_title" = "Express interest";  // ios-only
 "mp.opps.registering" = "Registering...";
 "mp.opps.role_full_badge" = "Full";
 "mp.opps.role_remaining" = "{remaining} / {total} left";
-"mp.opps.search_placeholder" = "Search by name...";
+"mp.opps.search_placeholder" = "Search projects, roles, committees";  // ios-only
+"mp.opps.status_cancelled" = "Cancelled";  // ios-only
+"mp.opps.status_done" = "Done";  // ios-only
+"mp.opps.status_filled" = "Filled";  // ios-only
+"mp.opps.status_needs_help" = "Needs help";  // ios-only
+"mp.opps.status_open" = "Open";  // ios-only
 "mp.opps.success" = "Your interest is registered. The committee head will get in touch.";
 "mp.opps.success_withdraw" = "Your interest has been withdrawn.";
 "mp.opps.withdraw_btn" = "↩️ Withdraw interest";

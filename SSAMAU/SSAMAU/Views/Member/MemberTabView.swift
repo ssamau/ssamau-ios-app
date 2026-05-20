@@ -6,14 +6,11 @@ import SwiftUI
 struct MemberTabView: View {
     var body: some View {
         TabView {
-            TabStub(
-                titleKey: "mp.tabs.opportunities",
-                systemImage: "list.bullet.rectangle"
-            )
-            .tabItem {
-                Label(LocalizedStringKey("mp.tabs.opportunities"),
-                      systemImage: "list.bullet.rectangle")
-            }
+            OpportunitiesView()
+                .tabItem {
+                    Label(LocalizedStringKey("mp.tabs.opportunities"),
+                          systemImage: "list.bullet.rectangle")
+                }
 
             TabStub(
                 titleKey: "mp.tabs.tasks",

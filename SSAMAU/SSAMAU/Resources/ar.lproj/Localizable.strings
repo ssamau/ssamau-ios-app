@@ -1427,6 +1427,7 @@
 "mp.logh.submitting" = "جاري الإرسال...";
 "mp.logh.success" = "تم إرسال ساعاتك. ستظهر في تبويب الساعات بانتظار موافقة رئيس اللجنة.";
 "mp.logh.title" = "⏱️ تسجيل ساعات";
+"mp.opps.any_role" = "أيّ دور";  // ios-only
 "mp.opps.any_role_badge" = "أي دور";
 "mp.opps.any_role_lead" = "مساعدة حيث تحتاج اللجنة — رئيس اللجنة يحدد المكان المناسب.";
 "mp.opps.any_role_title" = "أي دور";
@@ -1440,8 +1441,11 @@
 "mp.opps.col_opportunity" = "الفرصة";
 "mp.opps.col_project" = "المشروع";
 "mp.opps.col_role" = "الدور";
+"mp.opps.comment_label" = "ملاحظة (اختياري)";  // ios-only
+"mp.opps.comment_placeholder" = "أيّ ملاحظة للرئيس؟";  // ios-only
 "mp.opps.committee_all" = "للجميع";
-"mp.opps.empty" = "لا توجد فرص مفتوحة حالياً تناسبك";
+"mp.opps.confirm_interest" = "تأكيد";  // ios-only
+"mp.opps.empty" = "لا توجد فرص مطابقة.";  // ios-only
 "mp.opps.err_load" = "تعذّر التحميل";
 "mp.opps.err_no_session" = "يجب تسجيل الدخول كعضو لإبداء الاهتمام.";
 "mp.opps.err_pick_role" = "اختر دوراً قبل المتابعة";
@@ -1449,6 +1453,9 @@
 "mp.opps.err_withdraw" = "تعذّر سحب الاهتمام.";
 "mp.opps.express_btn" = "🙋 اهتمام";
 "mp.opps.expressed_badge" = "✓ مُسجّل";
+"mp.opps.expressed_chip" = "مُسجَّل";  // ios-only
+"mp.opps.expressed_ok" = "تم تسجيل اهتمامك.";  // ios-only
+"mp.opps.filter_all" = "الكل";  // ios-only
 "mp.opps.filter_committee_all" = "لجنتي + المفتوحة للجميع";
 "mp.opps.filter_committee_mine" = "لجنتي فقط";
 "mp.opps.filter_committee_open" = "المفتوحة للجميع";
@@ -1458,6 +1465,7 @@
 "mp.opps.filter_date_this_week" = "هذا الأسبوع";
 "mp.opps.filter_date_today" = "اليوم";
 "mp.opps.filter_date_upcoming" = "القادمة فقط";
+"mp.opps.filter_open" = "المتاحة فقط";  // ios-only
 "mp.opps.interest_any_role_comment" = "مهتم بأي دور — مساعدة حيث تحتاج اللجنة";
 "mp.opps.interest_role_prefix" = "مهتم بدور:";
 "mp.opps.lead" = "الفرص الخاصة بلجنتك والفرص المفتوحة للجميع. اضغط \"اهتمام\" لتسجيل اهتمامك، وسيتواصل معك رئيس اللجنة لتأكيد المشاركة.";
@@ -1467,11 +1475,16 @@
 "mp.opps.pick_role_cancel" = "إلغاء";
 "mp.opps.pick_role_lead" = "اختر الدور الذي يناسبك. إذا لم تكن متأكداً أو مستعد للمساعدة في أي مهمة، اختر \"أي دور\".";
 "mp.opps.pick_role_submit" = "✓ تسجيل الاهتمام";
-"mp.opps.pick_role_title" = "🎯 اختر الدور";
+"mp.opps.pick_role_title" = "تسجيل اهتمام";  // ios-only
 "mp.opps.registering" = "جاري التسجيل...";
 "mp.opps.role_full_badge" = "ممتلئ";
 "mp.opps.role_remaining" = "{remaining} / {total} متبقّي";
-"mp.opps.search_placeholder" = "بحث بالاسم...";
+"mp.opps.search_placeholder" = "ابحث: مشاريع، أدوار، لجان";  // ios-only
+"mp.opps.status_cancelled" = "ملغاة";  // ios-only
+"mp.opps.status_done" = "منتهية";  // ios-only
+"mp.opps.status_filled" = "مكتملة";  // ios-only
+"mp.opps.status_needs_help" = "بحاجة مساعدة";  // ios-only
+"mp.opps.status_open" = "مفتوحة";  // ios-only
 "mp.opps.success" = "تم تسجيل اهتمامك. سيتواصل معك رئيس اللجنة.";
 "mp.opps.success_withdraw" = "تم سحب اهتمامك.";
 "mp.opps.withdraw_btn" = "↩️ سحب الاهتمام";

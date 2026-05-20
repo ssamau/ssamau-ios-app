@@ -40,5 +40,22 @@
   "reset.identifier_empty": {
     "en": "Please enter your email or national ID.",
     "ar": "يرجى إدخال البريد أو الهوية الوطنية."
-  }
+  },
+
+  "mp.opps.search_placeholder":  { "en": "Search projects, roles, committees", "ar": "ابحث: مشاريع، أدوار، لجان" },
+  "mp.opps.filter_open":         { "en": "Open only",        "ar": "المتاحة فقط" },
+  "mp.opps.filter_all":          { "en": "All",              "ar": "الكل" },
+  "mp.opps.status_open":         { "en": "Open",             "ar": "مفتوحة" },
+  "mp.opps.status_needs_help":   { "en": "Needs help",       "ar": "بحاجة مساعدة" },
+  "mp.opps.status_filled":       { "en": "Filled",           "ar": "مكتملة" },
+  "mp.opps.status_cancelled":    { "en": "Cancelled",        "ar": "ملغاة" },
+  "mp.opps.status_done":         { "en": "Done",             "ar": "منتهية" },
+  "mp.opps.empty":               { "en": "No opportunities match.", "ar": "لا توجد فرص مطابقة." },
+  "mp.opps.expressed_chip":      { "en": "Expressed",        "ar": "مُسجَّل" },
+  "mp.opps.expressed_ok":        { "en": "Interest recorded.", "ar": "تم تسجيل اهتمامك." },
+  "mp.opps.pick_role_title":     { "en": "Express interest", "ar": "تسجيل اهتمام" },
+  "mp.opps.any_role":            { "en": "Any role",         "ar": "أيّ دور" },
+  "mp.opps.comment_label":       { "en": "Comment (optional)", "ar": "ملاحظة (اختياري)" },
+  "mp.opps.comment_placeholder": { "en": "Anything the head should know?", "ar": "أيّ ملاحظة للرئيس؟" },
+  "mp.opps.confirm_interest":    { "en": "Confirm",          "ar": "تأكيد" }
 }
