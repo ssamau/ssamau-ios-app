@@ -6,6 +6,8 @@ struct LoginView: View {
     @FocusState private var focusedField: Field?
     @State private var showSettingsFallback = false
     @State private var showResetPassword = false
+    @State private var showSignupComplete = false
+    @State private var signupToken: String?
 
     private enum Field: Hashable { case identifier, password }
 
@@ -40,6 +42,26 @@ struct LoginView: View {
             .navigationDestination(isPresented: $showResetPassword) {
                 ResetPasswordView()
             }
+            .navigationDestination(isPresented: $showSignupComplete) {
+                SignupCompleteView(
+                    prefilledToken: signupToken,
+                    initialMode: signupToken == nil ? .pin : .token
+                )
+            }
+            .onOpenURL { url in
+                handleIncomingURL(url)
+            }
+        }
+    }
+
+    /// Universal Link / custom-scheme handler. Today only signup.html?token=
+    /// is wired — cert verify + reset-password redirects come later.
+    private func handleIncomingURL(_ url: URL) {
+        guard let comps = URLComponents(url: url, resolvingAgainstBaseURL: false) else { return }
+        let path = comps.path
+        if path == "/signup.html" || path == "/signup" {
+            signupToken = comps.queryItems?.first(where: { $0.name == "token" })?.value
+            showSignupComplete = true
         }
     }
 
@@ -85,6 +107,18 @@ struct LoginView: View {
                     showResetPassword = true
                 } label: {
                     Text(LocalizedStringKey("login.forgot"))
+                        .font(.ssCaption)
+                        .foregroundStyle(Color.ssGreen)
+                        .padding(.vertical, 4)
+                        .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+
+                Button {
+                    signupToken = nil
+                    showSignupComplete = true
+                } label: {
+                    Text(LocalizedStringKey("login.activate_cta"))
                         .font(.ssCaption)
                         .foregroundStyle(Color.ssGreen)
                         .padding(.vertical, 4)

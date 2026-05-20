@@ -23,6 +23,30 @@ For web entries:
 
 ---
 
+## [iOS] 2026-05-21 · Phase 1 — Signup-complete (token + PIN)
+
+Spec §4 first-login flows for both invite paths.
+
+- `SignupCompleteViewModel`: `Mode.token` / `.pin` switcher, validates
+  passwords + NID-format + PIN-format locally (mirrors web's `su.err_*`
+  messaging), calls `auth.signup.completeByToken` or
+  `auth.signup.completeByPin`.
+- `SignupCompleteView`: brand-aligned layout. Token field OR
+  (national ID + PIN) fields by mode, password + confirm-password,
+  submit button with progress state, mode-switch link, back link.
+  Auto-dismisses 2s after a successful activation.
+- `LoginView`: added "Activate account" link in the footer that pushes
+  SignupCompleteView in PIN mode. Wrapped `onOpenURL` handler that
+  routes `ssamau.com/signup.html?token=…` URLs to the same view
+  with the token pre-filled and the mode set to `.token`.
+- Universal Link end-to-end isn't live yet — Associated Domains
+  entitlement requires a paid Apple Developer cert, and the AASA file
+  needs hosting at `https://ssamau.com/.well-known/apple-app-site-association`.
+  The `onOpenURL` handler is ready for both. Until then, members enter
+  token or PIN manually via the LoginView link.
+- **Web impact:** AASA file hosting is the only outstanding piece —
+  coordinate via the web repo when the iOS cert is upgraded.
+
 ## [iOS] 2026-05-21 · Phase 1 — Profile photo + CV upload
 
 - `Member` was storing `profile_photo_url` / `cv_url` as storage paths,
