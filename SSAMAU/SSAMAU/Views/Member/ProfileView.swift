@@ -1,10 +1,16 @@
 import SwiftUI
+import PhotosUI
+import UniformTypeIdentifiers
 
 /// Member-mode profile screen — spec §8.2, styled per SSAM Brand Identity Guide.
 struct ProfileView: View {
     @EnvironmentObject var session: SessionStore
     @StateObject private var vm = ProfileViewModel()
     @State private var showSettingsFallback = false
+    @State private var photoPickerItem: PhotosPickerItem?
+    @State private var showCVPicker = false
+    @State private var showDeletePhotoConfirm = false
+    @State private var showDeleteCVConfirm = false
 
     var body: some View {
         NavigationStack {
@@ -156,6 +162,10 @@ struct ProfileView: View {
                     }
                 }
 
+                if !vm.isEditing {
+                    filesSection
+                }
+
                 section(latin: "Account", arabic: "mp.profile.section_account") {
                     readRow("mp.profile.ro_full_name", member.fullName ?? member.displayName)
                     readRow("mp.profile.ro_nid", member.nationalId)
@@ -188,8 +198,8 @@ struct ProfileView: View {
                     .fill(Color.ssPale)
                     .overlay(Circle().stroke(Color.ssGold, lineWidth: 1.5))
                     .frame(width: 100, height: 100)
-                if let url = member.profilePhotoUrl, let parsed = URL(string: url) {
-                    AsyncImage(url: parsed) { phase in
+                if let url = vm.photoSignedURL {
+                    AsyncImage(url: url) { phase in
                         if let img = phase.image {
                             img.resizable().scaledToFill()
                         } else {
@@ -422,6 +432,223 @@ struct ProfileView: View {
                 .padding(.horizontal, 14),
             alignment: .bottom
         )
+    }
+
+    // MARK: - Files (photo + CV)
+
+    private var filesSection: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Text("Files")
+                .font(.ssLatinLabel)
+                .tracking(2)
+                .foregroundStyle(Color.ssGold)
+            Text(LocalizedStringKey("mp.profile.sec_files"))
+                .font(.ssH2)
+                .foregroundStyle(Color.ssGreen)
+                .padding(.bottom, 8)
+            VStack(spacing: 0) {
+                photoRow
+                cvRow
+            }
+            .background(Color.ssPale)
+            .overlay(
+                RoundedRectangle(cornerRadius: 12)
+                    .stroke(Color.ssGold.opacity(0.4), lineWidth: 1)
+            )
+            .clipShape(RoundedRectangle(cornerRadius: 12))
+        }
+        .onChange(of: photoPickerItem) { newItem in
+            handlePhotoSelection(newItem)
+        }
+        .fileImporter(
+            isPresented: $showCVPicker,
+            allowedContentTypes: [.pdf],
+            allowsMultipleSelection: false
+        ) { result in
+            handleCVSelection(result)
+        }
+        .confirmationDialog(
+            LocalizedStringKey("mp.profile.upl_confirm_photo"),
+            isPresented: $showDeletePhotoConfirm,
+            titleVisibility: .visible
+        ) {
+            Button(LocalizedStringKey("mp.profile.upl_delete"), role: .destructive) {
+                Task { await vm.deleteFile(kind: "photo") }
+            }
+            Button(LocalizedStringKey("common.cancel"), role: .cancel) {}
+        }
+        .confirmationDialog(
+            LocalizedStringKey("mp.profile.upl_confirm_cv"),
+            isPresented: $showDeleteCVConfirm,
+            titleVisibility: .visible
+        ) {
+            Button(LocalizedStringKey("mp.profile.upl_delete"), role: .destructive) {
+                Task { await vm.deleteFile(kind: "cv") }
+            }
+            Button(LocalizedStringKey("common.cancel"), role: .cancel) {}
+        }
+    }
+
+    private var photoRow: some View {
+        let hasPhoto = vm.photoSignedURL != nil
+        return VStack(alignment: .leading, spacing: 8) {
+            HStack {
+                Text(LocalizedStringKey("mp.profile.lbl_photo"))
+                    .font(.ssBodyBold)
+                    .foregroundStyle(Color.ssCharcoal)
+                Spacer()
+                if vm.isUploadingPhoto {
+                    ProgressView().tint(Color.ssGreen)
+                } else if hasPhoto {
+                    Text(LocalizedStringKey("mp.profile.upl_no_photo"))
+                        .font(.ssCaption)
+                        .foregroundStyle(.clear) // placeholder for alignment
+                }
+            }
+            Text(LocalizedStringKey("mp.profile.upl_photo_hint"))
+                .font(.ssCaption)
+                .foregroundStyle(Color.ssGrey)
+            HStack(spacing: 8) {
+                PhotosPicker(
+                    selection: $photoPickerItem,
+                    matching: .images,
+                    photoLibrary: .shared()
+                ) {
+                    Label(
+                        LocalizedStringKey(hasPhoto ? "common.refresh" : "mp.profile.upl_btn"),
+                        systemImage: "photo.on.rectangle.angled"
+                    )
+                    .font(.ssCaption.weight(.semibold))
+                    .foregroundStyle(Color.ssGreen)
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 8)
+                    .background(Color.ssCream)
+                    .clipShape(Capsule())
+                    .overlay(Capsule().stroke(Color.ssGreen.opacity(0.4), lineWidth: 1))
+                }
+                .disabled(vm.isUploadingPhoto)
+
+                if hasPhoto {
+                    Button(role: .destructive) {
+                        showDeletePhotoConfirm = true
+                    } label: {
+                        Label(LocalizedStringKey("mp.profile.upl_delete"),
+                              systemImage: "trash")
+                            .font(.ssCaption.weight(.semibold))
+                            .foregroundStyle(.red)
+                            .padding(.horizontal, 12)
+                            .padding(.vertical, 8)
+                            .background(Color.ssCream)
+                            .clipShape(Capsule())
+                            .overlay(Capsule().stroke(.red.opacity(0.4), lineWidth: 1))
+                    }
+                }
+            }
+        }
+        .padding(14)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .overlay(
+            Rectangle()
+                .fill(Color.ssLight.opacity(0.6))
+                .frame(height: 0.5)
+                .padding(.horizontal, 14),
+            alignment: .bottom
+        )
+    }
+
+    private var cvRow: some View {
+        let hasCV = vm.cvSignedURL != nil
+        return VStack(alignment: .leading, spacing: 8) {
+            HStack {
+                Text(LocalizedStringKey("mp.profile.lbl_cv"))
+                    .font(.ssBodyBold)
+                    .foregroundStyle(Color.ssCharcoal)
+                Spacer()
+                if vm.isUploadingCV {
+                    ProgressView().tint(Color.ssGreen)
+                }
+            }
+            Text(LocalizedStringKey("mp.profile.upl_cv_hint"))
+                .font(.ssCaption)
+                .foregroundStyle(Color.ssGrey)
+            HStack(spacing: 8) {
+                Button {
+                    showCVPicker = true
+                } label: {
+                    Label(
+                        LocalizedStringKey(hasCV ? "common.refresh" : "mp.profile.upl_btn"),
+                        systemImage: "doc.badge.plus"
+                    )
+                    .font(.ssCaption.weight(.semibold))
+                    .foregroundStyle(Color.ssGreen)
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 8)
+                    .background(Color.ssCream)
+                    .clipShape(Capsule())
+                    .overlay(Capsule().stroke(Color.ssGreen.opacity(0.4), lineWidth: 1))
+                }
+                .disabled(vm.isUploadingCV)
+
+                if hasCV, let url = vm.cvSignedURL {
+                    Link(destination: url) {
+                        Label(LocalizedStringKey("mp.profile.upl_open_cv"),
+                              systemImage: "arrow.up.right.square")
+                            .font(.ssCaption.weight(.semibold))
+                            .foregroundStyle(Color.ssGreen)
+                            .padding(.horizontal, 12)
+                            .padding(.vertical, 8)
+                            .background(Color.ssCream)
+                            .clipShape(Capsule())
+                            .overlay(Capsule().stroke(Color.ssGreen.opacity(0.4), lineWidth: 1))
+                    }
+                    Button(role: .destructive) {
+                        showDeleteCVConfirm = true
+                    } label: {
+                        Image(systemName: "trash")
+                            .font(.ssCaption.weight(.semibold))
+                            .foregroundStyle(.red)
+                            .padding(8)
+                            .background(Color.ssCream)
+                            .clipShape(Capsule())
+                            .overlay(Capsule().stroke(.red.opacity(0.4), lineWidth: 1))
+                    }
+                }
+            }
+        }
+        .padding(14)
+        .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    private func handlePhotoSelection(_ item: PhotosPickerItem?) {
+        guard let item else { return }
+        Task {
+            guard let data = try? await item.loadTransferable(type: Data.self) else {
+                vm.toastMessage = ErrorLocalization.localize("mp.profile.upl_failed")
+                photoPickerItem = nil
+                return
+            }
+            let name = "photo.jpg"
+            await vm.uploadPhoto(data, originalFilename: name)
+            photoPickerItem = nil
+        }
+    }
+
+    private func handleCVSelection(_ result: Result<[URL], Error>) {
+        switch result {
+        case .success(let urls):
+            guard let url = urls.first else { return }
+            // Security-scoped resource for files picked from Files app.
+            let didStart = url.startAccessingSecurityScopedResource()
+            defer { if didStart { url.stopAccessingSecurityScopedResource() } }
+            do {
+                let data = try Data(contentsOf: url)
+                Task { await vm.uploadCV(data, originalFilename: url.lastPathComponent) }
+            } catch {
+                vm.toastMessage = ErrorLocalization.localize("mp.profile.upl_failed")
+            }
+        case .failure:
+            vm.toastMessage = ErrorLocalization.localize("mp.profile.upl_failed")
+        }
     }
 
     // MARK: - Language + Sign out

@@ -23,6 +23,31 @@ For web entries:
 
 ---
 
+## [iOS] 2026-05-21 · Phase 1 — Profile photo + CV upload
+
+- `Member` was storing `profile_photo_url` / `cv_url` as storage paths,
+  not displayable URLs. Added `getMemberFile` calls on profile load to
+  fetch fresh 1h signed URLs for both files.
+- `ProfileViewModel`: `photoSignedURL`, `cvSignedURL`, `isUploading*`
+  state, `uploadPhoto`, `uploadCV`, `deleteFile(kind:)` methods.
+  Photo upload resizes via UIImage to fit within 512×512 then encodes
+  as JPEG quality 0.85 so payloads stay well under the server's 3 MB
+  cap. CV client-side guards 5 MB before POSTing.
+- New "Files" section in ProfileView between About and Account. Two
+  rows: Profile photo + CV. Each row shows the brand-specified hint
+  ("JPG/PNG/WebP, 3 MB max" / "PDF only, 5 MB max"), an Upload
+  button, a Delete button (only if a file exists), and for CV an
+  Open button that opens the signed URL.
+- PhotosPicker for image selection, .fileImporter for PDF. Both wired
+  through ViewModel upload/delete actions; toast confirms success or
+  failure.
+- Avatar in header now uses `photoSignedURL` (was trying to render the
+  raw storage path, which never worked).
+- Square-crop UI for the avatar is deferred — current resize keeps
+  aspect ratio. Spec §8.2 calls for crop-to-square; can layer on a
+  cropper sheet later.
+- **Web impact:** none.
+
 ## [iOS] 2026-05-21 · Brand identity reskin (cream theme + Almarai)
 
 First full pass at the SSAM Brand Identity Guide aesthetic.
