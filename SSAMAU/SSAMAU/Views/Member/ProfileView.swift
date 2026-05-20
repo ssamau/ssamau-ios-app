@@ -4,6 +4,7 @@ import SwiftUI
 struct ProfileView: View {
     @EnvironmentObject var session: SessionStore
     @StateObject private var vm = ProfileViewModel()
+    @State private var showSettingsFallback = false
 
     var body: some View {
         NavigationStack {
@@ -15,6 +16,14 @@ struct ProfileView: View {
                 .refreshable { if !vm.isEditing { await vm.load() } }
                 .task { await vm.load() }
                 .overlay(alignment: .bottom) { toast }
+                .alert(
+                    LocalizedStringKey("settings.cant_open.title"),
+                    isPresented: $showSettingsFallback
+                ) {
+                    Button(LocalizedStringKey("common.ok")) {}
+                } message: {
+                    Text(LocalizedStringKey("settings.cant_open.message"))
+                }
         }
     }
 
@@ -419,13 +428,14 @@ struct ProfileView: View {
 
     private var languageButton: some View {
         Button {
-            // Same workaround as LoginView — bypass openURL because it
-            // rewrites the settings URL into a scheme iOS rejects.
             let raw = UIApplication.openSettingsURLString
-            guard let url = URL(string: raw) else { return }
+            guard let url = URL(string: raw) else {
+                showSettingsFallback = true
+                return
+            }
             UIApplication.shared.open(url, options: [:]) { success in
-                if !success, let fallback = URL(string: "app-settings:") {
-                    UIApplication.shared.open(fallback)
+                Task { @MainActor in
+                    if !success { showSettingsFallback = true }
                 }
             }
         } label: {

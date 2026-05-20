@@ -21,5 +21,15 @@
   "brand.ssam_full": {
     "en": "Saudi Students Association in Melbourne",
     "ar": "نادي الطلبة السعوديين في ملبورن"
-  }
+  },
+
+  "settings.cant_open.title": {
+    "en": "Open Settings manually",
+    "ar": "افتح الإعدادات يدوياً"
+  },
+  "settings.cant_open.message": {
+    "en": "iOS wouldn't open Settings from inside the app. Please open the Settings app, scroll to SSAMAU, then tap Language.",
+    "ar": "تعذّر فتح الإعدادات من داخل التطبيق. افتح تطبيق الإعدادات، انزل إلى SSAMAU، ثم اضغط على اللغة."
+  },
+  "common.ok": { "en": "OK", "ar": "حسناً" }
 }

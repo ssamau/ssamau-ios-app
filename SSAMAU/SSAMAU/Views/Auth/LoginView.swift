@@ -4,6 +4,7 @@ import SwiftUI
 struct LoginView: View {
     @StateObject private var vm = LoginViewModel()
     @FocusState private var focusedField: Field?
+    @State private var showSettingsFallback = false
 
     private enum Field: Hashable { case identifier, password }
 
@@ -25,6 +26,14 @@ struct LoginView: View {
             if focusedField != nil {
                 Color.clear.frame(height: 8)
             }
+        }
+        .alert(
+            LocalizedStringKey("settings.cant_open.title"),
+            isPresented: $showSettingsFallback
+        ) {
+            Button(LocalizedStringKey("common.ok")) {}
+        } message: {
+            Text(LocalizedStringKey("settings.cant_open.message"))
         }
     }
 
@@ -75,7 +84,7 @@ struct LoginView: View {
                 .opacity(0.5)
 
                 Button {
-                    openAppSettings()
+                    openAppSettings { showSettingsFallback = true }
                 } label: {
                     HStack(spacing: 6) {
                         Image(systemName: "globe")
@@ -154,11 +163,9 @@ struct LoginView: View {
                 .autocorrectionDisabled(true)
                 .submitLabel(.go)
                 .focused($focusedField, equals: .password)
-                // onSubmit + AutoFill: keyboard "Go" submits, AutoFill
-                // commits via the same path. LoginViewModel guards
-                // against same-credentials resubmit so AutoFill rapid-
-                // fires after a failed attempt don't loop.
-                .onSubmit { Task { await vm.signIn() } }
+                // Auto-submit only — gated in the VM against
+                // same-credentials loops (AutoFill rapid-fire).
+                .onSubmit { Task { await vm.signIn(trigger: .fieldSubmit) } }
 
                 Button {
                     vm.isPasswordVisible.toggle()
@@ -180,7 +187,8 @@ struct LoginView: View {
 
     private var submitButton: some View {
         Button {
-            Task { await vm.signIn() }
+            // Explicit user tap — bypasses the same-credentials guard.
+            Task { await vm.signIn(trigger: .button) }
         } label: {
             ZStack {
                 Text(LocalizedStringKey("login.submit"))
@@ -200,28 +208,20 @@ struct LoginView: View {
     }
 }
 
-/// Opens iOS Settings → SSAMAU page. Bypasses SwiftUI's
-/// `@Environment(\.openURL)` because on iOS 26 beta it rewrites
-/// `app-settings:` into `app-prefs:<bundle-id>`, which iOS itself
-/// then refuses to open (LSApplicationWorkspaceErrorDomain 115).
-/// Using `UIApplication.shared.open` directly bypasses the rewrite.
+/// Try to open iOS Settings → SSAMAU. On iOS 26 beta + personal dev
+/// cert, the OS rewrites the URL and refuses with an LSApplicationWorkspace
+/// sandbox-extension error, so we surface a fallback callback the caller
+/// can use to show manual instructions.
 @MainActor
-private func openAppSettings() {
+private func openAppSettings(onFailure: @escaping @MainActor () -> Void) {
     let raw = UIApplication.openSettingsURLString
-    #if DEBUG
-    print("📍 openSettingsURLString = \(raw)")
-    #endif
-    guard let url = URL(string: raw) else { return }
+    guard let url = URL(string: raw) else {
+        onFailure()
+        return
+    }
     UIApplication.shared.open(url, options: [:]) { success in
-        #if DEBUG
-        print("📍 open(\(url)) → success=\(success)")
-        #endif
-        // Hardcoded fallback if the system constant is broken.
-        if !success, let fallback = URL(string: "app-settings:") {
-            #if DEBUG
-            print("📍 retrying with hardcoded app-settings:")
-            #endif
-            UIApplication.shared.open(fallback)
+        Task { @MainActor in
+            if !success { onFailure() }
         }
     }
 }

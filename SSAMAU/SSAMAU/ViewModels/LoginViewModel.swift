@@ -9,23 +9,18 @@ final class LoginViewModel: ObservableObject {
     @Published var isLoading: Bool = false
     @Published var errorMessage: String?
 
+    /// Source of a sign-in attempt — used to decide whether to apply
+    /// the same-credentials guard.
+    enum Trigger {
+        case button        // explicit user tap — always proceeds
+        case fieldSubmit   // keyboard "Go" / AutoFill commit — gated to break loops
+    }
+
     /// Snapshot of (identifier, password) at the moment of the last
-    /// failed sign-in. Guards against AutoFill rapid-fire re-submitting
-    /// the same wrong credentials on a loop. Cleared when the user
-    /// edits either field (the didSets below) and on success.
+    /// failed sign-in. Used to gate `.fieldSubmit` calls so AutoFill
+    /// rapid-fires after a failure don't loop. Explicit button taps
+    /// ignore this — the user is the source of truth there.
     private var lastFailedSnapshot: String?
-
-    init() {}
-
-    func setIdentifier(_ value: String) {
-        identifier = value
-        lastFailedSnapshot = nil
-    }
-
-    func setPassword(_ value: String) {
-        password = value
-        lastFailedSnapshot = nil
-    }
 
     var canSubmit: Bool {
         !identifier.trimmingCharacters(in: .whitespaces).isEmpty
@@ -37,13 +32,15 @@ final class LoginViewModel: ObservableObject {
         "\(identifier.trimmingCharacters(in: .whitespaces))|\(password)"
     }
 
-    func signIn() async {
+    func signIn(trigger: Trigger = .button) async {
         guard canSubmit else { return }
 
-        // Guard against same-credentials resubmit. AutoFill commits the
-        // password field on each prompt-accept; without this, a wrong
-        // saved password loops failure → AutoFill prompt → failure …
-        if currentSnapshot == lastFailedSnapshot { return }
+        if trigger == .fieldSubmit && currentSnapshot == lastFailedSnapshot {
+            // Same credentials, auto-submitted again — skip silently so
+            // AutoFill prompt → failure → prompt doesn't loop. User can
+            // still retry by tapping the Sign in button (.button trigger).
+            return
+        }
 
         isLoading = true
         errorMessage = nil
@@ -67,8 +64,6 @@ final class LoginViewModel: ObservableObject {
                 let username = resolved.username ?? trimmed
                 _ = try await AuthService.loginLegacy(username: username, password: password)
             }
-            // Success — clear the guard so a subsequent log-out/log-in
-            // with the same credentials still works.
             lastFailedSnapshot = nil
         } catch let apiError as APIError {
             errorMessage = apiError.localizedMessage

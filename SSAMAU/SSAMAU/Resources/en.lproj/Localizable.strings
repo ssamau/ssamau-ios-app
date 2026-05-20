@@ -950,6 +950,7 @@
 "common.loading" = "Loading...";
 "common.logout" = "Sign out";
 "common.network_error" = "Couldn’t reach the server. Try again.";
+"common.ok" = "OK";  // ios-only
 "common.please_fill" = "Please enter both your identifier and password.";
 "common.refresh" = "Refresh";
 "common.refresh_success" = "✅ Refreshed.";
@@ -1581,6 +1582,8 @@
 "rp.password_label" = "New password";
 "rp.password_placeholder" = "At least 8 characters";
 "rp.submit" = "Set password";
+"settings.cant_open.message" = "iOS wouldn't open Settings from inside the app. Please open the Settings app, scroll to SSAMAU, then tap Language.";  // ios-only
+"settings.cant_open.title" = "Open Settings manually";  // ios-only
 "su.back_to_login" = "→ Back to sign in";
 "su.confirm_label" = "Confirm password";
 "su.confirm_placeholder" = "Re-enter password";

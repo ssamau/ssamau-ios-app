@@ -950,6 +950,7 @@
 "common.loading" = "جاري التحميل...";
 "common.logout" = "خروج";
 "common.network_error" = "تعذّر الاتصال بالخادم، حاول مجدداً";
+"common.ok" = "حسناً";  // ios-only
 "common.please_fill" = "يرجى إدخال المعرّف وكلمة المرور";
 "common.refresh" = "تحديث";
 "common.refresh_success" = "✅ تم التحديث";
@@ -1581,6 +1582,8 @@
 "rp.password_label" = "كلمة المرور الجديدة";
 "rp.password_placeholder" = "8 أحرف على الأقل";
 "rp.submit" = "تعيين كلمة المرور";
+"settings.cant_open.message" = "تعذّر فتح الإعدادات من داخل التطبيق. افتح تطبيق الإعدادات، انزل إلى SSAMAU، ثم اضغط على اللغة.";  // ios-only
+"settings.cant_open.title" = "افتح الإعدادات يدوياً";  // ios-only
 "su.back_to_login" = "← الرجوع إلى تسجيل الدخول";
 "su.confirm_label" = "تأكيد كلمة المرور";
 "su.confirm_placeholder" = "أعد إدخال كلمة المرور";
