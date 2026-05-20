@@ -98,6 +98,9 @@ struct ResetPasswordView: View {
             .submitLabel(.send)
             .focused($identifierFocused)
             .onSubmit { Task { await vm.submit() } }
+            // LTR — email / NID. Works around SwiftUI RTL cursor bug.
+            .environment(\.layoutDirection, .leftToRight)
+            .multilineTextAlignment(.leading)
             .padding(12)
             .background(Color.ssCream)
             .clipShape(RoundedRectangle(cornerRadius: 8))

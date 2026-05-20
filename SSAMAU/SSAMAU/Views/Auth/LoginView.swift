@@ -171,6 +171,11 @@ struct LoginView: View {
             .submitLabel(.next)
             .focused($focusedField, equals: .identifier)
             .onSubmit { focusedField = .password }
+            // Identifier is always LTR (email / NID / ASCII username).
+            // Forcing LTR also works around a SwiftUI RTL bug where the
+            // cursor jumps and the first keystroke is dropped.
+            .environment(\.layoutDirection, .leftToRight)
+            .multilineTextAlignment(.leading)
             .padding(12)
             .background(Color.ssCream)
             .clipShape(RoundedRectangle(cornerRadius: 8))
@@ -209,6 +214,8 @@ struct LoginView: View {
                 // Auto-submit only — gated in the VM against
                 // same-credentials loops (AutoFill rapid-fire).
                 .onSubmit { Task { await vm.signIn(trigger: .fieldSubmit) } }
+                .environment(\.layoutDirection, .leftToRight)
+                .multilineTextAlignment(.leading)
 
                 Button {
                     vm.isPasswordVisible.toggle()

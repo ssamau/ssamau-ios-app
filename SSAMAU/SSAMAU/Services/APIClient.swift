@@ -129,6 +129,15 @@ struct APIClient {
         }
         return payload
     }
+
+    /// One-shot diagnostic helper for DEBUG builds — call after a
+    /// signed-up account fails to log in to see what the dispatcher
+    /// thinks about the account / token state. Logs only in DEBUG.
+    static func debugLog(_ message: String) {
+        #if DEBUG
+        print("⚠️ APIClient: \(message)")
+        #endif
+    }
 }
 
 extension JSONDecoder {

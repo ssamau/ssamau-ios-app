@@ -233,12 +233,17 @@ struct SignupCompleteView: View {
 
     // MARK: - Building blocks
 
+    /// All signup fields are LTR (token = hex, NID/PIN = digits,
+    /// password = ASCII). Force LTR layout to work around the SwiftUI
+    /// RTL cursor-jump bug.
     private func labeled<V: View>(_ label: LocalizedStringKey, @ViewBuilder content: () -> V) -> some View {
         VStack(alignment: .leading, spacing: 6) {
             Text(label)
                 .font(.ssCaption)
                 .foregroundStyle(Color.ssGrey)
             content()
+                .environment(\.layoutDirection, .leftToRight)
+                .multilineTextAlignment(.leading)
                 .padding(12)
                 .background(Color.ssCream)
                 .clipShape(RoundedRectangle(cornerRadius: 8))

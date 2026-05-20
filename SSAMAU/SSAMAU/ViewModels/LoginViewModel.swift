@@ -66,9 +66,15 @@ final class LoginViewModel: ObservableObject {
             }
             lastFailedSnapshot = nil
         } catch let apiError as APIError {
+            #if DEBUG
+            print("⚠️ LoginViewModel.signIn APIError: \(apiError)")
+            #endif
             errorMessage = apiError.localizedMessage
             lastFailedSnapshot = currentSnapshot
         } catch {
+            #if DEBUG
+            print("⚠️ LoginViewModel.signIn non-API error: \(error)")
+            #endif
             errorMessage = ErrorLocalization.localize("err.unknown")
             lastFailedSnapshot = currentSnapshot
         }

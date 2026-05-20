@@ -90,6 +90,11 @@ final class SignupCompleteViewModel: ObservableObject {
             }
         }
 
+        // A stale Bearer token in Keychain (e.g. from a deleted-and-recreated
+        // account) gets auto-attached by APIClient and can cause downstream
+        // weirdness. Signup-complete is a public action and never needs auth.
+        KeychainService.deleteToken()
+
         isLoading = true
         defer { isLoading = false }
 
@@ -102,7 +107,7 @@ final class SignupCompleteViewModel: ObservableObject {
                         "token": token.trimmingCharacters(in: .whitespacesAndNewlines),
                         "password": password,
                     ],
-                    as: ActivateResponse.self
+                    as: EmptyResponse.self
                 )
             case .pin:
                 _ = try await APIClient.shared.call(
@@ -112,20 +117,21 @@ final class SignupCompleteViewModel: ObservableObject {
                         "pin":         pin.trimmingCharacters(in: .whitespaces),
                         "password":    password,
                     ],
-                    as: ActivateResponse.self
+                    as: EmptyResponse.self
                 )
             }
             successMessage = ErrorLocalization.localize("su.success_activated")
             didActivate = true
         } catch let apiError as APIError {
+            #if DEBUG
+            print("⚠️ SignupCompleteViewModel.submit APIError: \(apiError)")
+            #endif
             errorMessage = apiError.localizedMessage
         } catch {
+            #if DEBUG
+            print("⚠️ SignupCompleteViewModel.submit non-API error: \(error)")
+            #endif
             errorMessage = ErrorLocalization.localize("su.err_unexpected")
         }
-    }
-
-    private struct ActivateResponse: Decodable {
-        let email: String?
-        let login_hint: String?
     }
 }
