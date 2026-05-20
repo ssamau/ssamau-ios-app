@@ -12,14 +12,11 @@ struct MemberTabView: View {
                           systemImage: "list.bullet.rectangle")
                 }
 
-            TabStub(
-                titleKey: "mp.tabs.tasks",
-                systemImage: "checkmark.circle"
-            )
-            .tabItem {
-                Label(LocalizedStringKey("mp.tabs.tasks"),
-                      systemImage: "checkmark.circle")
-            }
+            MyTasksView()
+                .tabItem {
+                    Label(LocalizedStringKey("mp.tabs.tasks"),
+                          systemImage: "checkmark.circle")
+                }
 
             TabStub(
                 titleKey: "mp.tabs.hours",

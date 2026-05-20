@@ -58,5 +58,21 @@
   "mp.opps.comment_label":       { "en": "Comment (optional)", "ar": "ملاحظة (اختياري)" },
   "mp.opps.comment_placeholder": { "en": "Anything the head should know?", "ar": "أيّ ملاحظة للرئيس؟" },
   "mp.opps.confirm_interest":    { "en": "Confirm",          "ar": "تأكيد" },
-  "mp.opps.all_roles_full":      { "en": "All roles full",   "ar": "كل الأدوار ممتلئة" }
+  "mp.opps.all_roles_full":      { "en": "All roles full",   "ar": "كل الأدوار ممتلئة" },
+
+  "mp.tasks.section_upcoming":   { "en": "Upcoming",         "ar": "القادمة" },
+  "mp.tasks.section_completed":  { "en": "Completed",        "ar": "المنتهية" },
+  "mp.tasks.section_missed":     { "en": "Missed",           "ar": "الفائتة" },
+  "mp.tasks.status_pending":     { "en": "Pending",          "ar": "بانتظار التأكيد" },
+  "mp.tasks.status_attended":    { "en": "Attended",         "ar": "حضرت" },
+  "mp.tasks.status_absent":      { "en": "Absent",           "ar": "لم تحضر" },
+  "mp.tasks.status_excused":     { "en": "Excused",          "ar": "بعذر" },
+  "mp.tasks.empty":              { "en": "No tasks yet — express interest in an opportunity to get assigned.", "ar": "لا توجد مهام بعد — سجّل اهتمامك بإحدى الفرص ليتم تكليفك." },
+  "mp.tasks.detail_title":       { "en": "Task details",     "ar": "تفاصيل المهمة" },
+  "mp.tasks.row_date":           { "en": "Date",             "ar": "التاريخ" },
+  "mp.tasks.row_time":           { "en": "Time",             "ar": "الوقت" },
+  "mp.tasks.row_location":       { "en": "Location",         "ar": "المكان" },
+  "mp.tasks.row_status":         { "en": "Status",           "ar": "الحالة" },
+  "mp.tasks.row_hours_recorded": { "en": "Hours recorded",   "ar": "الساعات المسجّلة" },
+  "mp.tasks.no_hours_yet":       { "en": "Not yet logged",   "ar": "لم تُسجَّل بعد" }
 }
