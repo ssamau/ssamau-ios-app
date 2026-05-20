@@ -96,7 +96,7 @@ struct APIClient {
         }
 
         if let http = httpResponse as? HTTPURLResponse, http.statusCode == 401 {
-            await SessionStore.shared.handleUnauthorized()
+            SessionStore.shared.handleUnauthorized()
             throw APIError.unauthorized
         }
 

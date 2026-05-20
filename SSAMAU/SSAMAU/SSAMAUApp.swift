@@ -1,17 +1,13 @@
-//
-//  SSAMAUApp.swift
-//  SSAMAU
-//
-//  Created by Faisal Alotaibi on 20/5/2026.
-//
-
 import SwiftUI
 
 @main
 struct SSAMAUApp: App {
+    @StateObject private var session = SessionStore.shared
+
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            RootView()
+                .environmentObject(session)
         }
     }
 }
