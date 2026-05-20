@@ -59,14 +59,17 @@ struct HeadTabView: View {
     }
 
     /// Intercepts tab selection so we can reset the More tab's navigation
-    /// path whenever it becomes active (re-tap while active OR coming
-    /// back from another tab). Other tabs preserve their state per iOS
-    /// default.
+    /// path. Reset happens whenever the user was just on More — covers
+    /// both "leaving More for another tab" AND "re-tapping More while
+    /// already there". By resetting on LEAVE (not on entry), the next
+    /// visit lands on the More menu without the user seeing the old
+    /// sub-page slide in during the tab transition. Other tabs preserve
+    /// their state per iOS default.
     private var tabSelectionBinding: Binding<Tab> {
         Binding(
             get: { selection },
             set: { newValue in
-                if newValue == .more {
+                if selection == .more {
                     morePath = NavigationPath()
                 }
                 selection = newValue
