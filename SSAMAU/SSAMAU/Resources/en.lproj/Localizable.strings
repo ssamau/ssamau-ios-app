@@ -1398,6 +1398,12 @@
 "mp.asn.past_title" = "📜 Past assignments";
 "mp.asn.recorded_badge" = "✓ Logged";
 "mp.asn.upcoming_title" = "📋 Upcoming assignments";
+"mp.certs.cert_code_label" = "Code";  // ios-only
+"mp.certs.cert_of_appreciation" = "Certificate of Appreciation";  // ios-only
+"mp.certs.detail_title" = "Certificate";  // ios-only
+"mp.certs.empty" = "No certificates yet. Once your hours are final-approved and a project wraps, your certs appear here.";  // ios-only
+"mp.certs.share_verify" = "Share verification link";  // ios-only
+"mp.certs.verify_hint" = "The link opens a public page that confirms the certificate is genuine.";  // ios-only
 "mp.hours.after" = "After";  // ios-only
 "mp.hours.before" = "Before";  // ios-only
 "mp.hours.card_title" = "⏱️ My volunteer hours";

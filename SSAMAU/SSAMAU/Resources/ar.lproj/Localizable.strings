@@ -1398,6 +1398,12 @@
 "mp.asn.past_title" = "📜 مهامي السابقة";
 "mp.asn.recorded_badge" = "✓ مسجَّلة";
 "mp.asn.upcoming_title" = "📋 مهامي القادمة";
+"mp.certs.cert_code_label" = "الرمز";  // ios-only
+"mp.certs.cert_of_appreciation" = "شهادة تقدير";  // ios-only
+"mp.certs.detail_title" = "الشهادة";  // ios-only
+"mp.certs.empty" = "لا توجد شهادات بعد. ستظهر شهاداتك هنا بعد اعتماد ساعاتك نهائياً وانتهاء المشاريع.";  // ios-only
+"mp.certs.share_verify" = "مشاركة رابط التحقق";  // ios-only
+"mp.certs.verify_hint" = "الرابط يفتح صفحة عامة تؤكد صحة الشهادة.";  // ios-only
 "mp.hours.after" = "بعد";  // ios-only
 "mp.hours.before" = "قبل";  // ios-only
 "mp.hours.card_title" = "⏱️ ساعاتي التطوعية";

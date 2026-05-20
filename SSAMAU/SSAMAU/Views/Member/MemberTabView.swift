@@ -24,14 +24,11 @@ struct MemberTabView: View {
                           systemImage: "clock.badge.checkmark")
                 }
 
-            TabStub(
-                titleKey: "mp.tabs.certs",
-                systemImage: "doc.badge.gearshape"
-            )
-            .tabItem {
-                Label(LocalizedStringKey("mp.tabs.certs"),
-                      systemImage: "doc.badge.gearshape")
-            }
+            CertificatesView()
+                .tabItem {
+                    Label(LocalizedStringKey("mp.tabs.certs"),
+                          systemImage: "doc.badge.gearshape")
+                }
 
             ProfileView()
                 .tabItem {

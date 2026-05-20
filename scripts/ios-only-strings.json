@@ -106,5 +106,12 @@
   "mp.hours.before":             { "en": "Before",           "ar": "قبل" },
   "mp.hours.during":             { "en": "During",           "ar": "أثناء" },
   "mp.hours.after":              { "en": "After",            "ar": "بعد" },
-  "mp.hours.total":              { "en": "Total",            "ar": "الإجمالي" }
+  "mp.hours.total":              { "en": "Total",            "ar": "الإجمالي" },
+
+  "mp.certs.empty":              { "en": "No certificates yet. Once your hours are final-approved and a project wraps, your certs appear here.", "ar": "لا توجد شهادات بعد. ستظهر شهاداتك هنا بعد اعتماد ساعاتك نهائياً وانتهاء المشاريع." },
+  "mp.certs.detail_title":       { "en": "Certificate",      "ar": "الشهادة" },
+  "mp.certs.cert_of_appreciation": { "en": "Certificate of Appreciation", "ar": "شهادة تقدير" },
+  "mp.certs.cert_code_label":    { "en": "Code",             "ar": "الرمز" },
+  "mp.certs.share_verify":       { "en": "Share verification link", "ar": "مشاركة رابط التحقق" },
+  "mp.certs.verify_hint":        { "en": "The link opens a public page that confirms the certificate is genuine.", "ar": "الرابط يفتح صفحة عامة تؤكد صحة الشهادة." }
 }
