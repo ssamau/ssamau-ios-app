@@ -14,5 +14,10 @@
 		<string>Almarai-Bold.ttf</string>
 		<string>Almarai-ExtraBold.ttf</string>
 	</array>
+	<key>LSApplicationQueriesSchemes</key>
+	<array>
+		<string>app-prefs</string>
+		<string>app-settings</string>
+	</array>
 </dict>
 </plist>
