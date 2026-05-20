@@ -21,11 +21,7 @@ struct RootView: View {
                     subtitle: "AdminTabView — signed in as \(user.displayName)"
                 )
             } else if user.isHead {
-                PlaceholderView(
-                    latin: "Head",
-                    title: "Head",
-                    subtitle: "HeadTabView — signed in as \(user.displayName)"
-                )
+                HeadTabView()
             } else {
                 MemberTabView()
             }

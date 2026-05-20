@@ -1163,6 +1163,7 @@
 "hp.att.success_delete" = "🗑️ Deleted.";
 "hp.att.success_record" = "✅ Attendance recorded.";
 "hp.att.success_update" = "✅ Record updated.";
+"hp.coming_soon" = "Coming soon in Phase 3.";  // ios-only
 "hp.dash.action_decide" = "Decide →";
 "hp.dash.empty_apps" = "No applications waiting on you 🎉";
 "hp.dash.empty_hours" = "No hours waiting on you ✅";
@@ -1356,6 +1357,17 @@
 "hp.sb.section_account" = "Account";
 "hp.sb.section_mycommittee" = "My committee";
 "hp.sb.section_presidency" = "Overview";
+"hp.tabs.applications" = "Applications";  // ios-only
+"hp.tabs.attendance" = "Attendance";  // ios-only
+"hp.tabs.certs" = "Certificates";  // ios-only
+"hp.tabs.dashboard" = "Dashboard";  // ios-only
+"hp.tabs.hours" = "Hours";  // ios-only
+"hp.tabs.members" = "Members";  // ios-only
+"hp.tabs.more" = "More";  // ios-only
+"hp.tabs.opportunities" = "Opportunities";  // ios-only
+"hp.tabs.profile" = "Profile";  // ios-only
+"hp.tabs.projects" = "Projects";  // ios-only
+"hp.tabs.thanks" = "Thanks";  // ios-only
 "hp.title.applications" = "Applications";
 "hp.title.attendance" = "Attendance";
 "hp.title.certificates" = "Certificates";

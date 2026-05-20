@@ -1163,6 +1163,7 @@
 "hp.att.success_delete" = "🗑️ تم الحذف";
 "hp.att.success_record" = "✅ تم تسجيل الحضور";
 "hp.att.success_update" = "✅ تم تحديث السجل";
+"hp.coming_soon" = "قريباً في المرحلة الثالثة.";  // ios-only
 "hp.dash.action_decide" = "قرّر ←";
 "hp.dash.empty_apps" = "لا توجد طلبات بانتظار قرارك 🎉";
 "hp.dash.empty_hours" = "لا توجد ساعات بانتظار اعتمادك ✅";
@@ -1356,6 +1357,17 @@
 "hp.sb.section_account" = "حسابي";
 "hp.sb.section_mycommittee" = "إدارة لجنتي";
 "hp.sb.section_presidency" = "لوحة الرئاسة";
+"hp.tabs.applications" = "الطلبات";  // ios-only
+"hp.tabs.attendance" = "الحضور";  // ios-only
+"hp.tabs.certs" = "الشهادات";  // ios-only
+"hp.tabs.dashboard" = "لوحة القيادة";  // ios-only
+"hp.tabs.hours" = "الساعات";  // ios-only
+"hp.tabs.members" = "الأعضاء";  // ios-only
+"hp.tabs.more" = "المزيد";  // ios-only
+"hp.tabs.opportunities" = "الفرص";  // ios-only
+"hp.tabs.profile" = "ملفي";  // ios-only
+"hp.tabs.projects" = "المشاريع";  // ios-only
+"hp.tabs.thanks" = "الشكر";  // ios-only
 "hp.title.applications" = "طلبات الانضمام";
 "hp.title.attendance" = "الحضور";
 "hp.title.certificates" = "الشهادات";
