@@ -59,29 +59,26 @@ struct HeadTabView: View {
     }
 
     /// Intercepts tab selection so we can reset the More tab's navigation
-    /// path. Reset happens whenever the user was just on More — covers
-    /// both "leaving More for another tab" AND "re-tapping More while
-    /// already there". By resetting on LEAVE (not on entry), the next
-    /// visit lands on the More menu without seeing the old sub-page
-    /// slide in during the tab transition.
+    /// path. Reset is **deferred** to the next run-loop tick via
+    /// `DispatchQueue.main.async` — that way:
     ///
-    /// The reset is wrapped in a non-animating transaction so the user
-    /// doesn't see the pop-to-root animation play out while the More tab
-    /// is still on screen. Combined with iOS's near-instant tab switch,
-    /// the change is effectively invisible — they tap Dashboard and just
-    /// see Dashboard.
+    ///   - Leaving More for another tab: selection switches first, More
+    ///     goes off-screen, then the path reset runs invisibly. Next
+    ///     visit lands on the menu with no flicker.
+    ///   - Re-tapping More while on a sub-page: selection is a no-op
+    ///     (same value), then deferred reset pops to root. User sees a
+    ///     normal pop animation, matching iOS convention.
     private var tabSelectionBinding: Binding<Tab> {
         Binding(
             get: { selection },
             set: { newValue in
-                if selection == .more {
-                    var t = Transaction()
-                    t.disablesAnimations = true
-                    withTransaction(t) {
+                let wasOnMore = selection == .more
+                selection = newValue
+                if wasOnMore {
+                    DispatchQueue.main.async {
                         morePath = NavigationPath()
                     }
                 }
-                selection = newValue
             }
         )
     }
