@@ -22,4 +22,32 @@ struct InterestRequest: Codable, Identifiable, Equatable {
         case submittedAt   = "submitted_at"
         case reviewedAt    = "reviewed_at"
     }
+
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        // Postgres serial PKs may serialize as String (postgres.js
+        // default for BIGINT) or as Int. Accept both for forward-compat.
+        if let n = try? c.decode(Int64.self, forKey: .id) {
+            id = n
+        } else if let s = try? c.decode(String.self, forKey: .id),
+                  let n = Int64(s) {
+            id = n
+        } else {
+            id = 0
+        }
+        projectId     = try c.decode(String.self, forKey: .projectId)
+        opportunityId = try c.decodeIfPresent(String.self, forKey: .opportunityId)
+        if let n = try? c.decode(Int64.self, forKey: .roleId) {
+            roleId = n
+        } else if let s = try c.decodeIfPresent(String.self, forKey: .roleId),
+                  let n = Int64(s) {
+            roleId = n
+        } else {
+            roleId = nil
+        }
+        interested  = try c.decodeIfPresent(Bool.self, forKey: .interested) ?? false
+        comment     = try c.decodeIfPresent(String.self, forKey: .comment)
+        submittedAt = try c.decodeIfPresent(String.self, forKey: .submittedAt)
+        reviewedAt  = try c.decodeIfPresent(String.self, forKey: .reviewedAt)
+    }
 }

@@ -89,13 +89,32 @@ final class OpportunitiesViewModel: ObservableObject {
                 as: EmptyResponse.self
             )
             toastMessage = ErrorLocalization.localize("mp.opps.expressed_ok")
-            // Refresh own-interests so the row chip updates.
-            if let refreshed = try? await APIClient.shared.call(
-                "interest.listOwn",
-                as: [InterestRequest].self
-            ) {
-                self.ownInterests = refreshed
+
+            // Optimistic local update so the chip flips immediately —
+            // doesn't depend on the listOwn refresh succeeding.
+            let synthetic = InterestRequest(
+                id: -1,
+                projectId: opportunity.projectId,
+                opportunityId: opportunity.id,
+                roleId: roleId,
+                interested: true,
+                comment: comment,
+                submittedAt: nil,
+                reviewedAt: nil
+            )
+            // Replace any existing row for this opportunity, otherwise append.
+            if let idx = ownInterests.firstIndex(where: { $0.opportunityId == opportunity.id }) {
+                ownInterests[idx] = synthetic
+            } else {
+                ownInterests.append(synthetic)
             }
+
+            // Then refresh from server so we have the real row + ids.
+            // Errors logged but don't undo the optimistic update.
+            await refreshOwnInterests()
+            // Also refresh the opportunities list — server may auto-flip
+            // status to "Filled" if the role hit capacity.
+            await refreshOpportunities()
             return true
         } catch let apiError as APIError {
             #if DEBUG
@@ -110,5 +129,58 @@ final class OpportunitiesViewModel: ObservableObject {
             toastMessage = ErrorLocalization.localize("err.unknown")
             return false
         }
+    }
+
+    private func refreshOwnInterests() async {
+        do {
+            let refreshed = try await APIClient.shared.call(
+                "interest.listOwn",
+                as: [InterestRequest].self
+            )
+            self.ownInterests = refreshed
+        } catch {
+            #if DEBUG
+            print("⚠️ refreshOwnInterests failed: \(error)")
+            #endif
+            // Keep the optimistic update — chip stays correct visually.
+        }
+    }
+
+    private func refreshOpportunities() async {
+        do {
+            let refreshed = try await APIClient.shared.call(
+                "opportunities.list",
+                as: [Opportunity].self
+            )
+            self.opportunities = refreshed
+        } catch {
+            #if DEBUG
+            print("⚠️ refreshOpportunities failed: \(error)")
+            #endif
+        }
+    }
+}
+
+// InterestRequest synthesized init — used for the optimistic local
+// update path. Codable's auto-init covers the from-JSON path.
+extension InterestRequest {
+    init(
+        id: Int64,
+        projectId: String,
+        opportunityId: String?,
+        roleId: Int64?,
+        interested: Bool,
+        comment: String?,
+        submittedAt: String?,
+        reviewedAt: String?
+    ) {
+        self.id = id
+        self.projectId = projectId
+        self.opportunityId = opportunityId
+        self.roleId = roleId
+        self.interested = interested
+        self.comment = comment
+        self.submittedAt = submittedAt
+        self.reviewedAt = reviewedAt
     }
 }
