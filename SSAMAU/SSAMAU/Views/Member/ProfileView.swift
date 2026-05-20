@@ -721,11 +721,14 @@ struct ProfileView: View {
     // MARK: - Error state
 
     private func errorState(_ message: String) -> some View {
-        VStack(spacing: 14) {
+        let display = message.trimmingCharacters(in: .whitespaces).isEmpty
+            ? String(localized: "err.unknown")
+            : message
+        return VStack(spacing: 14) {
             Image(systemName: "exclamationmark.triangle.fill")
                 .font(.system(size: 36))
                 .foregroundStyle(Color.ssGold)
-            Text(message)
+            Text(display)
                 .font(.ssBody)
                 .foregroundStyle(Color.ssCharcoal)
                 .multilineTextAlignment(.center)
