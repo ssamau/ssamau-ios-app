@@ -45,20 +45,16 @@ struct HeadTabView: View {
 // MARK: - "More" tab — Projects, Attendance, Applications, Thanks, Certs, Profile
 
 private struct HeadMoreView: View {
-    enum Destination: Hashable {
-        case projects, attendance, applications, thanks, certs, profile
-    }
-
     var body: some View {
         NavigationStack {
             ScrollView {
                 VStack(spacing: 10) {
-                    moreRow(.projects,     icon: "folder.fill",            key: "hp.tabs.projects")
-                    moreRow(.attendance,   icon: "checkmark.rectangle",    key: "hp.tabs.attendance")
-                    moreRow(.applications, icon: "doc.text.fill",          key: "hp.tabs.applications")
-                    moreRow(.thanks,       icon: "envelope.badge",         key: "hp.tabs.thanks")
-                    moreRow(.certs,        icon: "doc.badge.gearshape",    key: "hp.tabs.certs")
-                    moreRow(.profile,      icon: "person.circle",          key: "hp.tabs.profile")
+                    row(icon: "folder.fill",         key: "hp.tabs.projects")     { HeadProjectsView() }
+                    row(icon: "checkmark.rectangle", key: "hp.tabs.attendance")   { AttendanceView() }
+                    row(icon: "doc.text.fill",       key: "hp.tabs.applications") { ApplicationsView() }
+                    row(icon: "envelope.badge",      key: "hp.tabs.thanks")       { ThanksView() }
+                    row(icon: "doc.badge.gearshape", key: "hp.tabs.certs")        { HeadCertsView() }
+                    row(icon: "person.circle",       key: "hp.tabs.profile")      { ProfileView() }
                 }
                 .padding(.horizontal, 20)
                 .padding(.vertical, 16)
@@ -66,21 +62,20 @@ private struct HeadMoreView: View {
             .background(Color.ssCream)
             .navigationTitle(LocalizedStringKey("hp.tabs.more"))
             .navigationBarTitleDisplayMode(.inline)
-            .navigationDestination(for: Destination.self) { dest in
-                switch dest {
-                case .projects:     HeadProjectsView()
-                case .attendance:   AttendanceView()
-                case .applications: ApplicationsView()
-                case .thanks:       ThanksView()
-                case .certs:        HeadCertsView()
-                case .profile:      ProfileView()
-                }
-            }
         }
     }
 
-    private func moreRow(_ dest: Destination, icon: String, key: String) -> some View {
-        NavigationLink(value: dest) {
+    /// Direct-destination NavigationLink. Avoids the value/destination
+    /// dance which trips SwiftUI's "no matching navigationDestination"
+    /// warning when the .navigationDestination modifier sits on ScrollView.
+    private func row<Destination: View>(
+        icon: String,
+        key: String,
+        @ViewBuilder destination: @escaping () -> Destination
+    ) -> some View {
+        NavigationLink {
+            destination()
+        } label: {
             HStack(spacing: 14) {
                 Image(systemName: icon)
                     .font(.title3)
