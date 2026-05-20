@@ -21,7 +21,7 @@ struct ProfileView: View {
                 .toolbar { toolbarButtons }
                 .refreshable { if !vm.isEditing { await vm.load() } }
                 .task { await vm.load() }
-                .overlay(alignment: .bottom) { toast }
+                .ssToast($vm.toastMessage)
                 .alert(
                     LocalizedStringKey("settings.cant_open.title"),
                     isPresented: $showSettingsFallback
@@ -702,27 +702,6 @@ struct ProfileView: View {
                         .stroke(.red.opacity(0.4), lineWidth: 1)
                 )
                 .clipShape(RoundedRectangle(cornerRadius: 10))
-        }
-    }
-
-    // MARK: - Toast
-
-    @ViewBuilder
-    private var toast: some View {
-        if let msg = vm.toastMessage {
-            Text(msg)
-                .font(.ssCaption)
-                .foregroundStyle(Color.ssCream)
-                .padding(.horizontal, 18)
-                .padding(.vertical, 10)
-                .background(Color.ssGreen)
-                .clipShape(Capsule())
-                .padding(.bottom, 24)
-                .transition(.move(edge: .bottom).combined(with: .opacity))
-                .task {
-                    try? await Task.sleep(nanoseconds: 2_500_000_000)
-                    vm.toastMessage = nil
-                }
         }
     }
 

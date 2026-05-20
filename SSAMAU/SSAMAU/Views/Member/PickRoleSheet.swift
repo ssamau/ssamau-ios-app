@@ -45,8 +45,13 @@ struct PickRoleSheet: View {
                     }
                 }
                 .padding(20)
+                .padding(.bottom, 80) // room for toast overlay
             }
             .background(Color.ssCream.ignoresSafeArea())
+            .ssToast(Binding(
+                get: { viewModel.toastMessage },
+                set: { viewModel.toastMessage = $0 }
+            ))
             .navigationTitle(LocalizedStringKey(
                 hasExistingInterest
                 ? "mp.opps.update_interest_title"
