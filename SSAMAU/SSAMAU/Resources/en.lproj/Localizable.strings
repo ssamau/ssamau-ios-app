@@ -1427,6 +1427,7 @@
 "mp.logh.submitting" = "Submitting...";
 "mp.logh.success" = "Hours submitted. They’ll appear in the Hours tab pending your committee head’s approval.";
 "mp.logh.title" = "⏱️ Log hours";
+"mp.opps.all_roles_full" = "All roles full";  // ios-only
 "mp.opps.any_role" = "Any role";  // ios-only
 "mp.opps.any_role_badge" = "Any role";
 "mp.opps.any_role_lead" = "Help wherever the committee needs — the head will decide where to place you.";

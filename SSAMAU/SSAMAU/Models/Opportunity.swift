@@ -72,6 +72,14 @@ struct Opportunity: Codable, Identifiable, Equatable {
     var totalTaken: Int { roles.reduce(0) { $0 + $1.taken } }
     var totalNeeded: Int { roles.reduce(0) { $0 + $1.headcountNeeded } }
 
+    /// True when every role is at capacity — submitting "any role"
+    /// would now return err.business.role_full per the web changelog
+    /// 2026-05-21. We pre-disable that path in PickRoleSheet so the
+    /// member doesn't round-trip just to see the toast.
+    var isFullCapacity: Bool {
+        !roles.isEmpty && roles.allSatisfy(\.isFull)
+    }
+
     enum CodingKeys: String, CodingKey {
         case status, notes, roles
         case id                   = "opportunity_id"

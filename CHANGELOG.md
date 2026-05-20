@@ -72,6 +72,27 @@ Spec §4 first-login flows for both invite paths.
   cropper sheet later.
 - **Web impact:** none.
 
+## [iOS] 2026-05-21 · Mirror web 2026-05-21 sync changes
+
+Two web changes from the same day acknowledged on the iOS side.
+
+**[Web] interest.submit blocks "any role" on full multi-role opps**
+- Server now returns err.business.role_full when role_id=null on a
+  fully-booked multi-role opportunity (previously slipped through
+  silently with no slot to assign).
+- iOS: pre-disable the "Any role" row in PickRoleSheet when every
+  role in the opp is at capacity (`Opportunity.isFullCapacity`),
+  with a red "All roles full" sub-label. The 409 path still works
+  if a race condition fills the last slot mid-tap — APIClient
+  surfaces err.business.role_full via the existing toast.
+
+**[Web] pre-auth 401 envelope reaches the page**
+- iOS APIClient already implements the same rule (commit 0205095):
+  decode the envelope first regardless of status, surface err.* via
+  the i18n catalog, only auto-logout when there's no decodable
+  envelope OR the code is explicitly err.auth.unauthorized.
+- No code change needed; documented for the sync contract.
+
 ## [iOS] 2026-05-21 · Brand identity reskin (cream theme + Almarai)
 
 First full pass at the SSAM Brand Identity Guide aesthetic.

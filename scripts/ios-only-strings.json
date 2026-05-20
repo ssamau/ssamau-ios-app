@@ -57,5 +57,6 @@
   "mp.opps.any_role":            { "en": "Any role",         "ar": "أيّ دور" },
   "mp.opps.comment_label":       { "en": "Comment (optional)", "ar": "ملاحظة (اختياري)" },
   "mp.opps.comment_placeholder": { "en": "Anything the head should know?", "ar": "أيّ ملاحظة للرئيس؟" },
-  "mp.opps.confirm_interest":    { "en": "Confirm",          "ar": "تأكيد" }
+  "mp.opps.confirm_interest":    { "en": "Confirm",          "ar": "تأكيد" },
+  "mp.opps.all_roles_full":      { "en": "All roles full",   "ar": "كل الأدوار ممتلئة" }
 }

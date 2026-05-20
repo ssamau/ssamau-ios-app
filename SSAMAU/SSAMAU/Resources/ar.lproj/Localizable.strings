@@ -1427,6 +1427,7 @@
 "mp.logh.submitting" = "جاري الإرسال...";
 "mp.logh.success" = "تم إرسال ساعاتك. ستظهر في تبويب الساعات بانتظار موافقة رئيس اللجنة.";
 "mp.logh.title" = "⏱️ تسجيل ساعات";
+"mp.opps.all_roles_full" = "كل الأدوار ممتلئة";  // ios-only
 "mp.opps.any_role" = "أيّ دور";  // ios-only
 "mp.opps.any_role_badge" = "أي دور";
 "mp.opps.any_role_lead" = "مساعدة حيث تحتاج اللجنة — رئيس اللجنة يحدد المكان المناسب.";

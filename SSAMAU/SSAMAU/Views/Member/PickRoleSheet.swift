@@ -123,16 +123,28 @@ struct PickRoleSheet: View {
 
     private var anyRoleRow: some View {
         let isSelected = selectedRoleId == .any
+        // Disabled when every role is already at capacity — server
+        // would reject with err.business.role_full per the 2026-05-21
+        // web change (interest.submit's null-branch now enforces caps
+        // on multi-role opps).
+        let isFull = opportunity.isFullCapacity
         return Button {
-            selectedRoleId = .any
+            if !isFull { selectedRoleId = .any }
         } label: {
             HStack(spacing: 12) {
                 Image(systemName: isSelected ? "largecircle.fill.circle" : "circle")
                     .foregroundStyle(isSelected ? Color.ssGreen : Color.ssGrey)
                     .font(.title3)
-                Text(LocalizedStringKey("mp.opps.any_role"))
-                    .font(.ssBodyBold)
-                    .foregroundStyle(Color.ssCharcoal)
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(LocalizedStringKey("mp.opps.any_role"))
+                        .font(.ssBodyBold)
+                        .foregroundStyle(Color.ssCharcoal)
+                    if isFull {
+                        Text(LocalizedStringKey("mp.opps.all_roles_full"))
+                            .font(.ssCaption)
+                            .foregroundStyle(.red)
+                    }
+                }
                 Spacer()
             }
             .padding(14)
@@ -140,6 +152,8 @@ struct PickRoleSheet: View {
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
+        .disabled(isFull)
+        .opacity(isFull ? 0.5 : 1)
     }
 
     private var commentField: some View {
