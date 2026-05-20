@@ -50,6 +50,25 @@ enum MemberFieldMaps {
         ("2028+",   "apply.s4.opt.grad_2028"),
     ]
 
+    // Read-only role display — mirrors READONLY_ROLE_KEY in the web's
+    // profile.js. Stored canonical values are the English role names.
+    static let roleOpts: [Option] = [
+        ("President",           "ap.role.president"),
+        ("Vice President",      "ap.role.vice_president"),
+        ("Deputy Vice Head",    "ap.role.deputy_vice_head"),
+        ("Committee Head",      "ap.role.committee_head"),
+        ("Committee Vice Head", "ap.role.committee_vice_head"),
+        ("Project Manager",     "ap.role.project_manager"),
+        ("Event Manager",       "ap.role.event_manager"),
+        ("Member",              "ap.role.member"),
+        ("Volunteer",           "ap.role.volunteer"),
+    ]
+
+    static let statusOpts: [Option] = [
+        ("Active",   "ap.status.active"),
+        ("Inactive", "ap.status.inactive"),
+    ]
+
     // MARK: - Lookup helpers
 
     /// Resolve a raw enum value to a human-readable label using the
@@ -78,6 +97,14 @@ enum MemberFieldMaps {
 
     static func studyLevelLabel(_ value: String?) -> String? {
         label(for: value, in: studyLevelOpts)
+    }
+
+    static func roleLabel(_ value: String?) -> String? {
+        label(for: value, in: roleOpts)
+    }
+
+    static func statusLabel(_ value: String?) -> String? {
+        label(for: value, in: statusOpts)
     }
 
     // MARK: - Date formatting

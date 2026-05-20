@@ -149,7 +149,7 @@ struct ProfileView: View {
                     readRow("mp.profile.ro_full_name", member.fullName ?? member.displayName)
                     readRow("mp.profile.ro_nid", member.nationalId)
                     readRow("mp.profile.ro_committee", member.committeeName)
-                    readRow("mp.profile.ro_role", member.clubRole)
+                    readRow("mp.profile.ro_role", MemberFieldMaps.roleLabel(member.clubRole))
                 }
 
                 Text(LocalizedStringKey("mp.profile.ro_note"))
@@ -197,7 +197,8 @@ struct ProfileView: View {
                     chip(committee, color: Color("BrandGreen"))
                 }
                 if let role = member.clubRole {
-                    chip(role, color: Color("BrandGold"))
+                    chip(MemberFieldMaps.roleLabel(role) ?? role,
+                         color: Color("BrandGold"))
                 }
             }
         }
@@ -228,7 +229,7 @@ struct ProfileView: View {
         HStack(spacing: 12) {
             statCard(value: String(format: "%.0f", member.totalHours),
                      labelKey: "mp.profile.stat_hours_label")
-            statCard(value: member.status ?? "Active",
+            statCard(value: MemberFieldMaps.statusLabel(member.status) ?? "—",
                      labelKey: "mp.profile.stat_status_label",
                      valueColor: member.isActive ? Color("BrandGreen") : Color("InkMuted"))
         }
