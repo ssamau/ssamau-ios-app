@@ -4,7 +4,6 @@ import SwiftUI
 struct ProfileView: View {
     @EnvironmentObject var session: SessionStore
     @StateObject private var vm = ProfileViewModel()
-    @Environment(\.openURL) private var openURL
 
     var body: some View {
         NavigationStack {
@@ -420,8 +419,14 @@ struct ProfileView: View {
 
     private var languageButton: some View {
         Button {
-            if let url = URL(string: UIApplication.openSettingsURLString) {
-                openURL(url)
+            // Same workaround as LoginView — bypass openURL because it
+            // rewrites the settings URL into a scheme iOS rejects.
+            let raw = UIApplication.openSettingsURLString
+            guard let url = URL(string: raw) else { return }
+            UIApplication.shared.open(url, options: [:]) { success in
+                if !success, let fallback = URL(string: "app-settings:") {
+                    UIApplication.shared.open(fallback)
+                }
             }
         } label: {
             HStack {

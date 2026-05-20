@@ -4,7 +4,6 @@ import SwiftUI
 struct LoginView: View {
     @StateObject private var vm = LoginViewModel()
     @FocusState private var focusedField: Field?
-    @Environment(\.openURL) private var openURL
 
     private enum Field: Hashable { case identifier, password }
 
@@ -76,9 +75,7 @@ struct LoginView: View {
                 .opacity(0.5)
 
                 Button {
-                    if let url = URL(string: UIApplication.openSettingsURLString) {
-                        openURL(url)
-                    }
+                    openAppSettings()
                 } label: {
                     HStack(spacing: 6) {
                         Image(systemName: "globe")
@@ -155,14 +152,13 @@ struct LoginView: View {
                 .foregroundStyle(Color.ssCharcoal)
                 .textInputAutocapitalization(.never)
                 .autocorrectionDisabled(true)
-                .submitLabel(.done)
+                .submitLabel(.go)
                 .focused($focusedField, equals: .password)
-                // Intentionally NO onSubmit auto-sign-in: iOS AutoFill
-                // for saved passwords commits via Submit, which on a
-                // failed login re-triggers the sign-in attempt and
-                // creates an infinite loop with the AutoFill prompt.
-                // User must tap the Sign in button explicitly.
-                .onSubmit { focusedField = nil }
+                // onSubmit + AutoFill: keyboard "Go" submits, AutoFill
+                // commits via the same path. LoginViewModel guards
+                // against same-credentials resubmit so AutoFill rapid-
+                // fires after a failed attempt don't loop.
+                .onSubmit { Task { await vm.signIn() } }
 
                 Button {
                     vm.isPasswordVisible.toggle()
@@ -201,6 +197,32 @@ struct LoginView: View {
             .clipShape(RoundedRectangle(cornerRadius: 10))
         }
         .disabled(!vm.canSubmit)
+    }
+}
+
+/// Opens iOS Settings → SSAMAU page. Bypasses SwiftUI's
+/// `@Environment(\.openURL)` because on iOS 26 beta it rewrites
+/// `app-settings:` into `app-prefs:<bundle-id>`, which iOS itself
+/// then refuses to open (LSApplicationWorkspaceErrorDomain 115).
+/// Using `UIApplication.shared.open` directly bypasses the rewrite.
+@MainActor
+private func openAppSettings() {
+    let raw = UIApplication.openSettingsURLString
+    #if DEBUG
+    print("📍 openSettingsURLString = \(raw)")
+    #endif
+    guard let url = URL(string: raw) else { return }
+    UIApplication.shared.open(url, options: [:]) { success in
+        #if DEBUG
+        print("📍 open(\(url)) → success=\(success)")
+        #endif
+        // Hardcoded fallback if the system constant is broken.
+        if !success, let fallback = URL(string: "app-settings:") {
+            #if DEBUG
+            print("📍 retrying with hardcoded app-settings:")
+            #endif
+            UIApplication.shared.open(fallback)
+        }
     }
 }
 
