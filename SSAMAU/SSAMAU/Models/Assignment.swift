@@ -60,7 +60,17 @@ struct Assignment: Codable, Identifiable, Equatable {
 
     init(from decoder: Decoder) throws {
         let c = try decoder.container(keyedBy: CodingKeys.self)
-        id                = try c.decode(String.self, forKey: .id)
+        // assignment_id is a SERIAL int on the server, not a UUID — comes
+        // back as `23` not `"23"`. Accept either form and store as String
+        // so downstream comparisons (HoursRow.assignmentId, set membership
+        // in HoursViewModel.loggableAssignments) stay consistent.
+        if let n = try? c.decode(Int.self, forKey: .id) {
+            id = String(n)
+        } else if let s = try? c.decode(String.self, forKey: .id) {
+            id = s
+        } else {
+            id = ""
+        }
         memberId          = try c.decodeIfPresent(String.self, forKey: .memberId)
         opportunityId     = try c.decode(String.self, forKey: .opportunityId)
         if let n = try? c.decode(Int64.self, forKey: .roleId) {

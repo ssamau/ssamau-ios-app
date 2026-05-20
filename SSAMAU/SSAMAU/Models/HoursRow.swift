@@ -69,7 +69,13 @@ struct HoursRow: Codable, Identifiable, Equatable {
         }
         memberId            = try c.decodeIfPresent(String.self, forKey: .memberId)
         projectId           = try c.decodeIfPresent(String.self, forKey: .projectId)
-        assignmentId        = try c.decodeIfPresent(String.self, forKey: .assignmentId)
+        // Same int-or-string flexibility as Assignment.id — the column
+        // is a SERIAL int and comes back as a number.
+        if let n = try? c.decode(Int.self, forKey: .assignmentId) {
+            assignmentId = String(n)
+        } else {
+            assignmentId = try c.decodeIfPresent(String.self, forKey: .assignmentId)
+        }
         hoursBefore         = Self.doubleOrZero(c, .hoursBefore)
         hoursDuring         = Self.doubleOrZero(c, .hoursDuring)
         hoursAfter          = Self.doubleOrZero(c, .hoursAfter)
