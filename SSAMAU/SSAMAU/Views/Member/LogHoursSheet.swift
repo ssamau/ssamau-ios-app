@@ -33,8 +33,8 @@ struct LogHoursSheet: View {
             }
             .background(Color.ssCream.ignoresSafeArea())
             .ssToast(Binding(
-                get: { viewModel.toastMessage },
-                set: { viewModel.toastMessage = $0 }
+                get: { viewModel.toast },
+                set: { viewModel.toast = $0 }
             ))
             .navigationTitle(LocalizedStringKey("mp.hours.log_sheet_title"))
             .navigationBarTitleDisplayMode(.inline)

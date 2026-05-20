@@ -13,7 +13,7 @@ struct OpportunitiesView: View {
                 .background(Color.ssCream)
                 .refreshable { await vm.load() }
                 .task { await vm.load() }
-                .ssToast($vm.toastMessage)
+                .ssToast($vm.toast)
                 .sheet(item: $presentingOpportunity) { opp in
                     PickRoleSheet(
                         opportunity: opp,

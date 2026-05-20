@@ -15,7 +15,7 @@ struct HoursView: View {
                 .refreshable { await vm.load() }
                 .task { await vm.load() }
                 .overlay(alignment: .bottomTrailing) { fab }
-                .ssToast($vm.toastMessage)
+                .ssToast($vm.toast)
                 .sheet(isPresented: $showLogSheet) {
                     LogHoursSheet(viewModel: vm, isPresented: $showLogSheet)
                 }

@@ -21,7 +21,7 @@ struct ProfileView: View {
                 .toolbar { toolbarButtons }
                 .refreshable { if !vm.isEditing { await vm.load() } }
                 .task { await vm.load() }
-                .ssToast($vm.toastMessage)
+                .ssToast($vm.toast)
                 .alert(
                     LocalizedStringKey("settings.cant_open.title"),
                     isPresented: $showSettingsFallback
@@ -623,7 +623,7 @@ struct ProfileView: View {
         guard let item else { return }
         Task {
             guard let data = try? await item.loadTransferable(type: Data.self) else {
-                vm.toastMessage = ErrorLocalization.localize("mp.profile.upl_failed")
+                vm.toast = .error(ErrorLocalization.localize("mp.profile.upl_failed"))
                 photoPickerItem = nil
                 return
             }
@@ -644,10 +644,10 @@ struct ProfileView: View {
                 let data = try Data(contentsOf: url)
                 Task { await vm.uploadCV(data, originalFilename: url.lastPathComponent) }
             } catch {
-                vm.toastMessage = ErrorLocalization.localize("mp.profile.upl_failed")
+                vm.toast = .error(ErrorLocalization.localize("mp.profile.upl_failed"))
             }
         case .failure:
-            vm.toastMessage = ErrorLocalization.localize("mp.profile.upl_failed")
+            vm.toast = .error(ErrorLocalization.localize("mp.profile.upl_failed"))
         }
     }
 

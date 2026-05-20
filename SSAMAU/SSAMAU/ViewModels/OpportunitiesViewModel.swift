@@ -7,7 +7,7 @@ final class OpportunitiesViewModel: ObservableObject {
     @Published var ownInterests: [InterestRequest] = []
     @Published var isLoading: Bool = false
     @Published var errorMessage: String?
-    @Published var toastMessage: String?
+    @Published var toast: Toast?
 
     @Published var searchText: String = ""
     @Published var statusFilter: StatusFilter = .openOnly
@@ -89,7 +89,7 @@ final class OpportunitiesViewModel: ObservableObject {
                 params: ["data": data],
                 as: EmptyResponse.self
             )
-            toastMessage = ErrorLocalization.localize("mp.opps.expressed_ok")
+            toast = .success(ErrorLocalization.localize("mp.opps.expressed_ok"))
 
             // Optimistic local update so the chip flips immediately —
             // doesn't depend on the listOwn refresh succeeding.
@@ -122,13 +122,13 @@ final class OpportunitiesViewModel: ObservableObject {
             #if DEBUG
             print("⚠️ expressInterest APIError: \(apiError)")
             #endif
-            toastMessage = apiError.localizedMessage
+            toast = .error(apiError.localizedMessage)
             return false
         } catch {
             #if DEBUG
             print("⚠️ expressInterest error: \(error)")
             #endif
-            toastMessage = ErrorLocalization.localize("err.unknown")
+            toast = .error(ErrorLocalization.localize("err.unknown"))
             return false
         }
     }
@@ -149,7 +149,7 @@ final class OpportunitiesViewModel: ObservableObject {
                 params: ["data": data],
                 as: EmptyResponse.self
             )
-            toastMessage = ErrorLocalization.localize("mp.opps.withdrawn_ok")
+            toast = .success(ErrorLocalization.localize("mp.opps.withdrawn_ok"))
 
             // Optimistically drop the row so the chip flips immediately.
             ownInterests.removeAll { $0.opportunityId == opportunity.id }
@@ -161,13 +161,13 @@ final class OpportunitiesViewModel: ObservableObject {
             #if DEBUG
             print("⚠️ withdrawInterest APIError: \(apiError)")
             #endif
-            toastMessage = apiError.localizedMessage
+            toast = .error(apiError.localizedMessage)
             return false
         } catch {
             #if DEBUG
             print("⚠️ withdrawInterest error: \(error)")
             #endif
-            toastMessage = ErrorLocalization.localize("err.unknown")
+            toast = .error(ErrorLocalization.localize("err.unknown"))
             return false
         }
     }

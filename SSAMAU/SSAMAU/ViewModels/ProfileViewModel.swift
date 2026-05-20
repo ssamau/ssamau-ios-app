@@ -13,7 +13,7 @@ final class ProfileViewModel: ObservableObject {
     @Published var isLoading: Bool = false
     @Published var isSaving: Bool = false
     @Published var errorMessage: String?
-    @Published var toastMessage: String?
+    @Published var toast: Toast?
 
     /// Signed URLs (1h expiry) for the member's photo and CV. Populated
     /// after `load()` via `getMemberFile`. `members.getOwn` only returns
@@ -46,7 +46,7 @@ final class ProfileViewModel: ObservableObject {
 
     func startEditing() {
         draft = member
-        toastMessage = nil
+        toast = nil
     }
 
     func cancelEditing() {
@@ -65,11 +65,11 @@ final class ProfileViewModel: ObservableObject {
             )
             self.member = draft
             self.draft = nil
-            self.toastMessage = ErrorLocalization.localize("mp.profile.save_success")
+            self.toast = .success(ErrorLocalization.localize("mp.profile.save_success"))
         } catch let apiError as APIError {
-            self.toastMessage = apiError.localizedMessage
+            self.toast = .error(apiError.localizedMessage)
         } catch {
-            self.toastMessage = ErrorLocalization.localize("mp.profile.save_failed")
+            self.toast = .error(ErrorLocalization.localize("mp.profile.save_failed"))
         }
     }
 
@@ -126,12 +126,12 @@ final class ProfileViewModel: ObservableObject {
         isUploadingPhoto = true
         defer { isUploadingPhoto = false }
         guard let image = UIImage(data: data) else {
-            toastMessage = ErrorLocalization.localize("mp.profile.upl_failed")
+            toast = .error(ErrorLocalization.localize("mp.profile.upl_failed"))
             return
         }
         let resized = image.ssResized(toFit: 512)
         guard let jpeg = resized.jpegData(compressionQuality: 0.85) else {
-            toastMessage = ErrorLocalization.localize("mp.profile.upl_failed")
+            toast = .error(ErrorLocalization.localize("mp.profile.upl_failed"))
             return
         }
         await upload(
@@ -147,9 +147,9 @@ final class ProfileViewModel: ObservableObject {
         defer { isUploadingCV = false }
         // Client-side guard (server also enforces 5 MB).
         if data.count > 5 * 1024 * 1024 {
-            toastMessage = ErrorLocalization.localize(
+            toast = .error(ErrorLocalization.localize(
                 "mp.profile.upl_too_large", params: ["megs": "5"]
-            )
+            ))
             return
         }
         await upload(
@@ -172,12 +172,12 @@ final class ProfileViewModel: ObservableObject {
                 ]],
                 as: UploadResponse.self
             )
-            toastMessage = ErrorLocalization.localize("mp.profile.upl_success")
+            toast = .success(ErrorLocalization.localize("mp.profile.upl_success"))
             await load()
         } catch let apiError as APIError {
-            toastMessage = apiError.localizedMessage
+            toast = .error(apiError.localizedMessage)
         } catch {
-            toastMessage = ErrorLocalization.localize("mp.profile.upl_failed")
+            toast = .error(ErrorLocalization.localize("mp.profile.upl_failed"))
         }
     }
 
@@ -195,12 +195,12 @@ final class ProfileViewModel: ObservableObject {
                 params: ["data": ["kind": kind]],
                 as: DeleteResponse.self
             )
-            toastMessage = ErrorLocalization.localize("mp.profile.upl_delete_success")
+            toast = .success(ErrorLocalization.localize("mp.profile.upl_delete_success"))
             await load()
         } catch let apiError as APIError {
-            toastMessage = apiError.localizedMessage
+            toast = .error(apiError.localizedMessage)
         } catch {
-            toastMessage = ErrorLocalization.localize("mp.profile.upl_delete_failed")
+            toast = .error(ErrorLocalization.localize("mp.profile.upl_delete_failed"))
         }
     }
 

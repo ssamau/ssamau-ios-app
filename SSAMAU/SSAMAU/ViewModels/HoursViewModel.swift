@@ -7,7 +7,7 @@ final class HoursViewModel: ObservableObject {
     @Published var assignments: [Assignment] = []
     @Published var isLoading: Bool = false
     @Published var errorMessage: String?
-    @Published var toastMessage: String?
+    @Published var toast: Toast?
     @Published var isLogging: Bool = false
 
     /// Sum of FinalApproved hours — the headline number shown at the top.
@@ -84,7 +84,7 @@ final class HoursViewModel: ObservableObject {
                 params: ["data": data],
                 as: EmptyResponse.self
             )
-            toastMessage = ErrorLocalization.localize("mp.hours.logged_ok")
+            toast = .success(ErrorLocalization.localize("mp.hours.logged_ok"))
             await load()
             return true
         } catch let apiError as APIError {
@@ -92,13 +92,13 @@ final class HoursViewModel: ObservableObject {
             #if DEBUG
             print("⚠️ logHours APIError: \(apiError)")
             #endif
-            toastMessage = apiError.localizedMessage
+            toast = .error(apiError.localizedMessage)
             return false
         } catch {
             #if DEBUG
             print("⚠️ logHours error: \(error)")
             #endif
-            toastMessage = ErrorLocalization.localize("err.unknown")
+            toast = .error(ErrorLocalization.localize("err.unknown"))
             return false
         }
     }
