@@ -18,14 +18,11 @@ struct MemberTabView: View {
                           systemImage: "checkmark.circle")
                 }
 
-            TabStub(
-                titleKey: "mp.tabs.hours",
-                systemImage: "clock.badge.checkmark"
-            )
-            .tabItem {
-                Label(LocalizedStringKey("mp.tabs.hours"),
-                      systemImage: "clock.badge.checkmark")
-            }
+            HoursView()
+                .tabItem {
+                    Label(LocalizedStringKey("mp.tabs.hours"),
+                          systemImage: "clock.badge.checkmark")
+                }
 
             TabStub(
                 titleKey: "mp.tabs.certs",
