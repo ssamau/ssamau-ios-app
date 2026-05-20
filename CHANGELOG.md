@@ -72,6 +72,23 @@ Spec §4 first-login flows for both invite paths.
   cropper sheet later.
 - **Web impact:** none.
 
+## [iOS] 2026-05-21 · CertificatesViewModel → certs.listOwn
+
+Web shipped certs.listOwn in api v126 (commit 9eb0af9). iOS now calls
+the self-scoped action instead of certs.list with a member_id, which
+was returning err.access.forbidden for regular members (ensureMemberScope
+required admin/head scope). Same row shape — Certificate model unchanged.
+
+**Web impact:** none — paired with the [Web] 2026-05-21 entry below.
+
+## [Web] 2026-05-21 · certs.listOwn — member-scoped certificate list
+
+- New action: returns the caller's own certificates joined with
+  project_name. Auth-gated; empty array when user.member_id is null.
+- certs.list unchanged — still admin/head only.
+- **iOS impact:** CertificatesViewModel.load() now calls certs.listOwn
+  with no params. Tab works for members without admin scope.
+
 ## [iOS] 2026-05-21 · Mirror web 2026-05-21 sync changes
 
 Two web changes from the same day acknowledged on the iOS side.

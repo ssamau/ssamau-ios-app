@@ -8,19 +8,15 @@ final class CertificatesViewModel: ObservableObject {
     @Published var errorMessage: String?
 
     func load() async {
-        // Member-scoped: filter by the current member_id. Server's
-        // certs.list returns ALL certs when called without filters by
-        // a non-head — we don't want that.
-        guard let memberId = SessionStore.shared.currentUser?.memberId else {
-            self.certificates = []
-            return
-        }
+        // Self-scoped action — server filters by user.member_id and
+        // returns an empty array when the caller has no member link
+        // (dev accounts). Same row shape as certs.list.
+        // Web 2026-05-21 — api edge fn v126.
         isLoading = true
         defer { isLoading = false }
         do {
             let rows = try await APIClient.shared.call(
-                "certs.list",
-                params: ["member_id": memberId],
+                "certs.listOwn",
                 as: [Certificate].self
             )
             self.certificates = rows
