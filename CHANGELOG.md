@@ -23,6 +23,28 @@ For web entries:
 
 ---
 
+## [iOS] 2026-05-21 · Localization: register Arabic + in-app Settings link
+
+- Bug: device locale set to Arabic gave RTL layout (SwiftUI detected
+  it correctly) but kept English strings — and iOS Settings showed no
+  per-app Language picker for SSAMAU.
+- Root cause: Xcode 16's auto-generated Info.plist did not include
+  `CFBundleLocalizations` for synchronized-folder projects with .lproj
+  subdirectories. Without that key, iOS only considers the development
+  region (en) supported regardless of bundled `ar.lproj/Localizable.strings`.
+- Fix: minimal `SSAMAU/Info.plist` with `CFBundleLocalizations = [en, ar]`,
+  wired via `INFOPLIST_FILE = Info.plist`. Kept outside the synchronized
+  `SSAMAU/` source folder to avoid "Multiple commands produce" conflict.
+  Auto-generated keys (scene manifest, icons, orientations) still merge
+  in from `INFOPLIST_KEY_*` settings.
+- Verified: `plutil -extract CFBundleLocalizations` returns `["en","ar"]`
+  in the built bundle.
+- Added "Change language" buttons on both LoginView (footer) and
+  ProfileView (above sign-out) that open
+  `UIApplication.openSettingsURLString` — iOS Settings → SSAMAU page,
+  where the language picker now appears.
+- **Web impact:** none.
+
 ## [iOS] 2026-05-21 · Phase 1 — Profile enum labels + edit mode
 
 - `Utils/MemberFieldMaps`: ports the enum-key → label maps from the web's

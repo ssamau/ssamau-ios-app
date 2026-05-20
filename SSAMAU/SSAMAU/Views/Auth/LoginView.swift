@@ -64,6 +64,17 @@ struct LoginView: View {
             }
             .disabled(true)
             .opacity(0.5)
+
+            Button {
+                openAppSettings()
+            } label: {
+                HStack(spacing: 6) {
+                    Image(systemName: "globe")
+                    Text(LocalizedStringKey("lang.toggle_title"))
+                }
+                .font(.footnote)
+                .foregroundStyle(Color("BrandGreen"))
+            }
         }
         .padding(20)
         .background(Color("BackgroundSoft"))
@@ -156,6 +167,14 @@ struct LoginView: View {
         }
         .disabled(!vm.canSubmit)
     }
+}
+
+/// Opens iOS Settings → SSAMAU page, where the per-app Language
+/// picker lives. Requires `CFBundleLocalizations` to be present in
+/// the bundle Info.plist for the picker to appear.
+private func openAppSettings() {
+    guard let url = URL(string: UIApplication.openSettingsURLString) else { return }
+    UIApplication.shared.open(url)
 }
 
 /// Bordered text field — used for the identifier field. Password field

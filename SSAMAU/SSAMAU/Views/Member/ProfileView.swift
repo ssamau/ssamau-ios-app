@@ -158,6 +158,7 @@ struct ProfileView: View {
                     .frame(maxWidth: .infinity, alignment: .leading)
 
                 if !vm.isEditing {
+                    languageButton
                     signOutButton
                 }
             }
@@ -365,6 +366,29 @@ struct ProfileView: View {
         .padding(.horizontal, 14)
         .padding(.vertical, 10)
         .overlay(Divider().padding(.horizontal, 14), alignment: .bottom)
+    }
+
+    // MARK: - Language
+
+    private var languageButton: some View {
+        Button {
+            guard let url = URL(string: UIApplication.openSettingsURLString) else { return }
+            UIApplication.shared.open(url)
+        } label: {
+            HStack {
+                Image(systemName: "globe")
+                Text(LocalizedStringKey("lang.toggle_title"))
+                Spacer()
+                Image(systemName: "arrow.up.forward.app")
+                    .font(.footnote)
+                    .foregroundStyle(Color("InkMuted"))
+            }
+            .frame(maxWidth: .infinity, minHeight: 44)
+            .padding(.horizontal, 14)
+        }
+        .buttonStyle(.bordered)
+        .tint(Color("BrandGreen"))
+        .padding(.top, 16)
     }
 
     // MARK: - Sign out
