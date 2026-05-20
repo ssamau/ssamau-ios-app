@@ -1,0 +1,43 @@
+# macOS
+.DS_Store
+
+# Xcode
+build/
+DerivedData/
+*.xcodeproj/xcuserdata/
+*.xcodeproj/project.xcworkspace/xcuserdata/
+*.xcworkspace/xcuserdata/
+*.swp
+*~.nib
+*.moved-aside
+*.hmap
+*.ipa
+*.dSYM.zip
+*.dSYM
+xcuserdata/
+
+# Swift Package Manager
+.swiftpm/
+Package.resolved
+.build/
+
+# CocoaPods (not used, but ignore if ever added)
+Pods/
+
+# Carthage (not used)
+Carthage/Build/
+
+# fastlane (not used yet)
+fastlane/report.xml
+fastlane/Preview.html
+fastlane/screenshots/**/*.png
+fastlane/test_output
+
+# Secrets / local config
+*.xcconfig.local
+.env
+.env.*
+
+# Spec + handoff (canonical copies live in ~/Desktop/SSAM-Demo-Output/pdfs/)
+ios-app-requirements.pdf
+ios-app-session-handoff.md
