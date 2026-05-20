@@ -11,6 +11,9 @@ struct ProfileView: View {
     @State private var showCVPicker = false
     @State private var showDeletePhotoConfirm = false
     @State private var showDeleteCVConfirm = false
+    #if DEBUG
+    @State private var showDebugToastMenu = false
+    #endif
 
     var body: some View {
         NavigationStack {
@@ -182,6 +185,9 @@ struct ProfileView: View {
                 if !vm.isEditing {
                     languageButton
                     signOutButton
+                    #if DEBUG
+                    debugToastButton
+                    #endif
                 }
             }
             .padding(.horizontal, 20)
@@ -704,6 +710,46 @@ struct ProfileView: View {
                 .clipShape(RoundedRectangle(cornerRadius: 10))
         }
     }
+
+    #if DEBUG
+    // MARK: - Debug
+
+    private var debugToastButton: some View {
+        Button {
+            showDebugToastMenu = true
+        } label: {
+            HStack(spacing: 6) {
+                Image(systemName: "ladybug")
+                Text("Debug: fire test toast")
+            }
+            .font(.ssCaption)
+            .foregroundStyle(Color.ssGrey)
+            .frame(maxWidth: .infinity, minHeight: 40)
+            .padding(.horizontal, 16)
+            .background(Color.ssPale.opacity(0.5))
+            .clipShape(RoundedRectangle(cornerRadius: 10))
+            .overlay(
+                RoundedRectangle(cornerRadius: 10)
+                    .stroke(Color.ssLight, style: StrokeStyle(lineWidth: 1, dash: [4]))
+            )
+        }
+        .padding(.top, 8)
+        .confirmationDialog("Fire a test toast",
+                            isPresented: $showDebugToastMenu,
+                            titleVisibility: .visible) {
+            Button("✓ Success") {
+                vm.toast = .success("Saved — looks like a successful operation.")
+            }
+            Button("⚠ Error", role: .destructive) {
+                vm.toast = .error("Something went wrong. Try again in a moment.")
+            }
+            Button("ℹ Info") {
+                vm.toast = .info("Heads up — meeting starts in 10 minutes.")
+            }
+            Button("Cancel", role: .cancel) {}
+        }
+    }
+    #endif
 
     // MARK: - Error state
 
