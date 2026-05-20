@@ -102,7 +102,7 @@ final class ProfileViewModel: ObservableObject {
     private func fetchSignedURL(kind: String) async -> URL? {
         do {
             let resp = try await APIClient.shared.call(
-                "getMemberFile",
+                "storage.getMemberFile",
                 params: ["data": ["kind": kind]],
                 as: SignedURLResponse.self
             )
@@ -163,7 +163,7 @@ final class ProfileViewModel: ObservableObject {
     private func upload(kind: String, filename: String, contentType: String, bytes: Data) async {
         do {
             _ = try await APIClient.shared.call(
-                "uploadMemberFile",
+                "storage.uploadMemberFile",
                 params: ["data": [
                     "kind": kind,
                     "filename": filename,
@@ -191,7 +191,7 @@ final class ProfileViewModel: ObservableObject {
     func deleteFile(kind: String) async {
         do {
             _ = try await APIClient.shared.call(
-                "deleteMemberFile",
+                "storage.deleteMemberFile",
                 params: ["data": ["kind": kind]],
                 as: DeleteResponse.self
             )
