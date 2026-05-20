@@ -72,6 +72,29 @@ Spec §4 first-login flows for both invite paths.
   cropper sheet later.
 - **Web impact:** none.
 
+## [iOS] 2026-05-21 · Hours detail sheet: approver chain section
+
+Web shipped `hours.listOwn` with approver-chain fields (api edge fn,
+commit-not-checked). iOS now renders an "Approval chain" section in
+HoursDetailSheet between the breakdown and notes.
+
+- `HoursRow` gains 7 nullable fields: `primaryApprovedAt`,
+  `finalApprovedAt`, `rejectedReason`, plus preferred + full name
+  pairs for the primary and final approvers. Computed
+  `primaryApproverName` / `finalApproverName` apply the standard
+  `preferred ?? full` fallback. `hasApproverChain` decides whether
+  to render the section at all.
+- Section renders up to three rows (whichever are present):
+    - Gold ✓ "Primary approved by X" + formatted date
+    - Green ✓-seal "Final approved by Y" + formatted date
+    - Red ✗ "Rejected — reason: …"
+- Brand styling: pale card with gold hairline border, gold-tracked
+  Latin label, Almarai H2 Arabic heading. Same row anatomy as the
+  existing breakdown rows.
+- 4 new iOS-only strings (en + ar).
+
+**Web impact:** none — paired with the [Web] 2026-05-21 entry below.
+
 ## [iOS] 2026-05-21 · CertificatesViewModel → certs.listOwn
 
 Web shipped certs.listOwn in api v126 (commit 9eb0af9). iOS now calls

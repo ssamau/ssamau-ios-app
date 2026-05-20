@@ -107,6 +107,10 @@
   "mp.hours.during":             { "en": "During",           "ar": "أثناء" },
   "mp.hours.after":              { "en": "After",            "ar": "بعد" },
   "mp.hours.total":              { "en": "Total",            "ar": "الإجمالي" },
+  "mp.hours.approval_chain":     { "en": "Approval chain",   "ar": "مسار الاعتماد" },
+  "mp.hours.primary_approved_by":{ "en": "Primary approved by", "ar": "اعتماد أولي من" },
+  "mp.hours.final_approved_by":  { "en": "Final approved by", "ar": "اعتماد نهائي من" },
+  "mp.hours.rejected_label":     { "en": "Rejected — reason:", "ar": "مرفوضة — السبب:" },
 
   "mp.certs.empty":              { "en": "No certificates yet. Once your hours are final-approved and a project wraps, your certs appear here.", "ar": "لا توجد شهادات بعد. ستظهر شهاداتك هنا بعد اعتماد ساعاتك نهائياً وانتهاء المشاريع." },
   "mp.certs.detail_title":       { "en": "Certificate",      "ar": "الشهادة" },

@@ -1405,6 +1405,7 @@
 "mp.certs.share_verify" = "مشاركة رابط التحقق";  // ios-only
 "mp.certs.verify_hint" = "الرابط يفتح صفحة عامة تؤكد صحة الشهادة.";  // ios-only
 "mp.hours.after" = "بعد";  // ios-only
+"mp.hours.approval_chain" = "مسار الاعتماد";  // ios-only
 "mp.hours.before" = "قبل";  // ios-only
 "mp.hours.card_title" = "⏱️ ساعاتي التطوعية";
 "mp.hours.col_date" = "التاريخ";
@@ -1418,6 +1419,7 @@
 "mp.hours.err_load" = "تعذّر التحميل";
 "mp.hours.fields_hint" = "وزّع ساعاتك قبل وأثناء وبعد الفعالية.";  // ios-only
 "mp.hours.fields_label" = "الساعات";  // ios-only
+"mp.hours.final_approved_by" = "اعتماد نهائي من";  // ios-only
 "mp.hours.hours_unit" = "ساعة";
 "mp.hours.log_btn" = "تسجيل ساعات";  // ios-only
 "mp.hours.log_sheet_title" = "تسجيل ساعات تطوع";  // ios-only
@@ -1427,6 +1429,8 @@
 "mp.hours.notes_label" = "ملاحظات (اختياري)";  // ios-only
 "mp.hours.notes_placeholder" = "أيّ ملاحظة للرئيس؟";  // ios-only
 "mp.hours.pick_assignment" = "اختر مهمة حضرتها";  // ios-only
+"mp.hours.primary_approved_by" = "اعتماد أولي من";  // ios-only
+"mp.hours.rejected_label" = "مرفوضة — السبب:";  // ios-only
 "mp.hours.row_date" = "تاريخ الفعالية";  // ios-only
 "mp.hours.row_recorded" = "تاريخ التسجيل";  // ios-only
 "mp.hours.row_status" = "الحالة";  // ios-only

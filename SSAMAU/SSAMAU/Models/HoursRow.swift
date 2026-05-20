@@ -22,6 +22,26 @@ struct HoursRow: Codable, Identifiable, Equatable {
     let opportunityRoleName: String?
     let meetingTitle: String?
     let meetingDate: String?
+    // Approver chain (web 2026-05-21)
+    let primaryApprovedAt: String?
+    let finalApprovedAt: String?
+    let rejectedReason: String?
+    let primaryApproverPreferredName: String?
+    let primaryApproverFullName: String?
+    let finalApproverPreferredName: String?
+    let finalApproverFullName: String?
+
+    var primaryApproverName: String? {
+        primaryApproverPreferredName ?? primaryApproverFullName
+    }
+    var finalApproverName: String? {
+        finalApproverPreferredName ?? finalApproverFullName
+    }
+    var hasApproverChain: Bool {
+        primaryApprovedAt != nil
+            || finalApprovedAt != nil
+            || (approvalStatus == "Rejected" && rejectedReason != nil)
+    }
 
     /// True when this row was auto-mirrored from a meeting attendance
     /// entry (notes prefix `auto:meeting:`). UI shows a 📅 badge.
@@ -55,6 +75,13 @@ struct HoursRow: Codable, Identifiable, Equatable {
         case opportunityRoleName  = "opportunity_role_name"
         case meetingTitle         = "meeting_title"
         case meetingDate          = "meeting_date"
+        case primaryApprovedAt    = "primary_approved_at"
+        case finalApprovedAt      = "final_approved_at"
+        case rejectedReason       = "rejected_reason"
+        case primaryApproverPreferredName = "primary_approver_preferred_name"
+        case primaryApproverFullName      = "primary_approver_full_name"
+        case finalApproverPreferredName   = "final_approver_preferred_name"
+        case finalApproverFullName        = "final_approver_full_name"
     }
 
     init(from decoder: Decoder) throws {
@@ -88,6 +115,13 @@ struct HoursRow: Codable, Identifiable, Equatable {
         opportunityRoleName = try c.decodeIfPresent(String.self, forKey: .opportunityRoleName)
         meetingTitle        = try c.decodeIfPresent(String.self, forKey: .meetingTitle)
         meetingDate         = try c.decodeIfPresent(String.self, forKey: .meetingDate)
+        primaryApprovedAt   = try c.decodeIfPresent(String.self, forKey: .primaryApprovedAt)
+        finalApprovedAt     = try c.decodeIfPresent(String.self, forKey: .finalApprovedAt)
+        rejectedReason      = try c.decodeIfPresent(String.self, forKey: .rejectedReason)
+        primaryApproverPreferredName = try c.decodeIfPresent(String.self, forKey: .primaryApproverPreferredName)
+        primaryApproverFullName      = try c.decodeIfPresent(String.self, forKey: .primaryApproverFullName)
+        finalApproverPreferredName   = try c.decodeIfPresent(String.self, forKey: .finalApproverPreferredName)
+        finalApproverFullName        = try c.decodeIfPresent(String.self, forKey: .finalApproverFullName)
     }
 
     private static func doubleOrZero(_ c: KeyedDecodingContainer<CodingKeys>, _ key: CodingKeys) -> Double {

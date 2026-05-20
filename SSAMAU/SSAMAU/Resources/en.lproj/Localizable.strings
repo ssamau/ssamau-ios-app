@@ -1405,6 +1405,7 @@
 "mp.certs.share_verify" = "Share verification link";  // ios-only
 "mp.certs.verify_hint" = "The link opens a public page that confirms the certificate is genuine.";  // ios-only
 "mp.hours.after" = "After";  // ios-only
+"mp.hours.approval_chain" = "Approval chain";  // ios-only
 "mp.hours.before" = "Before";  // ios-only
 "mp.hours.card_title" = "⏱️ My volunteer hours";
 "mp.hours.col_date" = "Date";
@@ -1418,6 +1419,7 @@
 "mp.hours.err_load" = "Failed to load.";
 "mp.hours.fields_hint" = "Split your time before, during, and after the event.";  // ios-only
 "mp.hours.fields_label" = "Hours";  // ios-only
+"mp.hours.final_approved_by" = "Final approved by";  // ios-only
 "mp.hours.hours_unit" = "hours";
 "mp.hours.log_btn" = "Log hours";  // ios-only
 "mp.hours.log_sheet_title" = "Log volunteer hours";  // ios-only
@@ -1427,6 +1429,8 @@
 "mp.hours.notes_label" = "Notes (optional)";  // ios-only
 "mp.hours.notes_placeholder" = "Anything the head should know?";  // ios-only
 "mp.hours.pick_assignment" = "Choose an Attended assignment";  // ios-only
+"mp.hours.primary_approved_by" = "Primary approved by";  // ios-only
+"mp.hours.rejected_label" = "Rejected — reason:";  // ios-only
 "mp.hours.row_date" = "Event date";  // ios-only
 "mp.hours.row_recorded" = "Recorded on";  // ios-only
 "mp.hours.row_status" = "Status";  // ios-only

@@ -223,6 +223,9 @@ private struct HoursDetailSheet: View {
                 VStack(alignment: .leading, spacing: 18) {
                     header
                     breakdown
+                    if row.hasApproverChain {
+                        approverChain
+                    }
                     if let n = row.notes, !n.isEmpty, !row.isAutoMeetingRow {
                         notesBlock(n)
                     }
@@ -290,6 +293,109 @@ private struct HoursDetailSheet: View {
         case "Rejected":        return "mp.hours.status_rejected"
         default:                return "mp.hours.status_draft"
         }
+    }
+
+    private var approverChain: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Text("Approval Chain")
+                .font(.ssLatinLabel)
+                .tracking(2)
+                .foregroundStyle(Color.ssGold)
+            Text(LocalizedStringKey("mp.hours.approval_chain"))
+                .font(.ssH2)
+                .foregroundStyle(Color.ssGreen)
+                .padding(.bottom, 8)
+            VStack(spacing: 0) {
+                if let at = row.primaryApprovedAt {
+                    chainEventRow(
+                        icon: "checkmark.circle",
+                        iconColor: Color.ssGold,
+                        labelKey: "mp.hours.primary_approved_by",
+                        actor: row.primaryApproverName ?? "—",
+                        at: at
+                    )
+                }
+                if let at = row.finalApprovedAt {
+                    chainEventRow(
+                        icon: "checkmark.seal.fill",
+                        iconColor: Color.ssGreen,
+                        labelKey: "mp.hours.final_approved_by",
+                        actor: row.finalApproverName ?? "—",
+                        at: at
+                    )
+                }
+                if row.approvalStatus == "Rejected",
+                   let reason = row.rejectedReason {
+                    rejectionEventRow(reason: reason)
+                }
+            }
+            .background(Color.ssPale)
+            .clipShape(RoundedRectangle(cornerRadius: 12))
+            .overlay(
+                RoundedRectangle(cornerRadius: 12)
+                    .stroke(Color.ssGold.opacity(0.4), lineWidth: 1)
+            )
+        }
+    }
+
+    private func chainEventRow(
+        icon: String,
+        iconColor: Color,
+        labelKey: LocalizedStringKey,
+        actor: String,
+        at: String
+    ) -> some View {
+        HStack(alignment: .top, spacing: 12) {
+            Image(systemName: icon)
+                .font(.title3)
+                .foregroundStyle(iconColor)
+                .frame(width: 24)
+            VStack(alignment: .leading, spacing: 2) {
+                HStack(spacing: 4) {
+                    Text(labelKey)
+                        .font(.ssCaption)
+                        .foregroundStyle(Color.ssGrey)
+                    Text(actor)
+                        .font(.ssBodyBold)
+                        .foregroundStyle(Color.ssCharcoal)
+                }
+                if let formatted = MemberFieldMaps.displayDate(at) {
+                    Text(formatted)
+                        .font(.ssTiny)
+                        .foregroundStyle(Color.ssGrey)
+                }
+            }
+            Spacer()
+        }
+        .padding(14)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .overlay(
+            Rectangle()
+                .fill(Color.ssLight.opacity(0.6))
+                .frame(height: 0.5)
+                .padding(.horizontal, 14),
+            alignment: .bottom
+        )
+    }
+
+    private func rejectionEventRow(reason: String) -> some View {
+        HStack(alignment: .top, spacing: 12) {
+            Image(systemName: "xmark.octagon.fill")
+                .font(.title3)
+                .foregroundStyle(.red)
+                .frame(width: 24)
+            VStack(alignment: .leading, spacing: 4) {
+                Text(LocalizedStringKey("mp.hours.rejected_label"))
+                    .font(.ssCaption.weight(.semibold))
+                    .foregroundStyle(.red)
+                Text(reason)
+                    .font(.ssBody)
+                    .foregroundStyle(Color.ssCharcoal)
+            }
+            Spacer()
+        }
+        .padding(14)
+        .frame(maxWidth: .infinity, alignment: .leading)
     }
 
     private func notesBlock(_ text: String) -> some View {
