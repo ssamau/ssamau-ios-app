@@ -11,10 +11,7 @@ struct RootView: View {
     var body: some View {
         switch session.state {
         case .loggedOut:
-            PlaceholderView(
-                title: "Login",
-                subtitle: "Phase 1 — LoginView goes here"
-            )
+            LoginView()
         case .loggedIn(let user):
             if user.hasAdminScope {
                 PlaceholderView(
