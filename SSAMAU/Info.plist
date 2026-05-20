@@ -7,5 +7,12 @@
 		<string>en</string>
 		<string>ar</string>
 	</array>
+	<key>UIAppFonts</key>
+	<array>
+		<string>Almarai-Light.ttf</string>
+		<string>Almarai-Regular.ttf</string>
+		<string>Almarai-Bold.ttf</string>
+		<string>Almarai-ExtraBold.ttf</string>
+	</array>
 </dict>
 </plist>

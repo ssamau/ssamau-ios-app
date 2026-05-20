@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// Member-mode profile screen — spec §8.2.
+/// Member-mode profile screen — spec §8.2, styled per SSAM Brand Identity Guide.
 struct ProfileView: View {
     @EnvironmentObject var session: SessionStore
     @StateObject private var vm = ProfileViewModel()
@@ -10,7 +10,7 @@ struct ProfileView: View {
             content
                 .navigationTitle(LocalizedStringKey("mp.tabs.profile"))
                 .navigationBarTitleDisplayMode(.inline)
-                .background(Color("Background"))
+                .background(Color.ssCream)
                 .toolbar { toolbarButtons }
                 .refreshable { if !vm.isEditing { await vm.load() } }
                 .task { await vm.load() }
@@ -18,25 +18,22 @@ struct ProfileView: View {
         }
     }
 
-    // MARK: - Content switcher
-
     @ViewBuilder
     private var content: some View {
         if let member = vm.draft ?? vm.member {
             loaded(member)
         } else if vm.isLoading {
             ProgressView()
+                .tint(Color.ssGreen)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .background(Color("Background"))
+                .background(Color.ssCream)
         } else if let error = vm.errorMessage {
             errorState(error)
         } else {
-            ProgressView()
+            ProgressView().tint(Color.ssGreen)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
     }
-
-    // MARK: - Toolbar
 
     @ToolbarContentBuilder
     private var toolbarButtons: some ToolbarContent {
@@ -45,6 +42,8 @@ struct ProfileView: View {
                 Button(LocalizedStringKey("common.cancel")) {
                     vm.cancelEditing()
                 }
+                .font(.ssBody)
+                .foregroundStyle(Color.ssGrey)
                 .disabled(vm.isSaving)
             }
             ToolbarItem(placement: .topBarTrailing) {
@@ -52,10 +51,11 @@ struct ProfileView: View {
                     Task { await vm.save() }
                 } label: {
                     if vm.isSaving {
-                        ProgressView()
+                        ProgressView().tint(Color.ssGreen)
                     } else {
                         Text(LocalizedStringKey("common.save"))
-                            .fontWeight(.semibold)
+                            .font(.ssBodyBold)
+                            .foregroundStyle(Color.ssGreen)
                     }
                 }
                 .disabled(vm.isSaving)
@@ -65,6 +65,8 @@ struct ProfileView: View {
                 Button(LocalizedStringKey("common.edit")) {
                     vm.startEditing()
                 }
+                .font(.ssBody)
+                .foregroundStyle(Color.ssGreen)
             }
         }
     }
@@ -73,11 +75,11 @@ struct ProfileView: View {
 
     private func loaded(_ member: Member) -> some View {
         ScrollView {
-            VStack(spacing: 24) {
+            VStack(spacing: 28) {
                 header(member)
                 stats(member)
 
-                section("mp.profile.sec_personal") {
+                section(latin: "Personal Info", arabic: "mp.profile.sec_personal") {
                     if vm.isEditing {
                         editableRow("mp.profile.lbl_preferred_name",
                                     binding: $vm.draft.unwrap(or: member).preferredName)
@@ -107,7 +109,7 @@ struct ProfileView: View {
                     }
                 }
 
-                section("mp.profile.sec_study") {
+                section(latin: "Study & Sponsorship", arabic: "mp.profile.sec_study") {
                     if vm.isEditing {
                         pickerRow("mp.profile.lbl_scholarship",
                                   binding: $vm.draft.unwrap(or: member).scholarshipEntity,
@@ -131,7 +133,7 @@ struct ProfileView: View {
                     }
                 }
 
-                section("mp.profile.sec_about") {
+                section(latin: "About You", arabic: "mp.profile.sec_about") {
                     if vm.isEditing {
                         editableRow("mp.profile.lbl_skills",
                                     binding: $vm.draft.unwrap(or: member).skillsHobbies,
@@ -145,7 +147,7 @@ struct ProfileView: View {
                     }
                 }
 
-                section("mp.profile.section_account") {
+                section(latin: "Account", arabic: "mp.profile.section_account") {
                     readRow("mp.profile.ro_full_name", member.fullName ?? member.displayName)
                     readRow("mp.profile.ro_nid", member.nationalId)
                     readRow("mp.profile.ro_committee", member.committeeName)
@@ -153,9 +155,10 @@ struct ProfileView: View {
                 }
 
                 Text(LocalizedStringKey("mp.profile.ro_note"))
-                    .font(.footnote)
-                    .foregroundStyle(Color("InkMuted"))
+                    .font(.ssCaption)
+                    .foregroundStyle(Color.ssGrey)
                     .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.horizontal, 4)
 
                 if !vm.isEditing {
                     languageButton
@@ -163,7 +166,7 @@ struct ProfileView: View {
                 }
             }
             .padding(.horizontal, 20)
-            .padding(.vertical, 16)
+            .padding(.vertical, 20)
         }
     }
 
@@ -173,8 +176,9 @@ struct ProfileView: View {
         VStack(spacing: 12) {
             ZStack {
                 Circle()
-                    .fill(Color("BackgroundSoft"))
-                    .frame(width: 96, height: 96)
+                    .fill(Color.ssPale)
+                    .overlay(Circle().stroke(Color.ssGold, lineWidth: 1.5))
+                    .frame(width: 100, height: 100)
                 if let url = member.profilePhotoUrl, let parsed = URL(string: url) {
                     AsyncImage(url: parsed) { phase in
                         if let img = phase.image {
@@ -190,36 +194,38 @@ struct ProfileView: View {
                 }
             }
             Text(member.displayName)
-                .font(.title2.weight(.semibold))
-                .foregroundStyle(Color("Ink"))
+                .font(.ssH1)
+                .foregroundStyle(Color.ssGreen)
+                .multilineTextAlignment(.center)
+            GoldRule(width: 40)
             HStack(spacing: 8) {
                 if let committee = member.committeeName {
-                    chip(committee, color: Color("BrandGreen"))
+                    chip(committee, fill: Color.ssGreen, text: Color.ssCream)
                 }
                 if let role = member.clubRole {
                     chip(MemberFieldMaps.roleLabel(role) ?? role,
-                         color: Color("BrandGold"))
+                         fill: Color.ssGold, text: Color.ssCream)
                 }
             }
         }
         .frame(maxWidth: .infinity)
-        .padding(.top, 12)
+        .padding(.top, 8)
     }
 
     private func avatarFallback(_ member: Member) -> some View {
         Text(String(member.displayName.prefix(1)).uppercased())
-            .font(.system(size: 40, weight: .semibold))
-            .foregroundStyle(Color("BrandGreen"))
+            .font(.custom("Almarai-Bold", size: 42))
+            .foregroundStyle(Color.ssGreen)
             .frame(width: 96, height: 96)
     }
 
-    private func chip(_ text: String, color: Color) -> some View {
+    private func chip(_ text: String, fill: Color, text textColor: Color) -> some View {
         Text(text)
-            .font(.footnote.weight(.medium))
-            .foregroundStyle(.white)
-            .padding(.horizontal, 10)
-            .padding(.vertical, 4)
-            .background(color)
+            .font(.ssCaption.weight(.semibold))
+            .foregroundStyle(textColor)
+            .padding(.horizontal, 12)
+            .padding(.vertical, 5)
+            .background(fill)
             .clipShape(Capsule())
     }
 
@@ -231,40 +237,55 @@ struct ProfileView: View {
                      labelKey: "mp.profile.stat_hours_label")
             statCard(value: MemberFieldMaps.statusLabel(member.status) ?? "—",
                      labelKey: "mp.profile.stat_status_label",
-                     valueColor: member.isActive ? Color("BrandGreen") : Color("InkMuted"))
+                     valueColor: member.isActive ? Color.ssGreen : Color.ssGrey)
         }
     }
 
     private func statCard(value: String,
                           labelKey: LocalizedStringKey,
-                          valueColor: Color = Color("Ink")) -> some View {
-        VStack(spacing: 4) {
+                          valueColor: Color = Color.ssCharcoal) -> some View {
+        VStack(spacing: 6) {
             Text(value)
-                .font(.title.weight(.semibold))
+                .font(.ssDisplay)
                 .foregroundStyle(valueColor)
             Text(labelKey)
-                .font(.caption)
-                .foregroundStyle(Color("InkMuted"))
+                .font(.ssCaption)
+                .foregroundStyle(Color.ssGrey)
         }
         .frame(maxWidth: .infinity)
-        .padding(.vertical, 16)
-        .background(Color("BackgroundSoft"))
+        .padding(.vertical, 18)
+        .background(Color.ssPale)
+        .overlay(
+            RoundedRectangle(cornerRadius: 12)
+                .stroke(Color.ssGold.opacity(0.4), lineWidth: 1)
+        )
         .clipShape(RoundedRectangle(cornerRadius: 12))
     }
 
-    // MARK: - Section + row building blocks
+    // MARK: - Section + rows
 
+    /// Section header: Latin small-caps label above Arabic h2 — matches the
+    /// "T H E   B O A R D / مجلس إدارة النادي" pattern from the brand guide.
     private func section<Content: View>(
-        _ title: LocalizedStringKey,
+        latin: String,
+        arabic: LocalizedStringKey,
         @ViewBuilder content: () -> Content
     ) -> some View {
-        VStack(alignment: .leading, spacing: 0) {
-            Text(title)
-                .font(.subheadline.weight(.semibold))
-                .foregroundStyle(Color("InkMuted"))
+        VStack(alignment: .leading, spacing: 6) {
+            Text(latin)
+                .font(.ssLatinLabel)
+                .tracking(2)
+                .foregroundStyle(Color.ssGold)
+            Text(arabic)
+                .font(.ssH2)
+                .foregroundStyle(Color.ssGreen)
                 .padding(.bottom, 8)
             VStack(spacing: 0) { content() }
-                .background(Color("BackgroundSoft"))
+                .background(Color.ssPale)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 12)
+                        .stroke(Color.ssGold.opacity(0.4), lineWidth: 1)
+                )
                 .clipShape(RoundedRectangle(cornerRadius: 12))
         }
     }
@@ -272,19 +293,25 @@ struct ProfileView: View {
     private func readRow(_ labelKey: LocalizedStringKey, _ value: String?) -> some View {
         HStack(alignment: .top) {
             Text(labelKey)
-                .font(.footnote)
-                .foregroundStyle(Color("InkMuted"))
+                .font(.ssCaption)
+                .foregroundStyle(Color.ssGrey)
                 .frame(width: 120, alignment: .leading)
             Text(value?.isEmpty == false
                  ? value!
                  : String(localized: "mp.profile.opt_unspecified"))
-                .font(.footnote)
-                .foregroundStyle(Color("Ink"))
+                .font(.ssBody)
+                .foregroundStyle(Color.ssCharcoal)
                 .frame(maxWidth: .infinity, alignment: .leading)
         }
         .padding(.horizontal, 14)
-        .padding(.vertical, 10)
-        .overlay(Divider().padding(.horizontal, 14), alignment: .bottom)
+        .padding(.vertical, 12)
+        .overlay(
+            Rectangle()
+                .fill(Color.ssLight.opacity(0.6))
+                .frame(height: 0.5)
+                .padding(.horizontal, 14),
+            alignment: .bottom
+        )
     }
 
     private func editableRow(
@@ -296,8 +323,8 @@ struct ProfileView: View {
     ) -> some View {
         VStack(alignment: .leading, spacing: 6) {
             Text(labelKey)
-                .font(.caption)
-                .foregroundStyle(Color("InkMuted"))
+                .font(.ssCaption)
+                .foregroundStyle(Color.ssGrey)
             TextField(
                 String(localized: "mp.profile.opt_unspecified"),
                 text: binding.orEmpty,
@@ -306,13 +333,19 @@ struct ProfileView: View {
             .keyboardType(keyboard)
             .textInputAutocapitalization(autocap)
             .autocorrectionDisabled(keyboard == .emailAddress || keyboard == .URL)
-            .font(.footnote)
-            .foregroundStyle(Color("Ink"))
+            .font(.ssBody)
+            .foregroundStyle(Color.ssCharcoal)
             .lineLimit(axis == .vertical ? 5 : 1, reservesSpace: axis == .vertical)
         }
         .padding(.horizontal, 14)
-        .padding(.vertical, 10)
-        .overlay(Divider().padding(.horizontal, 14), alignment: .bottom)
+        .padding(.vertical, 12)
+        .overlay(
+            Rectangle()
+                .fill(Color.ssLight.opacity(0.6))
+                .frame(height: 0.5)
+                .padding(.horizontal, 14),
+            alignment: .bottom
+        )
     }
 
     private func pickerRow(
@@ -322,8 +355,8 @@ struct ProfileView: View {
     ) -> some View {
         VStack(alignment: .leading, spacing: 6) {
             Text(labelKey)
-                .font(.caption)
-                .foregroundStyle(Color("InkMuted"))
+                .font(.ssCaption)
+                .foregroundStyle(Color.ssGrey)
             Menu {
                 Button(String(localized: "mp.profile.opt_unspecified")) { binding.wrappedValue = nil }
                 ForEach(options, id: \.value) { opt in
@@ -335,18 +368,24 @@ struct ProfileView: View {
                 HStack {
                     Text(MemberFieldMaps.label(for: binding.wrappedValue, in: options)
                          ?? String(localized: "mp.profile.opt_unspecified"))
-                        .font(.footnote)
-                        .foregroundStyle(Color("Ink"))
+                        .font(.ssBody)
+                        .foregroundStyle(Color.ssCharcoal)
                     Spacer()
                     Image(systemName: "chevron.up.chevron.down")
                         .font(.caption)
-                        .foregroundStyle(Color("InkMuted"))
+                        .foregroundStyle(Color.ssGrey)
                 }
             }
         }
         .padding(.horizontal, 14)
-        .padding(.vertical, 10)
-        .overlay(Divider().padding(.horizontal, 14), alignment: .bottom)
+        .padding(.vertical, 12)
+        .overlay(
+            Rectangle()
+                .fill(Color.ssLight.opacity(0.6))
+                .frame(height: 0.5)
+                .padding(.horizontal, 14),
+            alignment: .bottom
+        )
     }
 
     private func dobEditableRow(_ member: Member) -> some View {
@@ -357,19 +396,26 @@ struct ProfileView: View {
         )
         return VStack(alignment: .leading, spacing: 6) {
             Text(LocalizedStringKey("mp.profile.lbl_dob"))
-                .font(.caption)
-                .foregroundStyle(Color("InkMuted"))
+                .font(.ssCaption)
+                .foregroundStyle(Color.ssGrey)
             DatePicker("", selection: dateBinding,
                        in: ...Date(),
                        displayedComponents: .date)
                 .labelsHidden()
+                .tint(Color.ssGreen)
         }
         .padding(.horizontal, 14)
-        .padding(.vertical, 10)
-        .overlay(Divider().padding(.horizontal, 14), alignment: .bottom)
+        .padding(.vertical, 12)
+        .overlay(
+            Rectangle()
+                .fill(Color.ssLight.opacity(0.6))
+                .frame(height: 0.5)
+                .padding(.horizontal, 14),
+            alignment: .bottom
+        )
     }
 
-    // MARK: - Language
+    // MARK: - Language + Sign out
 
     private var languageButton: some View {
         Button {
@@ -379,43 +425,53 @@ struct ProfileView: View {
             HStack {
                 Image(systemName: "globe")
                 Text(LocalizedStringKey("lang.toggle_title"))
+                    .font(.ssBody)
                 Spacer()
                 Image(systemName: "arrow.up.forward.app")
-                    .font(.footnote)
-                    .foregroundStyle(Color("InkMuted"))
+                    .font(.ssCaption)
+                    .foregroundStyle(Color.ssGrey)
             }
-            .frame(maxWidth: .infinity, minHeight: 44)
-            .padding(.horizontal, 14)
+            .foregroundStyle(Color.ssGreen)
+            .frame(maxWidth: .infinity, minHeight: 48)
+            .padding(.horizontal, 16)
+            .background(Color.ssPale)
+            .overlay(
+                RoundedRectangle(cornerRadius: 10)
+                    .stroke(Color.ssGold.opacity(0.4), lineWidth: 1)
+            )
+            .clipShape(RoundedRectangle(cornerRadius: 10))
         }
-        .buttonStyle(.bordered)
-        .tint(Color("BrandGreen"))
-        .padding(.top, 16)
+        .padding(.top, 12)
     }
-
-    // MARK: - Sign out
 
     private var signOutButton: some View {
         Button(role: .destructive) {
             Task { await session.signOut() }
         } label: {
             Text(LocalizedStringKey("common.logout"))
-                .frame(maxWidth: .infinity, minHeight: 44)
+                .font(.ssBodyBold)
+                .foregroundStyle(.red)
+                .frame(maxWidth: .infinity, minHeight: 48)
+                .background(Color.ssPale)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 10)
+                        .stroke(.red.opacity(0.4), lineWidth: 1)
+                )
+                .clipShape(RoundedRectangle(cornerRadius: 10))
         }
-        .buttonStyle(.bordered)
-        .padding(.top, 16)
     }
 
-    // MARK: - Toast (success / save error)
+    // MARK: - Toast
 
     @ViewBuilder
     private var toast: some View {
         if let msg = vm.toastMessage {
             Text(msg)
-                .font(.footnote)
-                .foregroundStyle(.white)
-                .padding(.horizontal, 16)
+                .font(.ssCaption)
+                .foregroundStyle(Color.ssCream)
+                .padding(.horizontal, 18)
                 .padding(.vertical, 10)
-                .background(Color("BrandGreen"))
+                .background(Color.ssGreen)
                 .clipShape(Capsule())
                 .padding(.bottom, 24)
                 .transition(.move(edge: .bottom).combined(with: .opacity))
@@ -429,27 +485,29 @@ struct ProfileView: View {
     // MARK: - Error state
 
     private func errorState(_ message: String) -> some View {
-        VStack(spacing: 12) {
+        VStack(spacing: 14) {
             Image(systemName: "exclamationmark.triangle.fill")
                 .font(.system(size: 36))
-                .foregroundStyle(Color("InkMuted"))
+                .foregroundStyle(Color.ssGold)
             Text(message)
-                .font(.callout)
-                .foregroundStyle(Color("Ink"))
+                .font(.ssBody)
+                .foregroundStyle(Color.ssCharcoal)
                 .multilineTextAlignment(.center)
                 .padding(.horizontal, 32)
             Button {
                 Task { await vm.load() }
             } label: {
                 Text(LocalizedStringKey("common.retry"))
+                    .font(.ssBodyBold)
+                    .foregroundStyle(Color.ssCream)
                     .padding(.horizontal, 24)
-                    .padding(.vertical, 8)
+                    .padding(.vertical, 10)
+                    .background(Color.ssGreen)
+                    .clipShape(Capsule())
             }
-            .buttonStyle(.borderedProminent)
-            .tint(Color("BrandGreen"))
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(Color("Background"))
+        .background(Color.ssCream)
     }
 }
 
@@ -465,10 +523,6 @@ private extension Binding where Value == String? {
 }
 
 private extension Binding {
-    /// Unwraps an optional binding by mirroring writes to the wrapped value
-    /// when present and ignoring them when nil. Returns a binding into the
-    /// passed `fallback` when the optional is nil — used only as a transient
-    /// proxy while the draft is non-nil (which is the invariant during edit).
     func unwrap<Wrapped>(or fallback: Wrapped) -> Binding<Wrapped>
     where Value == Optional<Wrapped> {
         Binding<Wrapped>(

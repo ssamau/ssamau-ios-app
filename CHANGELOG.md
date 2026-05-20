@@ -23,6 +23,43 @@ For web entries:
 
 ---
 
+## [iOS] 2026-05-21 · Brand identity reskin (cream theme + Almarai)
+
+First full pass at the SSAM Brand Identity Guide aesthetic.
+
+- Bundled Almarai TTFs (Light / Regular / Bold / ExtraBold) under
+  `Resources/Fonts/`, registered via `UIAppFonts` in `SSAMAU/Info.plist`.
+  Pulled from `google/fonts` github mirror at install time.
+- New `Utils/Theme.swift` with typed font + color accessors:
+  - `Font.ssDisplay`, `.ssH1`, `.ssH2`, `.ssBody`, `.ssBodyBold`,
+    `.ssCaption`, `.ssTiny` — Almarai-based, mobile-adapted sizes
+  - `Font.ssLatinItalic` — Georgia-Italic for the brand's secondary
+    Latin subtitle pattern
+  - `Font.ssLatinLabel` — system small-caps for tracked
+    "T H E   B O A R D" style section headers
+  - `Color.ssGreen / .ssGold / .ssCream / .ssPale / .ssCharcoal /
+    .ssGrey / .ssLight` typed accessors
+  - `GoldRule` view — the recurring 1.5pt gold hairline.
+- Palette overhaul: Cream / Pale / Charcoal / Grey / Light added per
+  brand swatches. The existing role aliases (Background, Ink, etc.)
+  now resolve to the brand neutrals so light mode lands in the
+  cream/charcoal/gold space the brand actually wants. Dark mode keeps
+  the inverted relationship.
+- LoginView reskinned: cream background, gold-bordered pale card, gold
+  rule under the welcome message, brand fonts throughout, ssGreen
+  primary CTA.
+- ProfileView reskinned: cream background, gold-rule under member name,
+  pale cards with thin gold borders, section headers use the
+  Latin small-caps + Arabic H2 brand pattern ("S T U D Y &
+  S P O N S O R S H I P / الدراسة والابتعاث"), brand fonts throughout.
+- MemberTabView stubs: gold icon, ssH2 title, gold rule, on cream.
+- RootView admin/head placeholders match the new visual language.
+
+Heritage motifs (mihrab arch frame, eight-point star, crescent) +
+proper sponsor/board card layouts are follow-ups when those screens land.
+
+**Web impact:** none.
+
 ## [iOS] 2026-05-21 · Brand color hexes + keyboard fix + en.lproj move
 
 - Localization layout: moved English strings from bundle root to

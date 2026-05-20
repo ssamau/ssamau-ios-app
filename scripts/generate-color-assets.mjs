@@ -12,19 +12,34 @@ const here = dirname(fileURLToPath(import.meta.url));
 const iosRoot = resolve(here, '..');
 const assets = resolve(iosRoot, 'SSAMAU/SSAMAU/Assets.xcassets');
 
-// Canonical brand colors per SSAM Brand Identity Guide:
-//   Saudi Green  #0F5A2D
-//   Heritage Gold #B4962D
-// Dark-mode variants brightened so green/gold stay legible on dark surfaces.
+// Brand palette per SSAM Brand Identity Guide.
+//
+// Light theme is the brand's canonical mode: cream-dominant backgrounds,
+// charcoal text, deep-green for identity, heritage gold for accents.
+// Dark theme inverts to charcoal surfaces with cream text so brand
+// colours stay legible.
+//
+// Role-named tokens (Background, Ink, etc.) are aliases over the brand
+// neutrals so existing view code keeps working as the theme evolves.
 const PALETTE = {
+  // Brand colors
   BrandGreen:      { light: '#0F5A2D', dark: '#2A7E3F' },
   BrandGreenDark:  { light: '#093F1F', dark: '#0F5A2D' },
   BrandGold:       { light: '#B4962D', dark: '#D4AC3B' },
-  Background:      { light: '#FFFFFF', dark: '#0F1419' },
-  BackgroundSoft:  { light: '#F9FAFB', dark: '#1A1F26' },
-  Ink:             { light: '#1F2937', dark: '#E5E7EB' },
-  InkMuted:        { light: '#6B7280', dark: '#9CA3AF' },
-  Line:            { light: '#E5E7EB', dark: '#374151' },
+
+  // Brand neutrals
+  Cream:           { light: '#F0E5CC', dark: '#1A1814' },
+  Pale:            { light: '#F7EFDC', dark: '#241F18' },
+  Charcoal:        { light: '#1A1A1A', dark: '#F0E5CC' },
+  Grey:            { light: '#7C7C7C', dark: '#A89F8E' },
+  Light:           { light: '#D5CCB8', dark: '#3A332A' },
+
+  // Role aliases (used by views; map onto the neutrals above)
+  Background:      { light: '#F0E5CC', dark: '#1A1814' },  // = Cream / dark cream-tinted
+  BackgroundSoft:  { light: '#F7EFDC', dark: '#241F18' },  // = Pale / slightly lighter dark
+  Ink:             { light: '#1A1A1A', dark: '#F0E5CC' },  // = Charcoal / Cream
+  InkMuted:        { light: '#7C7C7C', dark: '#A89F8E' },  // = Grey
+  Line:            { light: '#D5CCB8', dark: '#3A332A' },  // = Light / dark warm grey
 };
 
 function hexToComponents(hex) {

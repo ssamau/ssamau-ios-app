@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// Sign-in screen — spec §8.1.
+/// Sign-in screen — spec §8.1, styled per SSAM Brand Identity Guide.
 struct LoginView: View {
     @StateObject private var vm = LoginViewModel()
     @FocusState private var focusedField: Field?
@@ -9,7 +9,7 @@ struct LoginView: View {
 
     var body: some View {
         ScrollView {
-            VStack(spacing: 24) {
+            VStack(spacing: 28) {
                 header
                 card
             }
@@ -19,11 +19,8 @@ struct LoginView: View {
             .frame(maxWidth: 480)
             .frame(maxWidth: .infinity)
         }
-        .background(Color("Background").ignoresSafeArea())
+        .background(Color.ssCream.ignoresSafeArea())
         .scrollDismissesKeyboard(.interactively)
-        // Pad ScrollView below the focused field so the submit button
-        // stays visible when the keyboard rises. SwiftUI auto-avoidance
-        // doesn't cover all layouts cleanly.
         .safeAreaInset(edge: .bottom) {
             if focusedField != nil {
                 Color.clear.frame(height: 8)
@@ -31,90 +28,108 @@ struct LoginView: View {
         }
     }
 
+    // MARK: - Header
+
     private var header: some View {
-        VStack(spacing: 12) {
+        VStack(spacing: 14) {
             Image("SSAMLogo")
                 .resizable()
                 .scaledToFit()
                 .frame(width: 96, height: 96)
             Text(LocalizedStringKey("brand.ssam_full"))
-                .font(.title3.weight(.semibold))
-                .foregroundStyle(Color("Ink"))
+                .font(.ssH1)
+                .foregroundStyle(Color.ssGreen)
                 .multilineTextAlignment(.center)
+            GoldRule(width: 48)
             Text(LocalizedStringKey("login.welcome"))
-                .font(.callout)
-                .foregroundStyle(Color("InkMuted"))
+                .font(.ssCaption)
+                .foregroundStyle(Color.ssGrey)
                 .multilineTextAlignment(.center)
+                .padding(.top, 4)
         }
     }
 
+    // MARK: - Card
+
     private var card: some View {
-        VStack(spacing: 16) {
+        VStack(spacing: 18) {
             identifierField
             passwordField
 
             if let error = vm.errorMessage {
                 Text(error)
-                    .font(.footnote)
+                    .font(.ssCaption)
                     .foregroundStyle(.red)
                     .frame(maxWidth: .infinity, alignment: .leading)
             }
 
             submitButton
 
-            // Phase 2 — wire to ResetPasswordView via NavigationLink.
-            Button {} label: {
-                Text(LocalizedStringKey("login.forgot"))
-                    .font(.footnote)
-                    .foregroundStyle(Color("BrandGreen"))
-            }
-            .disabled(true)
-            .opacity(0.5)
-
-            Button {
-                openAppSettings()
-            } label: {
-                HStack(spacing: 6) {
-                    Image(systemName: "globe")
-                    Text(LocalizedStringKey("lang.toggle_title"))
+            VStack(spacing: 14) {
+                Button {} label: {
+                    Text(LocalizedStringKey("login.forgot"))
+                        .font(.ssCaption)
+                        .foregroundStyle(Color.ssGreen)
                 }
-                .font(.footnote)
-                .foregroundStyle(Color("BrandGreen"))
+                .disabled(true)
+                .opacity(0.5)
+
+                Button {
+                    openAppSettings()
+                } label: {
+                    HStack(spacing: 6) {
+                        Image(systemName: "globe")
+                        Text(LocalizedStringKey("lang.toggle_title"))
+                    }
+                    .font(.ssCaption)
+                    .foregroundStyle(Color.ssGreen)
+                }
             }
+            .padding(.top, 4)
         }
-        .padding(20)
-        .background(Color("BackgroundSoft"))
-        .clipShape(RoundedRectangle(cornerRadius: 16))
+        .padding(22)
+        .background(Color.ssPale)
         .overlay(
-            RoundedRectangle(cornerRadius: 16)
-                .stroke(Color("Line"), lineWidth: 1)
+            RoundedRectangle(cornerRadius: 14)
+                .stroke(Color.ssGold.opacity(0.4), lineWidth: 1)
         )
+        .clipShape(RoundedRectangle(cornerRadius: 14))
     }
+
+    // MARK: - Fields
 
     private var identifierField: some View {
         VStack(alignment: .leading, spacing: 6) {
             Text(LocalizedStringKey("login.identifier_label"))
-                .font(.footnote)
-                .foregroundStyle(Color("InkMuted"))
+                .font(.ssCaption)
+                .foregroundStyle(Color.ssGrey)
             TextField(
                 LocalizedStringKey("login.identifier_placeholder"),
                 text: $vm.identifier
             )
+            .font(.ssBody)
+            .foregroundStyle(Color.ssCharcoal)
             .textInputAutocapitalization(.never)
             .autocorrectionDisabled(true)
             .keyboardType(.emailAddress)
             .submitLabel(.next)
             .focused($focusedField, equals: .identifier)
             .onSubmit { focusedField = .password }
-            .textFieldStyle(BorderedTextFieldStyle())
+            .padding(12)
+            .background(Color.ssCream)
+            .clipShape(RoundedRectangle(cornerRadius: 8))
+            .overlay(
+                RoundedRectangle(cornerRadius: 8)
+                    .stroke(Color.ssLight, lineWidth: 1)
+            )
         }
     }
 
     private var passwordField: some View {
         VStack(alignment: .leading, spacing: 6) {
             Text(LocalizedStringKey("login.password_label"))
-                .font(.footnote)
-                .foregroundStyle(Color("InkMuted"))
+                .font(.ssCaption)
+                .foregroundStyle(Color.ssGrey)
             HStack(spacing: 8) {
                 Group {
                     if vm.isPasswordVisible {
@@ -129,6 +144,8 @@ struct LoginView: View {
                         )
                     }
                 }
+                .font(.ssBody)
+                .foregroundStyle(Color.ssCharcoal)
                 .textInputAutocapitalization(.never)
                 .autocorrectionDisabled(true)
                 .submitLabel(.go)
@@ -139,16 +156,16 @@ struct LoginView: View {
                     vm.isPasswordVisible.toggle()
                 } label: {
                     Image(systemName: vm.isPasswordVisible ? "eye.slash" : "eye")
-                        .foregroundStyle(Color("InkMuted"))
+                        .foregroundStyle(Color.ssGrey)
                 }
                 .buttonStyle(.plain)
             }
             .padding(12)
-            .background(Color("Background"))
+            .background(Color.ssCream)
             .clipShape(RoundedRectangle(cornerRadius: 8))
             .overlay(
                 RoundedRectangle(cornerRadius: 8)
-                    .stroke(Color("Line"), lineWidth: 1)
+                    .stroke(Color.ssLight, lineWidth: 1)
             )
         }
     }
@@ -159,43 +176,25 @@ struct LoginView: View {
         } label: {
             ZStack {
                 Text(LocalizedStringKey("login.submit"))
-                    .font(.headline)
-                    .foregroundStyle(.white)
+                    .font(.ssBodyBold)
+                    .foregroundStyle(Color.ssCream)
                     .opacity(vm.isLoading ? 0 : 1)
                 if vm.isLoading {
                     ProgressView()
-                        .tint(.white)
+                        .tint(Color.ssCream)
                 }
             }
             .frame(maxWidth: .infinity, minHeight: 48)
-            .background(vm.canSubmit ? Color("BrandGreen") : Color("InkMuted"))
+            .background(vm.canSubmit ? Color.ssGreen : Color.ssGrey)
             .clipShape(RoundedRectangle(cornerRadius: 10))
         }
         .disabled(!vm.canSubmit)
     }
 }
 
-/// Opens iOS Settings → SSAMAU page, where the per-app Language
-/// picker lives. Requires `CFBundleLocalizations` to be present in
-/// the bundle Info.plist for the picker to appear.
 private func openAppSettings() {
     guard let url = URL(string: UIApplication.openSettingsURLString) else { return }
     UIApplication.shared.open(url)
-}
-
-/// Bordered text field — used for the identifier field. Password field
-/// builds its own to host the show/hide eye button.
-private struct BorderedTextFieldStyle: TextFieldStyle {
-    func _body(configuration: TextField<Self._Label>) -> some View {
-        configuration
-            .padding(12)
-            .background(Color("Background"))
-            .clipShape(RoundedRectangle(cornerRadius: 8))
-            .overlay(
-                RoundedRectangle(cornerRadius: 8)
-                    .stroke(Color("Line"), lineWidth: 1)
-            )
-    }
 }
 
 #Preview {

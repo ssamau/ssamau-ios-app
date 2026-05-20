@@ -48,7 +48,7 @@ struct MemberTabView: View {
                           systemImage: "person.circle")
                 }
         }
-        .tint(Color("BrandGreen"))
+        .tint(Color.ssGreen)
     }
 }
 
@@ -58,18 +58,19 @@ private struct TabStub: View {
     let systemImage: String
 
     var body: some View {
-        VStack(spacing: 12) {
+        VStack(spacing: 14) {
             Image(systemName: systemImage)
                 .font(.system(size: 48))
-                .foregroundStyle(Color("InkMuted"))
+                .foregroundStyle(Color.ssGold)
             Text(titleKey)
-                .font(.title3.weight(.medium))
-                .foregroundStyle(Color("Ink"))
+                .font(.ssH2)
+                .foregroundStyle(Color.ssGreen)
+            GoldRule(width: 32)
             Text(LocalizedStringKey("mp.tabs.coming_soon"))
-                .font(.footnote)
-                .foregroundStyle(Color("InkMuted"))
+                .font(.ssCaption)
+                .foregroundStyle(Color.ssGrey)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(Color("Background"))
+        .background(Color.ssCream)
     }
 }
