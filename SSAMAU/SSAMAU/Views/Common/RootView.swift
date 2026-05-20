@@ -41,13 +41,19 @@ private struct PlaceholderView: View {
     let subtitle: String
 
     var body: some View {
-        VStack(spacing: 12) {
+        VStack(spacing: 16) {
+            Image("SSAMLogo")
+                .resizable()
+                .scaledToFit()
+                .frame(width: 120, height: 120)
             Text(title)
                 .font(.largeTitle.weight(.semibold))
                 .foregroundStyle(Color("Ink"))
             Text(subtitle)
                 .font(.callout)
                 .foregroundStyle(Color("InkMuted"))
+                .multilineTextAlignment(.center)
+                .padding(.horizontal, 32)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(Color("Background"))
