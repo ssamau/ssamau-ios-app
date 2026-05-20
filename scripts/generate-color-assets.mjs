@@ -12,10 +12,14 @@ const here = dirname(fileURLToPath(import.meta.url));
 const iosRoot = resolve(here, '..');
 const assets = resolve(iosRoot, 'SSAMAU/SSAMAU/Assets.xcassets');
 
+// Canonical brand colors per SSAM Brand Identity Guide:
+//   Saudi Green  #0F5A2D
+//   Heritage Gold #B4962D
+// Dark-mode variants brightened so green/gold stay legible on dark surfaces.
 const PALETTE = {
-  BrandGreen:      { light: '#1A5C2E', dark: '#2A7E3F' },
-  BrandGreenDark:  { light: '#0E3A1C', dark: '#1A5C2E' },
-  BrandGold:       { light: '#B8932A', dark: '#D4AC3B' },
+  BrandGreen:      { light: '#0F5A2D', dark: '#2A7E3F' },
+  BrandGreenDark:  { light: '#093F1F', dark: '#0F5A2D' },
+  BrandGold:       { light: '#B4962D', dark: '#D4AC3B' },
   Background:      { light: '#FFFFFF', dark: '#0F1419' },
   BackgroundSoft:  { light: '#F9FAFB', dark: '#1A1F26' },
   Ink:             { light: '#1F2937', dark: '#E5E7EB' },

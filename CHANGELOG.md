@@ -23,6 +23,29 @@ For web entries:
 
 ---
 
+## [iOS] 2026-05-21 · Brand color hexes + keyboard fix + en.lproj move
+
+- Localization layout: moved English strings from bundle root to
+  `Resources/en.lproj/Localizable.strings`. Canonical Xcode layout —
+  unambiguous when iOS resolves Arabic-preferred locale (which it
+  appeared to be silently ignoring with the root-file layout).
+- Debug print on `SSAMAUApp.init()` now logs `Bundle.main.localizations`,
+  `preferredLocalizations`, current locale, and a sample lookup — Xcode
+  console will say at-a-glance whether iOS is finding the right .lproj.
+- LoginView keyboard avoidance: removed the `ZStack { Color... }` wrap
+  that broke SwiftUI's auto-avoid behaviour. Background now sits on the
+  ScrollView via `.background(...).ignoresSafeArea()`, content stays in
+  safe area so the keyboard pushes the form up. Added a small
+  `safeAreaInset` bottom buffer while a field is focused.
+- Brand colors: BrandGreen #0F5A2D (was #1A5C2E), BrandGold #B4962D
+  (was #B8932A), BrandGreenDark #093F1F — matches the
+  `SSAM Brand Identity Guide.pdf`. Dark-mode variants slightly
+  brightened for contrast.
+- **Web impact:** none.
+- **Followup:** the brand guide also specifies Almarai (Arabic) +
+  Georgia (Latin) fonts and a cream-and-green light theme. This commit
+  only addresses the palette — full brand reskin is its own task.
+
 ## [iOS] 2026-05-21 · Localization: register Arabic + in-app Settings link
 
 - Bug: device locale set to Arabic gave RTL layout (SwiftUI detected

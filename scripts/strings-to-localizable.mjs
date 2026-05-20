@@ -30,7 +30,10 @@ const sources = [
   {
     lang: 'en',
     src: resolve(webRepo, 'assets/js/lib/strings/en.js'),
-    out: resolve(iosRoot, 'SSAMAU/SSAMAU/Resources/Localizable.strings'),
+    // Canonical Xcode layout — English under en.lproj, not at root.
+    // Putting it at the bundle root made iOS treat it as a base fallback
+    // but didn't always trigger ar.lproj lookup. en.lproj is unambiguous.
+    out: resolve(iosRoot, 'SSAMAU/SSAMAU/Resources/en.lproj/Localizable.strings'),
   },
   {
     lang: 'ar',

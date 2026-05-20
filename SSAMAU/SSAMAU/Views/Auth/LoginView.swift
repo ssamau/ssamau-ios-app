@@ -8,20 +8,26 @@ struct LoginView: View {
     private enum Field: Hashable { case identifier, password }
 
     var body: some View {
-        ZStack {
-            Color("Background").ignoresSafeArea()
-
-            ScrollView {
-                VStack(spacing: 24) {
-                    header
-                    card
-                }
-                .padding(.horizontal, 24)
-                .padding(.top, 48)
-                .padding(.bottom, 32)
-                .frame(maxWidth: 480)
+        ScrollView {
+            VStack(spacing: 24) {
+                header
+                card
             }
-            .scrollDismissesKeyboard(.interactively)
+            .padding(.horizontal, 24)
+            .padding(.top, 48)
+            .padding(.bottom, 32)
+            .frame(maxWidth: 480)
+            .frame(maxWidth: .infinity)
+        }
+        .background(Color("Background").ignoresSafeArea())
+        .scrollDismissesKeyboard(.interactively)
+        // Pad ScrollView below the focused field so the submit button
+        // stays visible when the keyboard rises. SwiftUI auto-avoidance
+        // doesn't cover all layouts cleanly.
+        .safeAreaInset(edge: .bottom) {
+            if focusedField != nil {
+                Color.clear.frame(height: 8)
+            }
         }
     }
 
