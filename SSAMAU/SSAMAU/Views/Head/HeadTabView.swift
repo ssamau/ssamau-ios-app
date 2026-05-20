@@ -58,26 +58,39 @@ struct HeadTabView: View {
         .tint(Color.ssGreen)
     }
 
-    /// Intercepts tab selection so we can reset the More tab's navigation
-    /// path. Reset is **deferred** to the next run-loop tick via
-    /// `DispatchQueue.main.async` — that way:
+    /// Intercepts tab selection to reset the More tab's navigation path.
+    /// Three branches cover every case without flicker:
     ///
-    ///   - Leaving More for another tab: selection switches first, More
-    ///     goes off-screen, then the path reset runs invisibly. Next
-    ///     visit lands on the menu with no flicker.
-    ///   - Re-tapping More while on a sub-page: selection is a no-op
-    ///     (same value), then deferred reset pops to root. User sees a
-    ///     normal pop animation, matching iOS convention.
+    ///   1. **Leaving More** — defer the reset by 0.4s so it runs after
+    ///      the tab transition completes AND the More tab is fully
+    ///      off-screen. Re-check `selection` inside the deferred block
+    ///      so we don't reset if the user has already come back.
+    ///   2. **Re-tapping More while on a sub-page** — pop to root
+    ///      immediately (iOS convention, user-visible animation).
+    ///   3. **Entering More with a leftover path** (user came back
+    ///      faster than the deferred reset fired) — reset immediately
+    ///      so they don't see the stale sub-page. Rare; only if you
+    ///      bounce tabs in under 0.4 seconds.
     private var tabSelectionBinding: Binding<Tab> {
         Binding(
             get: { selection },
             set: { newValue in
                 let wasOnMore = selection == .more
                 selection = newValue
-                if wasOnMore {
-                    DispatchQueue.main.async {
-                        morePath = NavigationPath()
+
+                if wasOnMore && newValue != .more {
+                    // 1. Leaving More — defer reset off-screen.
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
+                        if selection != .more {
+                            morePath = NavigationPath()
+                        }
                     }
+                } else if wasOnMore && newValue == .more {
+                    // 2. Re-tap on More — animated pop.
+                    morePath = NavigationPath()
+                } else if !wasOnMore && newValue == .more && !morePath.isEmpty {
+                    // 3. Entered More before deferred reset could fire.
+                    morePath = NavigationPath()
                 }
             }
         )
