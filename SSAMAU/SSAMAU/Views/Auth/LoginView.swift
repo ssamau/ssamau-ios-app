@@ -5,35 +5,41 @@ struct LoginView: View {
     @StateObject private var vm = LoginViewModel()
     @FocusState private var focusedField: Field?
     @State private var showSettingsFallback = false
+    @State private var showResetPassword = false
 
     private enum Field: Hashable { case identifier, password }
 
     var body: some View {
-        ScrollView {
-            VStack(spacing: 28) {
-                header
-                card
+        NavigationStack {
+            ScrollView {
+                VStack(spacing: 28) {
+                    header
+                    card
+                }
+                .padding(.horizontal, 24)
+                .padding(.top, 48)
+                .padding(.bottom, 32)
+                .frame(maxWidth: 480)
+                .frame(maxWidth: .infinity)
             }
-            .padding(.horizontal, 24)
-            .padding(.top, 48)
-            .padding(.bottom, 32)
-            .frame(maxWidth: 480)
-            .frame(maxWidth: .infinity)
-        }
-        .background(Color.ssCream.ignoresSafeArea())
-        .scrollDismissesKeyboard(.interactively)
-        .safeAreaInset(edge: .bottom) {
-            if focusedField != nil {
-                Color.clear.frame(height: 8)
+            .background(Color.ssCream.ignoresSafeArea())
+            .scrollDismissesKeyboard(.interactively)
+            .safeAreaInset(edge: .bottom) {
+                if focusedField != nil {
+                    Color.clear.frame(height: 8)
+                }
             }
-        }
-        .alert(
-            LocalizedStringKey("settings.cant_open.title"),
-            isPresented: $showSettingsFallback
-        ) {
-            Button(LocalizedStringKey("common.ok")) {}
-        } message: {
-            Text(LocalizedStringKey("settings.cant_open.message"))
+            .alert(
+                LocalizedStringKey("settings.cant_open.title"),
+                isPresented: $showSettingsFallback
+            ) {
+                Button(LocalizedStringKey("common.ok")) {}
+            } message: {
+                Text(LocalizedStringKey("settings.cant_open.message"))
+            }
+            .navigationDestination(isPresented: $showResetPassword) {
+                ResetPasswordView()
+            }
         }
     }
 
@@ -75,13 +81,16 @@ struct LoginView: View {
             submitButton
 
             VStack(spacing: 14) {
-                Button {} label: {
+                Button {
+                    showResetPassword = true
+                } label: {
                     Text(LocalizedStringKey("login.forgot"))
                         .font(.ssCaption)
                         .foregroundStyle(Color.ssGreen)
+                        .padding(.vertical, 4)
+                        .contentShape(Rectangle())
                 }
-                .disabled(true)
-                .opacity(0.5)
+                .buttonStyle(.plain)
 
                 Button {
                     openAppSettings { showSettingsFallback = true }

@@ -1567,9 +1567,11 @@
 "mp.topbar.logout" = "🚪 Sign out";
 "mp.topbar.menu_label" = "Open menu";
 "reset.back" = "→ Back to sign in";
+"reset.identifier_empty" = "Please enter your email or national ID.";  // ios-only
 "reset.identifier_label" = "Email or national ID";
 "reset.identifier_placeholder" = "Enter your identifier";
 "reset.intro" = "Enter your email or national ID and we’ll send a recovery link to the email on file.";
+"reset.sent_success" = "If there's an account for that identifier, we sent a recovery link. Check your inbox (and spam folder).";  // ios-only
 "reset.submit" = "Send recovery link";
 "reset.title" = "Reset password";
 "rp.back" = "→ Back to sign in";

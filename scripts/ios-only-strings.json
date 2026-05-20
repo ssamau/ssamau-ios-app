@@ -31,5 +31,14 @@
     "en": "iOS wouldn't open Settings from inside the app. Please open the Settings app, scroll to SSAMAU, then tap Language.",
     "ar": "تعذّر فتح الإعدادات من داخل التطبيق. افتح تطبيق الإعدادات، انزل إلى SSAMAU، ثم اضغط على اللغة."
   },
-  "common.ok": { "en": "OK", "ar": "حسناً" }
+  "common.ok": { "en": "OK", "ar": "حسناً" },
+
+  "reset.sent_success": {
+    "en": "If there's an account for that identifier, we sent a recovery link. Check your inbox (and spam folder).",
+    "ar": "إذا كان هناك حساب مرتبط بهذا المعرّف، فستصلك رسالة بالرابط خلال دقائق. تحقق من بريدك (وصندوق الـ Spam)."
+  },
+  "reset.identifier_empty": {
+    "en": "Please enter your email or national ID.",
+    "ar": "يرجى إدخال البريد أو الهوية الوطنية."
+  }
 }
