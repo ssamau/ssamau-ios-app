@@ -1428,6 +1428,7 @@
 "mp.logh.success" = "تم إرسال ساعاتك. ستظهر في تبويب الساعات بانتظار موافقة رئيس اللجنة.";
 "mp.logh.title" = "⏱️ تسجيل ساعات";
 "mp.opps.all_roles_full" = "كل الأدوار ممتلئة";  // ios-only
+"mp.opps.already_expressed_banner" = "سبق أن سجّلت اهتمامك. يمكنك اختيار دور آخر أو تعديل ملاحظتك.";  // ios-only
 "mp.opps.any_role" = "أيّ دور";  // ios-only
 "mp.opps.any_role_badge" = "أي دور";
 "mp.opps.any_role_lead" = "مساعدة حيث تحتاج اللجنة — رئيس اللجنة يحدد المكان المناسب.";
@@ -1488,8 +1489,12 @@
 "mp.opps.status_open" = "مفتوحة";  // ios-only
 "mp.opps.success" = "تم تسجيل اهتمامك. سيتواصل معك رئيس اللجنة.";
 "mp.opps.success_withdraw" = "تم سحب اهتمامك.";
-"mp.opps.withdraw_btn" = "↩️ سحب الاهتمام";
+"mp.opps.update_interest_btn" = "تحديث";  // ios-only
+"mp.opps.update_interest_title" = "تحديث اهتمامك";  // ios-only
+"mp.opps.withdraw_btn" = "سحب الاهتمام";  // ios-only
+"mp.opps.withdraw_confirm" = "هل تريد سحب اهتمامك بهذه الفرصة؟";  // ios-only
 "mp.opps.withdrawing" = "جاري السحب...";
+"mp.opps.withdrawn_ok" = "تم سحب الاهتمام.";  // ios-only
 "mp.profile.card_title" = "👤 ملفي الشخصي";
 "mp.profile.contact_card_title" = "📞 للتواصل";
 "mp.profile.contact_no_phone" = "— لا يوجد رقم تواصل —";

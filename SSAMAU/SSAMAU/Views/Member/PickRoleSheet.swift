@@ -11,6 +11,7 @@ struct PickRoleSheet: View {
     @State private var selectedRoleId: SelectedRole = .any
     @State private var comment: String = ""
     @State private var isSubmitting: Bool = false
+    @State private var showWithdrawConfirm: Bool = false
 
     private enum SelectedRole: Hashable {
         case any
@@ -22,19 +23,35 @@ struct PickRoleSheet: View {
         }
     }
 
+    private var existingInterest: InterestRequest? {
+        viewModel.existingInterest(for: opportunity)
+    }
+
+    private var hasExistingInterest: Bool { existingInterest != nil }
+
     var body: some View {
         NavigationStack {
             ScrollView {
                 VStack(spacing: 18) {
                     header
+                    if hasExistingInterest {
+                        existingBanner
+                    }
                     rolesList
                     commentField
                     submit
+                    if hasExistingInterest {
+                        withdrawButton
+                    }
                 }
                 .padding(20)
             }
             .background(Color.ssCream.ignoresSafeArea())
-            .navigationTitle(LocalizedStringKey("mp.opps.pick_role_title"))
+            .navigationTitle(LocalizedStringKey(
+                hasExistingInterest
+                ? "mp.opps.update_interest_title"
+                : "mp.opps.pick_role_title"
+            ))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
@@ -45,7 +62,74 @@ struct PickRoleSheet: View {
                     .disabled(isSubmitting)
                 }
             }
+            .onAppear {
+                // Pre-select the role the member previously chose so
+                // "submitting" with no changes is a true no-op visually.
+                if let existing = existingInterest {
+                    if let r = existing.roleId {
+                        selectedRoleId = .role(r)
+                    } else {
+                        selectedRoleId = .any
+                    }
+                    comment = existing.comment ?? ""
+                }
+            }
+            .confirmationDialog(
+                LocalizedStringKey("mp.opps.withdraw_confirm"),
+                isPresented: $showWithdrawConfirm,
+                titleVisibility: .visible
+            ) {
+                Button(LocalizedStringKey("mp.opps.withdraw_btn"),
+                       role: .destructive) {
+                    Task {
+                        isSubmitting = true
+                        let ok = await viewModel.withdrawInterest(opportunity: opportunity)
+                        isSubmitting = false
+                        if ok { isPresented = false }
+                    }
+                }
+                Button(LocalizedStringKey("common.cancel"), role: .cancel) {}
+            }
         }
+    }
+
+    private var existingBanner: some View {
+        HStack(spacing: 10) {
+            Image(systemName: "checkmark.circle.fill")
+                .foregroundStyle(Color.ssGreen)
+            Text(LocalizedStringKey("mp.opps.already_expressed_banner"))
+                .font(.ssCaption)
+                .foregroundStyle(Color.ssCharcoal)
+            Spacer()
+        }
+        .padding(12)
+        .background(Color.ssGreen.opacity(0.1))
+        .overlay(
+            RoundedRectangle(cornerRadius: 10)
+                .stroke(Color.ssGreen.opacity(0.4), lineWidth: 1)
+        )
+        .clipShape(RoundedRectangle(cornerRadius: 10))
+    }
+
+    private var withdrawButton: some View {
+        Button(role: .destructive) {
+            showWithdrawConfirm = true
+        } label: {
+            HStack {
+                Image(systemName: "xmark.circle")
+                Text(LocalizedStringKey("mp.opps.withdraw_btn"))
+                    .font(.ssBodyBold)
+            }
+            .foregroundStyle(.red)
+            .frame(maxWidth: .infinity, minHeight: 48)
+            .background(Color.ssPale)
+            .overlay(
+                RoundedRectangle(cornerRadius: 10)
+                    .stroke(.red.opacity(0.4), lineWidth: 1)
+            )
+            .clipShape(RoundedRectangle(cornerRadius: 10))
+        }
+        .disabled(isSubmitting)
     }
 
     private var header: some View {
@@ -193,7 +277,11 @@ struct PickRoleSheet: View {
             }
         } label: {
             ZStack {
-                Text(LocalizedStringKey("mp.opps.confirm_interest"))
+                Text(LocalizedStringKey(
+                    hasExistingInterest
+                    ? "mp.opps.update_interest_btn"
+                    : "mp.opps.confirm_interest"
+                ))
                     .font(.ssBodyBold)
                     .foregroundStyle(Color.ssCream)
                     .opacity(isSubmitting ? 0 : 1)

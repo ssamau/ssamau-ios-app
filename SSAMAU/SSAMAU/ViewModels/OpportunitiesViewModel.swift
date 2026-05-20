@@ -59,6 +59,7 @@ final class OpportunitiesViewModel: ObservableObject {
             self.ownInterests = (try? await own) ?? []
             self.errorMessage = nil
         } catch let apiError as APIError {
+            if apiError.isCancellation { return }   // benign — ignore
             #if DEBUG
             print("⚠️ OpportunitiesViewModel.load APIError: \(apiError)")
             #endif
@@ -117,6 +118,7 @@ final class OpportunitiesViewModel: ObservableObject {
             await refreshOpportunities()
             return true
         } catch let apiError as APIError {
+            if apiError.isCancellation { return false }   // benign
             #if DEBUG
             print("⚠️ expressInterest APIError: \(apiError)")
             #endif
@@ -131,6 +133,52 @@ final class OpportunitiesViewModel: ObservableObject {
         }
     }
 
+    /// Withdraw a previously-expressed interest. Server rejects with
+    /// err.business.withdraw_after_assigned (409) if the head has
+    /// already assigned the member — in that case the toast surfaces
+    /// the localized message telling the member to contact the head.
+    func withdrawInterest(opportunity: Opportunity) async -> Bool {
+        let data: [String: Any] = [
+            "project_id":     opportunity.projectId,
+            "opportunity_id": opportunity.id,
+            "interested":     false,
+        ]
+        do {
+            _ = try await APIClient.shared.call(
+                "interest.submit",
+                params: ["data": data],
+                as: EmptyResponse.self
+            )
+            toastMessage = ErrorLocalization.localize("mp.opps.withdrawn_ok")
+
+            // Optimistically drop the row so the chip flips immediately.
+            ownInterests.removeAll { $0.opportunityId == opportunity.id }
+            await refreshOwnInterests()
+            await refreshOpportunities()
+            return true
+        } catch let apiError as APIError {
+            if apiError.isCancellation { return false }
+            #if DEBUG
+            print("⚠️ withdrawInterest APIError: \(apiError)")
+            #endif
+            toastMessage = apiError.localizedMessage
+            return false
+        } catch {
+            #if DEBUG
+            print("⚠️ withdrawInterest error: \(error)")
+            #endif
+            toastMessage = ErrorLocalization.localize("err.unknown")
+            return false
+        }
+    }
+
+    /// Lookup helper for views — find the member's existing interest
+    /// row (if any) for a given opportunity. Used to pre-select the
+    /// role in PickRoleSheet and to show a Withdraw button.
+    func existingInterest(for opportunity: Opportunity) -> InterestRequest? {
+        ownInterests.first { $0.opportunityId == opportunity.id && $0.interested }
+    }
+
     private func refreshOwnInterests() async {
         do {
             let refreshed = try await APIClient.shared.call(
@@ -138,11 +186,15 @@ final class OpportunitiesViewModel: ObservableObject {
                 as: [InterestRequest].self
             )
             self.ownInterests = refreshed
+        } catch let apiError as APIError {
+            if apiError.isCancellation { return }
+            #if DEBUG
+            print("⚠️ refreshOwnInterests APIError: \(apiError)")
+            #endif
         } catch {
             #if DEBUG
             print("⚠️ refreshOwnInterests failed: \(error)")
             #endif
-            // Keep the optimistic update — chip stays correct visually.
         }
     }
 
@@ -153,6 +205,11 @@ final class OpportunitiesViewModel: ObservableObject {
                 as: [Opportunity].self
             )
             self.opportunities = refreshed
+        } catch let apiError as APIError {
+            if apiError.isCancellation { return }
+            #if DEBUG
+            print("⚠️ refreshOpportunities APIError: \(apiError)")
+            #endif
         } catch {
             #if DEBUG
             print("⚠️ refreshOpportunities failed: \(error)")

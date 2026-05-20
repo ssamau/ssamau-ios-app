@@ -1428,6 +1428,7 @@
 "mp.logh.success" = "Hours submitted. They’ll appear in the Hours tab pending your committee head’s approval.";
 "mp.logh.title" = "⏱️ Log hours";
 "mp.opps.all_roles_full" = "All roles full";  // ios-only
+"mp.opps.already_expressed_banner" = "You've already expressed interest. Pick a different role or update your comment.";  // ios-only
 "mp.opps.any_role" = "Any role";  // ios-only
 "mp.opps.any_role_badge" = "Any role";
 "mp.opps.any_role_lead" = "Help wherever the committee needs — the head will decide where to place you.";
@@ -1488,8 +1489,12 @@
 "mp.opps.status_open" = "Open";  // ios-only
 "mp.opps.success" = "Your interest is registered. The committee head will get in touch.";
 "mp.opps.success_withdraw" = "Your interest has been withdrawn.";
-"mp.opps.withdraw_btn" = "↩️ Withdraw interest";
+"mp.opps.update_interest_btn" = "Update";  // ios-only
+"mp.opps.update_interest_title" = "Update interest";  // ios-only
+"mp.opps.withdraw_btn" = "Withdraw interest";  // ios-only
+"mp.opps.withdraw_confirm" = "Withdraw your interest in this opportunity?";  // ios-only
 "mp.opps.withdrawing" = "Withdrawing...";
+"mp.opps.withdrawn_ok" = "Interest withdrawn.";  // ios-only
 "mp.profile.card_title" = "👤 My profile";
 "mp.profile.contact_card_title" = "📞 Contacts";
 "mp.profile.contact_no_phone" = "— No contact number —";

@@ -59,6 +59,12 @@
   "mp.opps.comment_placeholder": { "en": "Anything the head should know?", "ar": "أيّ ملاحظة للرئيس؟" },
   "mp.opps.confirm_interest":    { "en": "Confirm",          "ar": "تأكيد" },
   "mp.opps.all_roles_full":      { "en": "All roles full",   "ar": "كل الأدوار ممتلئة" },
+  "mp.opps.update_interest_title": { "en": "Update interest", "ar": "تحديث اهتمامك" },
+  "mp.opps.update_interest_btn":   { "en": "Update",          "ar": "تحديث" },
+  "mp.opps.already_expressed_banner": { "en": "You've already expressed interest. Pick a different role or update your comment.", "ar": "سبق أن سجّلت اهتمامك. يمكنك اختيار دور آخر أو تعديل ملاحظتك." },
+  "mp.opps.withdraw_btn":         { "en": "Withdraw interest", "ar": "سحب الاهتمام" },
+  "mp.opps.withdraw_confirm":     { "en": "Withdraw your interest in this opportunity?", "ar": "هل تريد سحب اهتمامك بهذه الفرصة؟" },
+  "mp.opps.withdrawn_ok":         { "en": "Interest withdrawn.", "ar": "تم سحب الاهتمام." },
 
   "mp.tasks.section_upcoming":   { "en": "Upcoming",         "ar": "القادمة" },
   "mp.tasks.section_completed":  { "en": "Completed",        "ar": "المنتهية" },

@@ -9,6 +9,16 @@ enum APIError: Error, Equatable {
     case emptyResponse
     case upgradeRequired
 
+    /// True when this error represents a benign URLSession cancellation
+    /// (request superseded, app backgrounded, view dismissed mid-fetch).
+    /// ViewModels should silently swallow these instead of showing toasts.
+    var isCancellation: Bool {
+        if case .network(let urlError) = self, urlError.code == .cancelled {
+            return true
+        }
+        return false
+    }
+
     var localizedMessage: String {
         switch self {
         case .unauthorized:
