@@ -447,7 +447,7 @@ private struct AssignSheet: View {
                     Task { await vm.assign(member: c, to: role, opportunity: opportunity) }
                 } label: {
                     HStack(spacing: 6) {
-                        if vm.inFlightOppId == opportunity.id {
+                        if vm.inFlightMemberId == c.memberId {
                             ProgressView().tint(Color.ssCream)
                         } else {
                             Image(systemName: "plus")
@@ -461,7 +461,7 @@ private struct AssignSheet: View {
                     .clipShape(Capsule())
                 }
                 .buttonStyle(.plain)
-                .disabled(vm.inFlightOppId != nil)
+                .disabled(vm.inFlightMemberId != nil)
             }
             if let comment = c.comment, !comment.isEmpty {
                 Text(comment)
@@ -545,11 +545,14 @@ private struct AttendanceSheet: View {
                         Task {
                             let h: Double? = (includeHoursOverride && status == "Attended")
                                 ? Double(hoursOverrideText) : nil
-                            await vm.markAttendance(
+                            let ok = await vm.markAttendance(
                                 assignment, status: status,
                                 hoursOverride: h, opportunity: opportunity
                             )
-                            isPresented = false
+                            // Keep the sheet open on failure so the head
+                            // doesn't lose their hours/status pick on a
+                            // transient server error.
+                            if ok { isPresented = false }
                         }
                     } label: {
                         HStack {

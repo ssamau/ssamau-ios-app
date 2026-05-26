@@ -195,8 +195,11 @@ struct HoursApprovalView: View {
                     }
                     Button(role: .destructive) {
                         Task {
-                            await vm.reject(row, reason: rejectReason)
-                            rejectTarget = nil
+                            // Only dismiss + clear reason on success — on
+                            // failure the toast surfaces the error and the
+                            // user keeps their typed reason for retry.
+                            let ok = await vm.reject(row, reason: rejectReason)
+                            if ok { rejectTarget = nil }
                         }
                     } label: {
                         ZStack {

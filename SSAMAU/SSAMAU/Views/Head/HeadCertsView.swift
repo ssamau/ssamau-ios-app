@@ -22,7 +22,12 @@ struct HeadCertsView: View {
                 .task { await refresh() }
                 .ssToast($vm.toast)
                 .sheet(isPresented: $issuing) {
-                    IssueCertSheet(vm: vm, isPresented: $issuing)
+                    IssueCertSheet(vm: vm, isPresented: $issuing) {
+                        // Parent owns the committee scope (adminMode-aware);
+                        // refresh from here so the sheet doesn't have to
+                        // know which mode it's in.
+                        await refresh()
+                    }
                 }
             Button { issuing = true } label: {
                 HStack(spacing: 6) {
@@ -130,6 +135,10 @@ struct HeadCertsView: View {
 private struct IssueCertSheet: View {
     @ObservedObject var vm: HeadCertsViewModel
     @Binding var isPresented: Bool
+    /// Parent-supplied callback that knows the correct committee scope.
+    /// Called after a successful issue so the parent list refreshes
+    /// without the sheet having to know about adminMode.
+    let onSubmitted: () async -> Void
 
     @State private var mode: Mode = .single
     @State private var selectedProjectId: String = ""
@@ -172,9 +181,11 @@ private struct IssueCertSheet: View {
                                     recipientName = ""
                                     recipientEmail = ""
                                 }
-                                ForEach(vm.members.sorted { $0.displayName < $1.displayName }) { m in
+                                ForEach(vm.members
+                                    .filter { $0.memberId != nil }
+                                    .sorted { $0.displayName < $1.displayName }) { m in
                                     Button(m.displayName) {
-                                        selectedMemberId = m.memberId
+                                        selectedMemberId = m.memberId ?? ""
                                         recipientName = m.displayName
                                         recipientEmail = m.authEmail ?? ""
                                     }
@@ -232,7 +243,7 @@ private struct IssueCertSheet: View {
                                 )
                             }
                             if ok {
-                                await vm.load(committeeId: SessionStore.shared.currentUser?.committeeId)
+                                await onSubmitted()
                                 isPresented = false
                             }
                         }
@@ -263,7 +274,17 @@ private struct IssueCertSheet: View {
         }
     }
 
-    private var canSubmit: Bool { !selectedProjectId.isEmpty }
+    private var canSubmit: Bool {
+        guard !selectedProjectId.isEmpty else { return false }
+        // Bulk mode just needs the project — the server iterates
+        // participants. Single mode needs a recipient identity: either
+        // a picked member, or a manually-typed name + email.
+        if mode == .bulk { return true }
+        if !selectedMemberId.isEmpty { return true }
+        let nameOk = !recipientName.trimmingCharacters(in: .whitespaces).isEmpty
+        let emailOk = !recipientEmail.trimmingCharacters(in: .whitespaces).isEmpty
+        return nameOk && emailOk
+    }
     private var selectedProject: Project? { vm.projects.first { $0.id == selectedProjectId } }
     private var selectedMember: MemberAccountRow? { vm.members.first { $0.memberId == selectedMemberId } }
 

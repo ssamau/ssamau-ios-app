@@ -8,6 +8,7 @@ struct AccountsView: View {
     @StateObject private var vm = MembersListViewModel()
     @State private var inviteSheetRow: MemberAccountRow?
     @State private var revokeConfirmRow: MemberAccountRow?
+    @State private var viewerRow: MemberAccountRow?
 
     var body: some View {
         content
@@ -24,6 +25,15 @@ struct AccountsView: View {
             }
             .sheet(item: $vm.pinInviteResult) { result in
                 PinResultSheet(result: result, vm: vm)
+            }
+            .sheet(item: $viewerRow) { row in
+                MemberProfileViewerSheet(
+                    row: row,
+                    isPresented: Binding(
+                        get: { viewerRow != nil },
+                        set: { if !$0 { viewerRow = nil } }
+                    )
+                )
             }
             .confirmationDialog(
                 LocalizedStringKey("hp.members.revoke_confirm"),
@@ -85,42 +95,72 @@ struct AccountsView: View {
     }
 
     private func rowCard(_ row: MemberAccountRow) -> some View {
-        Button { inviteSheetRow = row } label: {
-            VStack(alignment: .leading, spacing: 6) {
-                HStack {
-                    Text(row.displayName)
-                        .font(.ssBodyBold).foregroundStyle(Color.ssGreen)
+        // Body opens the viewer; small "actions" button opens the
+        // invite/revoke sheet. Splits the two intents so a tap to "see
+        // who this is" doesn't immediately demand a destructive action.
+        VStack(alignment: .leading, spacing: 8) {
+            Button { viewerRow = row } label: {
+                HStack(alignment: .top) {
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text(row.displayName)
+                            .font(.ssBodyBold).foregroundStyle(Color.ssGreen)
+                            .multilineTextAlignment(.leading)
+                        if let role = row.accessLevel {
+                            Text(role.capitalized)
+                                .font(.ssTiny.weight(.semibold))
+                                .foregroundStyle(.white)
+                                .padding(.horizontal, 6).padding(.vertical, 2)
+                                .background(Color.ssGold)
+                                .clipShape(Capsule())
+                        }
+                        if let u = row.username {
+                            Text(u).font(.ssTiny.monospaced()).foregroundStyle(Color.ssGrey)
+                        }
+                        if let committee = row.memberCommitteeName {
+                            Label(committee, systemImage: "building.2")
+                                .font(.ssTiny).foregroundStyle(Color.ssGrey)
+                        }
+                        if let last = MemberFieldMaps.displayDate(row.lastLoginAt) {
+                            Text(String(localized: "hp.members.last_login_prefix") + " " + last)
+                                .font(.ssTiny).foregroundStyle(Color.ssGrey)
+                        }
+                    }
                     Spacer()
                     stateBadge(row.state)
                 }
-                if let role = row.accessLevel {
-                    Text("\(role)")
-                        .font(.ssTiny.weight(.semibold))
-                        .foregroundStyle(.white)
-                        .padding(.horizontal, 6).padding(.vertical, 2)
-                        .background(Color.ssGold)
+            }
+            .buttonStyle(.plain)
+
+            // Action button only shown when there's an invite to send/revoke.
+            if row.state != .active {
+                HStack {
+                    Spacer()
+                    Button { inviteSheetRow = row } label: {
+                        HStack(spacing: 6) {
+                            Image(systemName: row.state == .pendingInvite
+                                  ? "arrow.clockwise"
+                                  : "envelope.badge")
+                            Text(LocalizedStringKey(row.state == .pendingInvite
+                                ? "hp.members.resend_invite"
+                                : "hp.members.invite_btn"))
+                        }
+                        .font(.ssCaption.weight(.semibold))
+                        .foregroundStyle(Color.ssGreen)
+                        .padding(.horizontal, 10).padding(.vertical, 6)
+                        .background(Color.ssCream)
                         .clipShape(Capsule())
-                }
-                if let u = row.username {
-                    Text(u).font(.ssTiny.monospaced()).foregroundStyle(Color.ssGrey)
-                }
-                if let committee = row.memberCommitteeName {
-                    Label(committee, systemImage: "building.2")
-                        .font(.ssTiny).foregroundStyle(Color.ssGrey)
-                }
-                if let last = MemberFieldMaps.displayDate(row.lastLoginAt) {
-                    Text(String(localized: "hp.members.last_login_prefix") + " " + last)
-                        .font(.ssTiny).foregroundStyle(Color.ssGrey)
+                        .overlay(Capsule().stroke(Color.ssGreen.opacity(0.4), lineWidth: 1))
+                    }
+                    .buttonStyle(.plain)
                 }
             }
-            .padding(12)
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .background(Color.ssPale)
-            .overlay(RoundedRectangle(cornerRadius: 12)
-                .stroke(Color.ssGold.opacity(0.4), lineWidth: 1))
-            .clipShape(RoundedRectangle(cornerRadius: 12))
         }
-        .buttonStyle(.plain)
+        .padding(12)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(Color.ssPale)
+        .overlay(RoundedRectangle(cornerRadius: 12)
+            .stroke(Color.ssGold.opacity(0.4), lineWidth: 1))
+        .clipShape(RoundedRectangle(cornerRadius: 12))
     }
 
     private func stateBadge(_ state: MemberAccountRow.State) -> some View {
@@ -170,9 +210,13 @@ private struct AccountActionsSheet: View {
                             .font(.ssCaption).foregroundStyle(Color.ssGrey)
 
                         Button {
+                            // Dismiss this sheet before the VM action so
+                            // toast + (for PIN) the result sheet present
+                            // cleanly. See HeadMembersView for context.
                             Task {
-                                await vm.inviteByEmail(row)
                                 onClose()
+                                try? await Task.sleep(nanoseconds: 250_000_000)
+                                await vm.inviteByEmail(row)
                             }
                         } label: {
                             actionRow(icon: "envelope.fill",
@@ -184,8 +228,9 @@ private struct AccountActionsSheet: View {
 
                         Button {
                             Task {
-                                await vm.inviteByPin(row)
                                 onClose()
+                                try? await Task.sleep(nanoseconds: 250_000_000)
+                                await vm.inviteByPin(row)
                             }
                         } label: {
                             actionRow(icon: "number.circle.fill",
@@ -196,8 +241,11 @@ private struct AccountActionsSheet: View {
                         .disabled(vm.inFlightMemberId != nil)
 
                     case .active:
-                        Text("Account is active — last login \(row.lastLoginAt.flatMap(MemberFieldMaps.displayDate) ?? "—")")
-                            .font(.ssCaption).foregroundStyle(Color.ssGrey)
+                        Text(String(
+                            format: NSLocalizedString("ap.accounts.active_with_last_login_fmt", comment: ""),
+                            row.lastLoginAt.flatMap(MemberFieldMaps.displayDate) ?? "—"
+                        ))
+                        .font(.ssCaption).foregroundStyle(Color.ssGrey)
                     }
                 }
                 .padding(20)

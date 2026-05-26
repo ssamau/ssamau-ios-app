@@ -68,7 +68,7 @@ struct InterestTriageView: View {
                     .font(.ssBodyBold).foregroundStyle(Color.ssGreen)
                 Spacer()
                 if row.reviewedAt != nil {
-                    Text("Reviewed")
+                    Text(LocalizedStringKey("common.status.reviewed"))
                         .font(.ssTiny.weight(.semibold))
                         .foregroundStyle(.white)
                         .padding(.horizontal, 8).padding(.vertical, 3)

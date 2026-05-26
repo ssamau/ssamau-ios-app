@@ -22,7 +22,9 @@ struct ThanksView: View {
                 .task { await refresh() }
                 .ssToast($vm.toast)
                 .sheet(isPresented: $sending) {
-                    SendThanksSheet(vm: vm, isPresented: $sending)
+                    SendThanksSheet(vm: vm, isPresented: $sending) {
+                        await refresh()
+                    }
                 }
             Button { sending = true } label: {
                 HStack(spacing: 6) {
@@ -124,15 +126,15 @@ struct ThanksView: View {
     }
 
     private func statusBadge(_ status: String) -> some View {
-        let (color, label): (Color, String) = {
+        let (color, key): (Color, String) = {
             switch status {
-            case "Sent":    return (.ssGreen, "Sent")
-            case "Pending": return (.ssGold,  "Pending")
-            case "Failed":  return (.red,     "Failed")
-            default:        return (.ssGrey,  status)
+            case "Sent":    return (.ssGreen, "common.status.sent")
+            case "Pending": return (.ssGold,  "common.status.pending")
+            case "Failed":  return (.red,     "common.status.failed")
+            default:        return (.ssGrey,  "")
             }
         }()
-        return Text(label)
+        return Text(key.isEmpty ? status : NSLocalizedString(key, comment: ""))
             .font(.ssTiny.weight(.semibold))
             .foregroundStyle(.white)
             .padding(.horizontal, 8).padding(.vertical, 3)
@@ -146,6 +148,8 @@ struct ThanksView: View {
 private struct SendThanksSheet: View {
     @ObservedObject var vm: ThanksViewModel
     @Binding var isPresented: Bool
+    /// Parent-supplied refresh callback that respects adminMode scope.
+    let onSubmitted: () async -> Void
 
     @State private var mode: Mode = .single
     @State private var selectedProjectId: String = ""
@@ -176,9 +180,11 @@ private struct SendThanksSheet: View {
                                     selectedMemberId = ""
                                     recipientEmail = ""
                                 }
-                                ForEach(vm.members.sorted { $0.displayName < $1.displayName }) { m in
+                                ForEach(vm.members
+                                    .filter { $0.memberId != nil }
+                                    .sorted { $0.displayName < $1.displayName }) { m in
                                     Button(m.displayName) {
-                                        selectedMemberId = m.memberId
+                                        selectedMemberId = m.memberId ?? ""
                                         recipientEmail = m.authEmail ?? ""
                                     }
                                 }
@@ -246,7 +252,7 @@ private struct SendThanksSheet: View {
                                 )
                             }
                             if ok {
-                                await vm.load(committeeId: SessionStore.shared.currentUser?.committeeId)
+                                await onSubmitted()
                                 isPresented = false
                             }
                         }

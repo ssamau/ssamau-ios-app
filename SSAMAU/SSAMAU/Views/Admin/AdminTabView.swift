@@ -15,6 +15,13 @@ struct AdminTabView: View {
 
     var body: some View {
         TabView(selection: tabSelectionBinding) {
+            // AdminDashboardView is the only view here that doesn't wrap
+            // itself in a NavigationStack — wrap it so the title + chrome
+            // render correctly. The others (HeadMembersView,
+            // HeadOpportunitiesView, HoursApprovalView) all wrap themselves,
+            // and double-wrapping would corrupt the destination registry
+            // (see ios-app-session-handoff-2.md — same trap that bit
+            // ProfileView in Phase 3).
             NavigationStack { AdminDashboardView() }
                 .tabItem {
                     Label(LocalizedStringKey("ap.tabs.dashboard"),
@@ -29,14 +36,14 @@ struct AdminTabView: View {
                 }
                 .tag(Tab.members)
 
-            NavigationStack { HeadOpportunitiesView() }
+            HeadOpportunitiesView()
                 .tabItem {
                     Label(LocalizedStringKey("ap.tabs.opportunities"),
                           systemImage: "list.bullet.rectangle")
                 }
                 .tag(Tab.opportunities)
 
-            NavigationStack { HoursApprovalView(mode: .adminFinalApproval) }
+            HoursApprovalView(mode: .adminFinalApproval)
                 .tabItem {
                     Label(LocalizedStringKey("ap.tabs.hours"),
                           systemImage: "checkmark.seal")
@@ -95,7 +102,11 @@ private struct AdminMoreView: View {
             ScrollView {
                 VStack(spacing: 10) {
                     row(.projects,     icon: "folder.fill",          key: "ap.tabs.projects")
-                    row(.attendance,   icon: "checkmark.rectangle",  key: "ap.tabs.attendance")
+                    // Attendance intentionally NOT in admin More:
+                    // head.attendance.* is head-or-superadmin scoped on
+                    // the server, so the admin (presidency) hits 403.
+                    // Heads handle attendance per-committee; cross-club
+                    // attendance review is via the web for now.
                     row(.applications, icon: "doc.text.fill",        key: "ap.tabs.applications")
                     row(.thanks,       icon: "envelope.badge",       key: "ap.tabs.thanks")
                     row(.certs,        icon: "rosette",              key: "ap.tabs.certs")

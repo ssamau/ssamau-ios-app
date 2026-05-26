@@ -68,6 +68,7 @@
 "ap.acc.success_create" = "✅ تم إنشاء الحساب";
 "ap.acc.success_update" = "✅ تم تعديل الحساب";
 "ap.access_denied" = "ليس لديك صلاحية للوصول لهذه الصفحة";
+"ap.accounts.active_with_last_login_fmt" = "الحساب نشط — آخر دخول %@";  // ios-only
 "ap.accounts.add_btn" = "حساب جديد";  // ios-only
 "ap.accounts.empty" = "لا توجد حسابات بعد.";  // ios-only
 "ap.accounts.search_placeholder" = "ابحث: اسم مستخدم، صلاحية، عضو";  // ios-only
@@ -1028,6 +1029,12 @@
 "common.send" = "إرسال";  // ios-only
 "common.sending" = "جاري الإرسال...";
 "common.skip_to_content" = "تجاوز إلى المحتوى";
+"common.status.active" = "نشط";  // ios-only
+"common.status.failed" = "فشل";  // ios-only
+"common.status.inactive" = "غير نشط";  // ios-only
+"common.status.pending" = "معلّقة";  // ios-only
+"common.status.reviewed" = "تمت المراجعة";  // ios-only
+"common.status.sent" = "مُرسلة";  // ios-only
 "dev.support_closed" = "مُغلقة";  // ios-only
 "dev.support_empty" = "لا توجد تذاكر دعم.";  // ios-only
 "dev.support_filter_all" = "الكل";  // ios-only
@@ -1435,6 +1442,11 @@
 "hp.members.state_no_account" = "بلا حساب";  // ios-only
 "hp.members.state_pending" = "معلّقة";  // ios-only
 "hp.members.status_active" = "نشط";
+"hp.members.viewer_account_section" = "حساب البوابة";  // ios-only
+"hp.members.viewer_created_at" = "تاريخ الإنشاء";  // ios-only
+"hp.members.viewer_last_login" = "آخر دخول";  // ios-only
+"hp.members.viewer_member_id" = "رقم العضو";  // ios-only
+"hp.members.viewer_username" = "اسم المستخدم";  // ios-only
 "hp.opps.any_role_chip" = "أيّ دور";  // ios-only
 "hp.opps.assign_btn" = "تكليف";  // ios-only
 "hp.opps.assign_col_hours" = "الساعات";

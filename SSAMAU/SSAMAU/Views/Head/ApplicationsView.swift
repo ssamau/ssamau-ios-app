@@ -163,8 +163,9 @@ private struct ApplicationDetailSheet: View {
                         ("apply.s4.study_level", MemberFieldMaps.studyLevelLabel(application.studyLevel) ?? "—"),
                         ("apply.s4.degree_field", application.degreeField ?? "—"),
                     ])
-                    if let cv = application.cvUrl, !cv.isEmpty {
-                        Link(destination: URL(string: cv)!) {
+                    if let cv = application.cvUrl, !cv.isEmpty,
+                       let cvURL = URL(string: cv) {
+                        Link(destination: cvURL) {
                             HStack(spacing: 6) {
                                 Image(systemName: "doc")
                                 Text(LocalizedStringKey("hp.apps.cv_link"))
@@ -250,7 +251,10 @@ private struct ApplicationDetailSheet: View {
                         .scrollContentBackground(.hidden)
                 }
                 Button {
-                    Task { await vm.accept(application, note: note); isPresented = false }
+                    Task {
+                        let ok = await vm.accept(application, note: note)
+                        if ok { isPresented = false }
+                    }
                 } label: {
                     actionLabel("hp.apps.accept_btn", systemImage: "checkmark.circle", color: Color.ssGreen)
                 }
@@ -258,7 +262,10 @@ private struct ApplicationDetailSheet: View {
                 .disabled(vm.inFlightId != nil)
 
                 Button {
-                    Task { await vm.requestInterview(application, note: note); isPresented = false }
+                    Task {
+                        let ok = await vm.requestInterview(application, note: note)
+                        if ok { isPresented = false }
+                    }
                 } label: {
                     actionLabel("hp.apps.interview_btn", systemImage: "video", color: Color.ssGold)
                 }
@@ -299,9 +306,13 @@ private struct ApplicationDetailSheet: View {
                     .scrollContentBackground(.hidden)
                 Button {
                     Task {
-                        await vm.reject(application, reason: rejectReason)
-                        showingReject = false
-                        isPresented = false
+                        // Keep the reject sheet (and its typed reason)
+                        // open on failure so the user can retry.
+                        let ok = await vm.reject(application, reason: rejectReason)
+                        if ok {
+                            showingReject = false
+                            isPresented = false
+                        }
                     }
                 } label: {
                     actionLabel("hp.apps.reject_btn", systemImage: "xmark.circle", color: .red)
@@ -320,6 +331,7 @@ private struct ApplicationDetailSheet: View {
                         .foregroundStyle(Color.ssGrey)
                 }
             }
+            .ssToast(Binding(get: { vm.toast }, set: { vm.toast = $0 }))
         }
     }
 

@@ -11,6 +11,7 @@ struct HeadMembersView: View {
     @StateObject private var vm = MembersListViewModel()
     @State private var inviteSheetRow: MemberAccountRow?
     @State private var revokeConfirmRow: MemberAccountRow?
+    @State private var viewerRow: MemberAccountRow?
 
     var body: some View {
         NavigationStack {
@@ -28,6 +29,15 @@ struct HeadMembersView: View {
                 }
                 .sheet(item: $vm.pinInviteResult) { result in
                     pinResultSheet(result)
+                }
+                .sheet(item: $viewerRow) { row in
+                    MemberProfileViewerSheet(
+                        row: row,
+                        isPresented: Binding(
+                            get: { viewerRow != nil },
+                            set: { if !$0 { viewerRow = nil } }
+                        )
+                    )
                 }
                 .confirmationDialog(
                     LocalizedStringKey("hp.members.revoke_confirm"),
@@ -148,36 +158,46 @@ struct HeadMembersView: View {
     }
 
     private func rowCard(_ row: MemberAccountRow) -> some View {
+        // Tap the body (name/role/state) to open the viewer; the action
+        // buttons live below and have their own tap targets so they
+        // don't trigger the viewer.
         VStack(alignment: .leading, spacing: 8) {
-            HStack(alignment: .top) {
-                VStack(alignment: .leading, spacing: 4) {
-                    Text(row.displayName)
-                        .font(.ssBodyBold)
-                        .foregroundStyle(Color.ssGreen)
-                    HStack(spacing: 6) {
-                        if let role = MemberFieldMaps.roleLabel(row.memberClubRole) {
-                            Text(role)
-                                .font(.ssCaption)
-                                .foregroundStyle(Color.ssCharcoal)
+            Button { viewerRow = row } label: {
+                HStack(alignment: .top) {
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text(row.displayName)
+                            .font(.ssBodyBold)
+                            .foregroundStyle(Color.ssGreen)
+                            .multilineTextAlignment(.leading)
+                        HStack(spacing: 6) {
+                            if let role = MemberFieldMaps.roleLabel(row.memberClubRole) {
+                                Text(role)
+                                    .font(.ssCaption)
+                                    .foregroundStyle(Color.ssCharcoal)
+                            }
+                            if adminMode, let committee = row.memberCommitteeName {
+                                Text("·")
+                                    .foregroundStyle(Color.ssGrey)
+                                Text(committee)
+                                    .font(.ssCaption)
+                                    .foregroundStyle(Color.ssGrey)
+                                    .lineLimit(1)
+                            }
                         }
-                        if adminMode, let committee = row.memberCommitteeName {
-                            Text("·")
+                        if let last = MemberFieldMaps.displayDate(row.lastLoginAt) {
+                            Text(String(localized: "hp.members.last_login_prefix") + " " + last)
+                                .font(.ssTiny)
                                 .foregroundStyle(Color.ssGrey)
-                            Text(committee)
-                                .font(.ssCaption)
-                                .foregroundStyle(Color.ssGrey)
-                                .lineLimit(1)
                         }
                     }
-                    if let last = MemberFieldMaps.displayDate(row.lastLoginAt) {
-                        Text(String(localized: "hp.members.last_login_prefix") + " " + last)
-                            .font(.ssTiny)
-                            .foregroundStyle(Color.ssGrey)
-                    }
+                    Spacer()
+                    stateBadge(row.state)
+                    Image(systemName: "chevron.forward")
+                        .font(.caption)
+                        .foregroundStyle(Color.ssGrey)
                 }
-                Spacer()
-                stateBadge(row.state)
             }
+            .buttonStyle(.plain)
             actionRow(row)
         }
         .padding(14)
@@ -189,16 +209,21 @@ struct HeadMembersView: View {
         .clipShape(RoundedRectangle(cornerRadius: 12))
     }
 
+    @ViewBuilder
     private func actionRow(_ row: MemberAccountRow) -> some View {
-        HStack(spacing: 8) {
-            switch row.state {
-            case .noAccount:
-                inviteAction(row)
-            case .pendingInvite:
-                inviteAction(row)
-                revokeAction(row)
-            case .active:
-                EmptyView()
+        // .active rows render nothing — no need for an empty HStack
+        // taking up extra padding under the body.
+        if row.state != .active {
+            HStack(spacing: 8) {
+                switch row.state {
+                case .noAccount:
+                    inviteAction(row)
+                case .pendingInvite:
+                    inviteAction(row)
+                    revokeAction(row)
+                case .active:
+                    EmptyView()
+                }
             }
         }
     }
@@ -289,9 +314,15 @@ struct HeadMembersView: View {
                         .foregroundStyle(Color.ssGrey)
 
                     Button {
+                        // Dismiss this invite sheet FIRST. Without the leading
+                        // dismiss, the toast-on-success briefly lands behind
+                        // this still-presented sheet, and on email failure
+                        // the user would be stuck on a sheet that already
+                        // ran its action.
                         Task {
-                            await vm.inviteByEmail(row)
                             inviteSheetRow = nil
+                            try? await Task.sleep(nanoseconds: 250_000_000)
+                            await vm.inviteByEmail(row)
                         }
                     } label: {
                         inviteOptionRow(
@@ -304,9 +335,15 @@ struct HeadMembersView: View {
                     .disabled(vm.inFlightMemberId != nil)
 
                     Button {
+                        // Dismiss this sheet BEFORE inviteByPin runs — the
+                        // VM sets pinInviteResult on success which presents
+                        // the PIN result sheet from the same anchor.
+                        // Setting two .sheet(item:) bindings non-nil at the
+                        // same time silently fails on iOS 16-17.
                         Task {
-                            await vm.inviteByPin(row)
                             inviteSheetRow = nil
+                            try? await Task.sleep(nanoseconds: 250_000_000)
+                            await vm.inviteByPin(row)
                         }
                     } label: {
                         inviteOptionRow(

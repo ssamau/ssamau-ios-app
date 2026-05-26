@@ -2,9 +2,18 @@ import SwiftUI
 import Combine
 
 struct CommitteesView: View {
+    @EnvironmentObject private var session: SessionStore
     @StateObject private var vm = CommitteesViewModel()
     @State private var editTarget: Committee?
     @State private var creatingNew: Bool = false
+
+    /// committees.create/update/delete are SUPERADMIN-only on the server,
+    /// so admin (presidency) sees this view in read-only mode. Hiding
+    /// the FAB + the row tap → edit gesture saves them from a 403 they
+    /// can't act on.
+    private var canMutate: Bool {
+        session.currentUser?.isSuperadmin == true
+    }
 
     var body: some View {
         ZStack(alignment: .bottomTrailing) {
@@ -28,16 +37,18 @@ struct CommitteesView: View {
                     )
                 }
 
-            Button { creatingNew = true } label: {
-                HStack(spacing: 6) {
-                    Image(systemName: "plus")
-                    Text(LocalizedStringKey("ap.committees.add_btn"))
+            if canMutate {
+                Button { creatingNew = true } label: {
+                    HStack(spacing: 6) {
+                        Image(systemName: "plus")
+                        Text(LocalizedStringKey("ap.committees.add_btn"))
+                    }
+                    .font(.ssBodyBold).foregroundStyle(Color.ssCream)
+                    .padding(.horizontal, 18).padding(.vertical, 12)
+                    .background(Color.ssGreen).clipShape(Capsule()).shadow(radius: 4)
                 }
-                .font(.ssBodyBold).foregroundStyle(Color.ssCream)
-                .padding(.horizontal, 18).padding(.vertical, 12)
-                .background(Color.ssGreen).clipShape(Capsule()).shadow(radius: 4)
+                .padding(20)
             }
-            .padding(20)
         }
     }
 
@@ -57,7 +68,9 @@ struct CommitteesView: View {
                     } else {
                         LazyVStack(spacing: 10) {
                             ForEach(vm.rows) { c in
-                                Button { editTarget = c } label: {
+                                Button {
+                                    if canMutate { editTarget = c }
+                                } label: {
                                     VStack(alignment: .leading, spacing: 6) {
                                         HStack {
                                             Text(c.name)
@@ -123,8 +136,8 @@ private struct CommitteeFormSheet: View {
                     }
                     field("ap.committees.field_status") {
                         Picker(selection: $status) {
-                            Text("Active").tag("Active")
-                            Text("Inactive").tag("Inactive")
+                            Text(LocalizedStringKey("common.status.active")).tag("Active")
+                            Text(LocalizedStringKey("common.status.inactive")).tag("Inactive")
                         } label: { EmptyView() }
                         .pickerStyle(.segmented)
                     }

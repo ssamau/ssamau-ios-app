@@ -302,6 +302,13 @@
   "hp.thanks.sent_ok":              { "en": "Thanks sent.",     "ar": "تم إرسال الشكر." },
   "hp.thanks.bulk_ok":              { "en": "%d sent.",         "ar": "تم إرسال %d رسالة." },
   "hp.thanks.row_status":           { "en": "Status",           "ar": "الحالة" },
+  "common.status.sent":             { "en": "Sent",             "ar": "مُرسلة" },
+  "common.status.pending":          { "en": "Pending",          "ar": "معلّقة" },
+  "common.status.failed":           { "en": "Failed",           "ar": "فشل" },
+  "common.status.active":           { "en": "Active",           "ar": "نشط" },
+  "common.status.inactive":         { "en": "Inactive",         "ar": "غير نشط" },
+  "common.status.reviewed":         { "en": "Reviewed",         "ar": "تمت المراجعة" },
+  "ap.accounts.active_with_last_login_fmt": { "en": "Account active — last login %@", "ar": "الحساب نشط — آخر دخول %@" },
   "hp.thanks.recorded_hours_fmt":   { "en": "%@ recorded hours","ar": "%@ ساعات مسجّلة" },
 
   "hp.certs.search_placeholder":    { "en": "Search recipient or project", "ar": "ابحث: مستلم، مشروع" },
@@ -322,6 +329,11 @@
   "hp.certs.section_history":       { "en": "Issued certificates", "ar": "الشهادات المُصدَرة" },
 
   "hp.profile.viewer_title":        { "en": "Member profile",   "ar": "ملف العضو" },
+  "hp.members.viewer_member_id":    { "en": "Member ID",        "ar": "رقم العضو" },
+  "hp.members.viewer_account_section": { "en": "Portal account", "ar": "حساب البوابة" },
+  "hp.members.viewer_username":     { "en": "Username",         "ar": "اسم المستخدم" },
+  "hp.members.viewer_last_login":   { "en": "Last login",       "ar": "آخر دخول" },
+  "hp.members.viewer_created_at":   { "en": "Created",          "ar": "تاريخ الإنشاء" },
 
   "ap.tabs.dashboard":              { "en": "Dashboard",        "ar": "لوحة" },
   "ap.tabs.accounts":               { "en": "Accounts",         "ar": "الحسابات" },

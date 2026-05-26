@@ -68,6 +68,7 @@
 "ap.acc.success_create" = "✅ Account created.";
 "ap.acc.success_update" = "✅ Account updated.";
 "ap.access_denied" = "You don’t have permission to view this page.";
+"ap.accounts.active_with_last_login_fmt" = "Account active — last login %@";  // ios-only
 "ap.accounts.add_btn" = "New account";  // ios-only
 "ap.accounts.empty" = "No accounts yet.";  // ios-only
 "ap.accounts.search_placeholder" = "Search username, role, member";  // ios-only
@@ -1028,6 +1029,12 @@
 "common.send" = "Send";  // ios-only
 "common.sending" = "Sending...";
 "common.skip_to_content" = "Skip to content";
+"common.status.active" = "Active";  // ios-only
+"common.status.failed" = "Failed";  // ios-only
+"common.status.inactive" = "Inactive";  // ios-only
+"common.status.pending" = "Pending";  // ios-only
+"common.status.reviewed" = "Reviewed";  // ios-only
+"common.status.sent" = "Sent";  // ios-only
 "dev.support_closed" = "Closed";  // ios-only
 "dev.support_empty" = "No support tickets.";  // ios-only
 "dev.support_filter_all" = "All";  // ios-only
@@ -1435,6 +1442,11 @@
 "hp.members.state_no_account" = "No account";  // ios-only
 "hp.members.state_pending" = "Pending";  // ios-only
 "hp.members.status_active" = "Active";
+"hp.members.viewer_account_section" = "Portal account";  // ios-only
+"hp.members.viewer_created_at" = "Created";  // ios-only
+"hp.members.viewer_last_login" = "Last login";  // ios-only
+"hp.members.viewer_member_id" = "Member ID";  // ios-only
+"hp.members.viewer_username" = "Username";  // ios-only
 "hp.opps.any_role_chip" = "Any role";  // ios-only
 "hp.opps.assign_btn" = "Assign";  // ios-only
 "hp.opps.assign_col_hours" = "Hours";

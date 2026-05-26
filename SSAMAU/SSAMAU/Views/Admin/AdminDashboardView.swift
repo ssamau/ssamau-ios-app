@@ -73,7 +73,7 @@ struct AdminDashboardView: View {
                                             }
                                         }
                                         Spacer()
-                                        Text(p.projectStatus ?? "—")
+                                        Text(localizedProjectStatus(p.projectStatus))
                                             .font(.ssTiny.weight(.semibold))
                                             .foregroundStyle(Color.ssGreen)
                                     }
@@ -137,6 +137,18 @@ struct AdminDashboardView: View {
         .overlay(RoundedRectangle(cornerRadius: 12)
             .stroke(Color.ssGold.opacity(0.4), lineWidth: 1))
         .clipShape(RoundedRectangle(cornerRadius: 12))
+    }
+
+    /// Project-status enum from the server (raw English) → localized label.
+    /// Falls through to the raw value for any unknown/legacy status.
+    private func localizedProjectStatus(_ raw: String?) -> String {
+        switch raw ?? "" {
+        case "Planned":   return NSLocalizedString("hp.projects.status_planned", comment: "")
+        case "Active":    return NSLocalizedString("hp.projects.status_active", comment: "")
+        case "Done":      return NSLocalizedString("hp.projects.status_done", comment: "")
+        case "Cancelled": return NSLocalizedString("hp.projects.status_cancelled", comment: "")
+        default:          return raw ?? "—"
+        }
     }
 
     private func errorState(_ message: String) -> some View {

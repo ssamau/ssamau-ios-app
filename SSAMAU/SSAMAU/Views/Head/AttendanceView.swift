@@ -19,7 +19,9 @@ struct AttendanceView: View {
                 .task         { await vm.load(committeeId: session.currentUser?.committeeId) }
                 .ssToast($vm.toast)
                 .sheet(isPresented: $recording) {
-                    RecordAttendanceSheet(vm: vm, isPresented: $recording)
+                    RecordAttendanceSheet(vm: vm, isPresented: $recording) {
+                        await vm.load(committeeId: session.currentUser?.committeeId)
+                    }
                 }
                 .confirmationDialog(
                     LocalizedStringKey("hp.attendance.delete_confirm"),
@@ -158,6 +160,8 @@ struct AttendanceView: View {
 private struct RecordAttendanceSheet: View {
     @ObservedObject var vm: AttendanceViewModel
     @Binding var isPresented: Bool
+    /// Parent-supplied refresh callback (carries the parent's committee scope).
+    let onSubmitted: () async -> Void
 
     @State private var mode: Mode = .project
     @State private var selectedProjectId: String = ""
@@ -198,7 +202,9 @@ private struct RecordAttendanceSheet: View {
                         Menu {
                             Button("—") { selectedMemberId = "" }
                             ForEach(activeMembers) { m in
-                                Button(m.displayName) { selectedMemberId = m.memberId }
+                                if let mid = m.memberId {
+                                    Button(m.displayName) { selectedMemberId = mid }
+                                }
                             }
                         } label: {
                             pickerLabel(selectedMember?.displayName ?? "—")
@@ -336,7 +342,7 @@ private struct RecordAttendanceSheet: View {
                     )
                 }
                 if ok {
-                    await vm.load(committeeId: SessionStore.shared.currentUser?.committeeId)
+                    await onSubmitted()
                     isPresented = false
                 }
             }
@@ -361,7 +367,11 @@ private struct RecordAttendanceSheet: View {
     }
 
     private var activeMembers: [MemberAccountRow] {
-        vm.members.sorted { $0.displayName < $1.displayName }
+        // Only members with a real member_id are recordable as attendees;
+        // member-less admin/dev rows are excluded from the picker.
+        vm.members
+            .filter { $0.memberId != nil }
+            .sorted { $0.displayName < $1.displayName }
     }
     private var selectedMember: MemberAccountRow? {
         vm.members.first { $0.memberId == selectedMemberId }

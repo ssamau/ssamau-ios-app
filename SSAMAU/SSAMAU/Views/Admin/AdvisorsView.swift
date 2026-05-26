@@ -4,10 +4,18 @@ import SwiftUI
 /// can browse via the admin More menu. Mutations gated by server's
 /// SUPERADMIN_ACTIONS allowlist.
 struct AdvisorsView: View {
+    @EnvironmentObject private var session: SessionStore
     @StateObject private var vm = AdvisorsViewModel()
     @State private var editTarget: Advisor?
     @State private var creatingNew: Bool = false
     @State private var deleteTarget: Advisor?
+
+    /// All advisor mutations are SUPERADMIN-only on the server. Hide the
+    /// create FAB + tap-to-edit + delete buttons for non-superadmins
+    /// (admin/presidency) so they don't hit 403s.
+    private var canMutate: Bool {
+        session.currentUser?.isSuperadmin == true
+    }
 
     var body: some View {
         ZStack(alignment: .bottomTrailing) {
@@ -46,16 +54,18 @@ struct AdvisorsView: View {
                     Button(LocalizedStringKey("common.cancel"), role: .cancel) {}
                 }
 
-            Button { creatingNew = true } label: {
-                HStack(spacing: 6) {
-                    Image(systemName: "plus")
-                    Text(LocalizedStringKey("ap.advisors.add_btn"))
+            if canMutate {
+                Button { creatingNew = true } label: {
+                    HStack(spacing: 6) {
+                        Image(systemName: "plus")
+                        Text(LocalizedStringKey("ap.advisors.add_btn"))
+                    }
+                    .font(.ssBodyBold).foregroundStyle(Color.ssCream)
+                    .padding(.horizontal, 18).padding(.vertical, 12)
+                    .background(Color.ssGreen).clipShape(Capsule()).shadow(radius: 4)
                 }
-                .font(.ssBodyBold).foregroundStyle(Color.ssCream)
-                .padding(.horizontal, 18).padding(.vertical, 12)
-                .background(Color.ssGreen).clipShape(Capsule()).shadow(radius: 4)
+                .padding(20)
             }
-            .padding(20)
         }
     }
 
@@ -88,18 +98,23 @@ struct AdvisorsView: View {
     }
 
     private func rowCard(_ a: Advisor) -> some View {
-        Button { editTarget = a } label: {
+        Button {
+            if canMutate { editTarget = a }
+        } label: {
             VStack(alignment: .leading, spacing: 6) {
                 HStack {
                     Text(a.fullName)
                         .font(.ssBodyBold).foregroundStyle(Color.ssGreen)
                     Spacer()
                     if let s = a.status {
-                        Text(s).font(.ssTiny.weight(.semibold))
-                            .foregroundStyle(.white)
-                            .padding(.horizontal, 8).padding(.vertical, 3)
-                            .background(s == "Active" ? Color.ssGreen : Color.ssGrey)
-                            .clipShape(Capsule())
+                        Text(LocalizedStringKey(
+                            s == "Active" ? "common.status.active" : "common.status.inactive"
+                        ))
+                        .font(.ssTiny.weight(.semibold))
+                        .foregroundStyle(.white)
+                        .padding(.horizontal, 8).padding(.vertical, 3)
+                        .background(s == "Active" ? Color.ssGreen : Color.ssGrey)
+                        .clipShape(Capsule())
                     }
                 }
                 if let r = a.advisoryRole {
@@ -113,18 +128,20 @@ struct AdvisorsView: View {
                         .font(.ssTiny.weight(.semibold))
                         .foregroundStyle(Color.ssGold)
                 }
-                HStack {
-                    Spacer()
-                    Button(role: .destructive) { deleteTarget = a } label: {
-                        Label(LocalizedStringKey("common.delete"), systemImage: "trash")
-                            .font(.ssTiny.weight(.semibold))
-                            .foregroundStyle(.red)
-                            .padding(.horizontal, 8).padding(.vertical, 4)
-                            .background(Color.ssCream).clipShape(Capsule())
-                            .overlay(Capsule().stroke(.red.opacity(0.3), lineWidth: 1))
+                if canMutate {
+                    HStack {
+                        Spacer()
+                        Button(role: .destructive) { deleteTarget = a } label: {
+                            Label(LocalizedStringKey("common.delete"), systemImage: "trash")
+                                .font(.ssTiny.weight(.semibold))
+                                .foregroundStyle(.red)
+                                .padding(.horizontal, 8).padding(.vertical, 4)
+                                .background(Color.ssCream).clipShape(Capsule())
+                                .overlay(Capsule().stroke(.red.opacity(0.3), lineWidth: 1))
+                        }
+                        .buttonStyle(.plain)
+                        .disabled(vm.inFlightId != nil)
                     }
-                    .buttonStyle(.plain)
-                    .disabled(vm.inFlightId != nil)
                 }
             }
             .padding(14)
@@ -181,8 +198,8 @@ private struct AdvisorFormSheet: View {
                     }
                     field("ap.advisors.field_status") {
                         Picker(selection: $status) {
-                            Text("Active").tag("Active")
-                            Text("Inactive").tag("Inactive")
+                            Text(LocalizedStringKey("common.status.active")).tag("Active")
+                            Text(LocalizedStringKey("common.status.inactive")).tag("Inactive")
                         } label: { EmptyView() }
                         .pickerStyle(.segmented)
                     }

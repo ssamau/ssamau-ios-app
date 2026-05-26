@@ -81,13 +81,13 @@ final class MembersListViewModel: ObservableObject {
     }
 
     func inviteByEmail(_ row: MemberAccountRow) async {
-        guard inFlightMemberId == nil else { return }
-        inFlightMemberId = row.memberId
+        guard inFlightMemberId == nil, let memberId = row.memberId else { return }
+        inFlightMemberId = memberId
         defer { inFlightMemberId = nil }
         do {
             _ = try await APIClient.shared.call(
                 "auth.invite.byEmail",
-                params: ["member_id": row.memberId],
+                params: ["member_id": memberId],
                 as: EmptyResponse.self
             )
             toast = .success(ErrorLocalization.localize("hp.members.invite_email_ok"))
@@ -101,13 +101,13 @@ final class MembersListViewModel: ObservableObject {
     }
 
     func inviteByPin(_ row: MemberAccountRow) async {
-        guard inFlightMemberId == nil else { return }
-        inFlightMemberId = row.memberId
+        guard inFlightMemberId == nil, let memberId = row.memberId else { return }
+        inFlightMemberId = memberId
         defer { inFlightMemberId = nil }
         do {
             let resp = try await APIClient.shared.call(
                 "auth.invite.byPin",
-                params: ["member_id": row.memberId],
+                params: ["member_id": memberId],
                 as: PinInviteResponse.self
             )
             pinInviteResult = PinInviteResult(
@@ -125,13 +125,13 @@ final class MembersListViewModel: ObservableObject {
     }
 
     func revokeInvite(_ row: MemberAccountRow) async {
-        guard inFlightMemberId == nil else { return }
-        inFlightMemberId = row.memberId
+        guard inFlightMemberId == nil, let memberId = row.memberId else { return }
+        inFlightMemberId = memberId
         defer { inFlightMemberId = nil }
         do {
             _ = try await APIClient.shared.call(
                 "auth.invite.revoke",
-                params: ["member_id": row.memberId],
+                params: ["member_id": memberId],
                 as: EmptyResponse.self
             )
             toast = .success(ErrorLocalization.localize("hp.members.revoked_ok"))

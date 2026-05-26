@@ -79,8 +79,13 @@ struct DashboardStats: Decodable {
         }
         init(from decoder: Decoder) throws {
             let c = try decoder.container(keyedBy: CodingKeys.self)
-            memberId = try c.decodeIfPresent(String.self, forKey: .memberId) ?? UUID().uuidString
-            name     = try c.decodeIfPresent(String.self, forKey: .name) ?? memberId
+            // Server's GROUP BY guarantees a non-null member_id, but a
+            // bogus row would still parse — fall back to the index-stable
+            // name rather than a per-call UUID (which would re-shuffle
+            // SwiftUI identity on every diff).
+            let n = try c.decodeIfPresent(String.self, forKey: .name) ?? ""
+            memberId = try c.decodeIfPresent(String.self, forKey: .memberId) ?? "tv-\(n)"
+            name     = n.isEmpty ? memberId : n
             if let d = try? c.decode(Double.self, forKey: .hours) {
                 hours = d
             } else if let s = try? c.decode(String.self, forKey: .hours), let d = Double(s) {
@@ -101,8 +106,9 @@ struct DashboardStats: Decodable {
         }
         init(from decoder: Decoder) throws {
             let c = try decoder.container(keyedBy: CodingKeys.self)
-            committeeId   = try c.decodeIfPresent(String.self, forKey: .committeeId) ?? UUID().uuidString
-            committeeName = try c.decodeIfPresent(String.self, forKey: .committeeName) ?? committeeId
+            let n = try c.decodeIfPresent(String.self, forKey: .committeeName) ?? ""
+            committeeId   = try c.decodeIfPresent(String.self, forKey: .committeeId) ?? "ch-\(n)"
+            committeeName = n.isEmpty ? committeeId : n
             if let d = try? c.decode(Double.self, forKey: .hours) {
                 hours = d
             } else if let s = try? c.decode(String.self, forKey: .hours), let d = Double(s) {

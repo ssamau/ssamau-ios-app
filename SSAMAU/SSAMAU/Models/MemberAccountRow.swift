@@ -1,12 +1,33 @@
 import Foundation
 
-/// One row from `users.list`. Pivots around the MEMBER (not the
-/// account) — `id` (account id) and `username` are nullable: members
-/// without an account have no users row. Used by HeadMembersView and
-/// AdminMembersView (admin variant returns the same shape, broader scope).
+/// One row from `users.list`.
+///
+/// Two server queries land here:
+///   * HEAD path: `FROM members LEFT JOIN users` — every row has a
+///     non-null `member_id`; account fields may be null (member has
+///     no portal account yet).
+///   * ADMIN path: `FROM users LEFT JOIN members` — every row has a
+///     non-null account id; `member_id` may be null (the dev account
+///     and any system-level account with no linked member).
+///
+/// To survive both shapes, `memberId` is optional. We synthesise a
+/// stable `id` for ForEach from whichever side is present.
 struct MemberAccountRow: Codable, Identifiable, Equatable {
-    /// Stable identity for ForEach: members.member_id, always present.
-    var id: String { memberId }
+    /// Stable identity for ForEach. Prefer the member id (consistent
+    /// across both query paths); fall back to the account id when the
+    /// row is a member-less admin/dev account. NEVER use a fresh UUID
+    /// per call — SwiftUI re-evaluates `id` on every diff, and a
+    /// non-stable id breaks scroll position + selection.
+    var id: String {
+        if let m = memberId { return m }
+        if let a = accountId { return "acct-\(a)" }
+        // Synthesised on the username when the row truly has no id
+        // (vanishingly rare — dev account with no member link AND no
+        // numeric account id). Falls through to a fixed sentinel as a
+        // last resort; collisions here only happen if there are
+        // multiple such rows, which is impossible per the DB schema.
+        return "row-\(username ?? "unknown")"
+    }
 
     let accountId: Int?              // users.id — nil if no account
     let username: String?
@@ -15,7 +36,7 @@ struct MemberAccountRow: Codable, Identifiable, Equatable {
     let createdAt: String?
     let lastLoginAt: String?
     let authEmail: String?
-    let memberId: String
+    let memberId: String?             // nil for admin-path rows w/ no linked member
     let memberFullName: String?
     let memberPreferredName: String?
     let memberCommitteeId: String?
@@ -23,7 +44,11 @@ struct MemberAccountRow: Codable, Identifiable, Equatable {
     let memberClubRole: String?
 
     var displayName: String {
-        memberPreferredName ?? memberFullName ?? memberId
+        memberPreferredName
+            ?? memberFullName
+            ?? username
+            ?? memberId
+            ?? "—"
     }
 
     /// Three account states:
@@ -69,7 +94,7 @@ struct MemberAccountRow: Codable, Identifiable, Equatable {
         createdAt            = try c.decodeIfPresent(String.self, forKey: .createdAt)
         lastLoginAt          = try c.decodeIfPresent(String.self, forKey: .lastLoginAt)
         authEmail            = try c.decodeIfPresent(String.self, forKey: .authEmail)
-        memberId             = try c.decode(String.self, forKey: .memberId)
+        memberId             = try c.decodeIfPresent(String.self, forKey: .memberId)
         memberFullName       = try c.decodeIfPresent(String.self, forKey: .memberFullName)
         memberPreferredName  = try c.decodeIfPresent(String.self, forKey: .memberPreferredName)
         memberCommitteeId    = try c.decodeIfPresent(String.self, forKey: .memberCommitteeId)

@@ -17,6 +17,10 @@ final class HeadOpportunitiesViewModel: ObservableObject {
     @Published var statusFilter: StatusFilter = .openOnly
     @Published var inFlightOppId: String?
     @Published var inFlightAssignmentId: String?
+    /// Tracks which specific candidate is being assigned so only that
+    /// row's button spins (vs every candidate's button spinning under
+    /// the broader inFlightOppId guard).
+    @Published var inFlightMemberId: String?
 
     enum StatusFilter: String, CaseIterable, Identifiable {
         case openOnly, all, past
@@ -98,9 +102,13 @@ final class HeadOpportunitiesViewModel: ObservableObject {
     // MARK: - Mutations
 
     func assign(member: InterestRow, to role: OpportunityRole?, opportunity: Opportunity) async {
-        guard inFlightOppId == nil else { return }
+        guard inFlightMemberId == nil else { return }
+        inFlightMemberId = member.memberId
         inFlightOppId = opportunity.id
-        defer { inFlightOppId = nil }
+        defer {
+            inFlightMemberId = nil
+            inFlightOppId = nil
+        }
         var params: [String: Any] = [
             "opportunity_id": opportunity.id,
             "member_id":      member.memberId,
@@ -144,13 +152,14 @@ final class HeadOpportunitiesViewModel: ObservableObject {
         }
     }
 
+    @discardableResult
     func markAttendance(
         _ assignment: AssignmentRow,
         status: String,
         hoursOverride: Double?,
         opportunity: Opportunity
-    ) async {
-        guard inFlightAssignmentId == nil else { return }
+    ) async -> Bool {
+        guard inFlightAssignmentId == nil else { return false }
         inFlightAssignmentId = assignment.id
         defer { inFlightAssignmentId = nil }
         var params: [String: Any] = [
@@ -167,11 +176,14 @@ final class HeadOpportunitiesViewModel: ObservableObject {
             toast = .success(ErrorLocalization.localize("hp.opps.attendance_marked"))
             await loadDetail(for: opportunity)
             await load()
+            return true
         } catch let apiError as APIError {
-            if apiError.isCancellation { return }
+            if apiError.isCancellation { return false }
             toast = .error(apiError.localizedMessage)
+            return false
         } catch {
             toast = .error(ErrorLocalization.localize("err.unknown"))
+            return false
         }
     }
 }

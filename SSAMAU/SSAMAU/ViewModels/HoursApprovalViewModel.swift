@@ -82,9 +82,11 @@ final class HoursApprovalViewModel: ObservableObject {
         }
     }
 
-    /// "Approve" → next state in the chain.
-    func approve(_ row: HoursAdminRow) async {
-        guard rowInFlight == nil else { return }
+    /// "Approve" → next state in the chain. Returns true on success so
+    /// the caller can decide whether to dismiss a sheet / clear state.
+    @discardableResult
+    func approve(_ row: HoursAdminRow) async -> Bool {
+        guard rowInFlight == nil else { return false }
         rowInFlight = row.id
         defer { rowInFlight = nil }
 
@@ -109,16 +111,20 @@ final class HoursApprovalViewModel: ObservableObject {
             )
             toast = .success(ErrorLocalization.localize("hp.hours.approved_ok"))
             await load()
+            return true
         } catch let apiError as APIError {
-            if apiError.isCancellation { return }
+            if apiError.isCancellation { return false }
             toast = .error(apiError.localizedMessage)
+            return false
         } catch {
             toast = .error(ErrorLocalization.localize("err.unknown"))
+            return false
         }
     }
 
-    func reject(_ row: HoursAdminRow, reason: String) async {
-        guard rowInFlight == nil else { return }
+    @discardableResult
+    func reject(_ row: HoursAdminRow, reason: String) async -> Bool {
+        guard rowInFlight == nil else { return false }
         rowInFlight = row.id
         defer { rowInFlight = nil }
         let trimmed = reason.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -132,11 +138,14 @@ final class HoursApprovalViewModel: ObservableObject {
             )
             toast = .success(ErrorLocalization.localize("hp.hours.rejected_ok"))
             await load()
+            return true
         } catch let apiError as APIError {
-            if apiError.isCancellation { return }
+            if apiError.isCancellation { return false }
             toast = .error(apiError.localizedMessage)
+            return false
         } catch {
             toast = .error(ErrorLocalization.localize("err.unknown"))
+            return false
         }
     }
 }

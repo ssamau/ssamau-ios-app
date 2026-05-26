@@ -49,26 +49,30 @@ final class ApplicationsViewModel: ObservableObject {
         self.errorMessage = nil
     }
 
-    func accept(_ application: Application, note: String?) async {
+    @discardableResult
+    func accept(_ application: Application, note: String?) async -> Bool {
         await mutate(application: application, action: "applications.accept",
                      params: noteParams(application.id, note),
                      successKey: "hp.apps.accepted_ok")
     }
-    func requestInterview(_ application: Application, note: String?) async {
+    @discardableResult
+    func requestInterview(_ application: Application, note: String?) async -> Bool {
         await mutate(application: application, action: "applications.requestInterview",
                      params: noteParams(application.id, note),
                      successKey: "hp.apps.interview_ok")
     }
-    func reject(_ application: Application, reason: String?) async {
+    @discardableResult
+    func reject(_ application: Application, reason: String?) async -> Bool {
         var p: [String: Any] = ["id": application.id]
         if let r = reason, !r.isEmpty { p["reason"] = r }
-        await mutate(application: application, action: "applications.reject",
-                     params: p, successKey: "hp.apps.rejected_ok")
+        return await mutate(application: application, action: "applications.reject",
+                            params: p, successKey: "hp.apps.rejected_ok")
     }
-    func assignCommittee(_ application: Application, committeeId: String) async {
+    @discardableResult
+    func assignCommittee(_ application: Application, committeeId: String) async -> Bool {
         let p: [String: Any] = ["id": application.id, "committee_id": committeeId]
-        await mutate(application: application, action: "applications.assignCommittee",
-                     params: p, successKey: "ap.apps.assigned_ok")
+        return await mutate(application: application, action: "applications.assignCommittee",
+                            params: p, successKey: "ap.apps.assigned_ok")
     }
 
     private func noteParams(_ id: String, _ note: String?) -> [String: Any] {
@@ -78,19 +82,22 @@ final class ApplicationsViewModel: ObservableObject {
     }
 
     private func mutate(application: Application, action: String,
-                        params: [String: Any], successKey: String) async {
-        guard inFlightId == nil else { return }
+                        params: [String: Any], successKey: String) async -> Bool {
+        guard inFlightId == nil else { return false }
         inFlightId = application.id
         defer { inFlightId = nil }
         do {
             _ = try await APIClient.shared.call(action, params: params, as: AnyJSON.self)
             toast = .success(ErrorLocalization.localize(successKey))
             await load()
+            return true
         } catch let apiError as APIError {
-            if apiError.isCancellation { return }
+            if apiError.isCancellation { return false }
             toast = .error(apiError.localizedMessage)
+            return false
         } catch {
             toast = .error(ErrorLocalization.localize("err.unknown"))
+            return false
         }
     }
 }
