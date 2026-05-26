@@ -96,6 +96,7 @@ enum AdminMoreDestination: Hashable {
 private struct AdminMoreView: View {
     @EnvironmentObject private var session: SessionStore
     @Binding var path: NavigationPath
+    @State private var showSignOutConfirm: Bool = false
 
     var body: some View {
         NavigationStack(path: $path) {
@@ -120,6 +121,14 @@ private struct AdminMoreView: View {
                             key: "ap.tabs.dev")
                     }
                     row(.profile,      icon: "person.circle",        key: "hp.tabs.profile")
+                    // Sign out sits directly under Profile so the
+                    // dev/admin can reach it even when their account
+                    // has no linked member row (ProfileView fails to
+                    // load for member-less accounts since members.getOwn
+                    // returns 404). Same pattern as the in-Profile
+                    // sign out button — confirms before tearing down
+                    // the session.
+                    signOutRow
                 }
                 .padding(.horizontal, 20)
                 .padding(.vertical, 16)
@@ -143,32 +152,70 @@ private struct AdminMoreView: View {
                 case .profile:      ProfileView(nestedInNavStack: true)
                 }
             }
+            .confirmationDialog(
+                LocalizedStringKey("common.logout_confirm"),
+                isPresented: $showSignOutConfirm,
+                titleVisibility: .visible
+            ) {
+                Button(LocalizedStringKey("common.logout"), role: .destructive) {
+                    Task { await session.signOut() }
+                }
+                Button(LocalizedStringKey("common.cancel"), role: .cancel) {}
+            }
         }
     }
 
     private func row(_ dest: AdminMoreDestination, icon: String, key: String) -> some View {
         NavigationLink(value: dest) {
-            HStack(spacing: 14) {
-                Image(systemName: icon)
-                    .font(.title3)
-                    .foregroundStyle(Color.ssGold)
-                    .frame(width: 32)
-                Text(LocalizedStringKey(key))
-                    .font(.ssBody)
-                    .foregroundStyle(Color.ssCharcoal)
-                Spacer()
+            menuRowLabel(icon: icon, key: key,
+                         tint: Color.ssGold, textColor: Color.ssCharcoal)
+        }
+        .buttonStyle(.plain)
+    }
+
+    private var signOutRow: some View {
+        Button(role: .destructive) {
+            showSignOutConfirm = true
+        } label: {
+            menuRowLabel(icon: "rectangle.portrait.and.arrow.right",
+                         key: "common.logout",
+                         tint: .red, textColor: .red,
+                         showChevron: false,
+                         borderColor: .red.opacity(0.35))
+        }
+        .buttonStyle(.plain)
+    }
+
+    /// Shared row chrome — extracted so Sign Out can reuse the same
+    /// padding + corner radius + border treatment as the navigation
+    /// rows, with red tint instead of gold.
+    private func menuRowLabel(
+        icon: String, key: String,
+        tint: Color, textColor: Color,
+        showChevron: Bool = true,
+        borderColor: Color = Color.ssGold.opacity(0.4)
+    ) -> some View {
+        HStack(spacing: 14) {
+            Image(systemName: icon)
+                .font(.title3)
+                .foregroundStyle(tint)
+                .frame(width: 32)
+            Text(LocalizedStringKey(key))
+                .font(.ssBody)
+                .foregroundStyle(textColor)
+            Spacer()
+            if showChevron {
                 Image(systemName: "chevron.forward")
                     .foregroundStyle(Color.ssGrey)
                     .font(.caption)
             }
-            .padding(14)
-            .background(Color.ssPale)
-            .overlay(
-                RoundedRectangle(cornerRadius: 12)
-                    .stroke(Color.ssGold.opacity(0.4), lineWidth: 1)
-            )
-            .clipShape(RoundedRectangle(cornerRadius: 12))
         }
-        .buttonStyle(.plain)
+        .padding(14)
+        .background(Color.ssPale)
+        .overlay(
+            RoundedRectangle(cornerRadius: 12)
+                .stroke(borderColor, lineWidth: 1)
+        )
+        .clipShape(RoundedRectangle(cornerRadius: 12))
     }
 }

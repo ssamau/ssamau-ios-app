@@ -1036,6 +1036,7 @@
 "common.generic_error" = "حدث خطأ، حاول مجدداً";
 "common.loading" = "جارٍ التحميل…";  // ios-only
 "common.logout" = "خروج";
+"common.logout_confirm" = "تسجيل الخروج من SSAMAU؟";  // ios-only
 "common.network_error" = "تعذّر الاتصال بالخادم، حاول مجدداً";
 "common.notes" = "ملاحظات";  // ios-only
 "common.ok" = "حسناً";  // ios-only
