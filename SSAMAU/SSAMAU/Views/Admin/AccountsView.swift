@@ -336,9 +336,15 @@ private struct AccountActionsSheet: View {
                         .disabled(vm.inFlightMemberId != nil)
 
                     case .active:
+                        // Resolve the date once up-front; passing
+                        // `flatMap(MemberFieldMaps.displayDate)` as a
+                        // method ref into String(format:) triggers a
+                        // strict-concurrency warning that's harmless but
+                        // noisy.
+                        let lastLogin = MemberFieldMaps.displayDate(row.lastLoginAt) ?? "—"
                         Text(String(
                             format: NSLocalizedString("ap.accounts.active_with_last_login_fmt", comment: ""),
-                            row.lastLoginAt.flatMap(MemberFieldMaps.displayDate) ?? "—"
+                            lastLogin
                         ))
                         .font(.ssCaption).foregroundStyle(Color.ssGrey)
                     }
@@ -461,7 +467,7 @@ private struct AccountFormSheet: View {
     /// the currently-linked member so the picker preselects correctly.
     private var memberCandidates: [MemberAccountRow] {
         vm.rows.filter { row in
-            guard let mid = row.memberId else { return false }
+            guard row.memberId != nil else { return false }
             if existing != nil && row.memberId == existing?.memberId { return true }
             return row.accountId == nil
         }.sorted { $0.displayName < $1.displayName }

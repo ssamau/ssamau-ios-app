@@ -108,8 +108,19 @@ enum MemberFieldMaps {
     }
 
     // MARK: - Date formatting
+    //
+    // ISO8601DateFormatter is non-Sendable in older SDKs but Sendable
+    // in Xcode 16+. We still tag the older type with
+    // nonisolated(unsafe) so the build stays warning-free on the older
+    // toolchain. DateFormatter is Sendable as of Xcode 16 — no
+    // annotation needed.
 
-    private static let serverDateFormatter: ISO8601DateFormatter = {
+    // Formatters as `nonisolated(unsafe)`: ISO8601DateFormatter and
+    // DateFormatter are documented thread-safe for parse/format
+    // operations (Apple, iOS 10+). The build tooling oscillates on
+    // whether DateFormatter is Sendable; the annotation is a no-op
+    // when it is and a correct opt-out when it isn't.
+    nonisolated(unsafe) private static let serverDateFormatter: ISO8601DateFormatter = {
         let f = ISO8601DateFormatter()
         f.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
         return f

@@ -34,5 +34,18 @@
 	     relevant docs) if we ever ship custom crypto. -->
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
+	<!-- Branded launch screen: cream background + the SSAM logo
+	     centered. Xcode's auto-generated launch screen is a plain
+	     white screen which looks abrupt against the green/gold
+	     brand. UILaunchScreen lets us style without a storyboard. -->
+	<key>UILaunchScreen</key>
+	<dict>
+		<key>UIColorName</key>
+		<string>Cream</string>
+		<key>UIImageName</key>
+		<string>SSAMLogo</string>
+		<key>UIImageRespectsSafeAreaInsets</key>
+		<true/>
+	</dict>
 </dict>
 </plist>

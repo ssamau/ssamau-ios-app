@@ -23,6 +23,54 @@ For web entries:
 
 ---
 
+## [iOS] 2026-05-27 · Beta 0.1 build 65 — App Store readiness
+
+Versioning system (per request: "Beta 0.1 and increments with every new
+commit and feature"):
+- MARKETING_VERSION = 0.1; CURRENT_PROJECT_VERSION driven by
+  `scripts/bump-build.sh` (git rev-list --count HEAD + 1).
+- `AppInfo` helper exposes marketingVersion, buildNumber, displayVersion
+  ("Beta 0.1 (65)"), serverVersion ("0.1+65"). The Beta prefix drops
+  automatically once we hit 1.0+.
+- ProfileView shows the version stamp at the bottom; tap to copy for
+  support triage. X-App-Version header now goes through AppInfo.
+
+Deferred features (now landed):
+- **MemberProfileViewerSheet** activity panel — approved hours total,
+  pending hours rows, total + open assignments. Recent assignments and
+  recent hours lists (top 5). Parallel fetch via `getMemberHours` +
+  `assignments.list` filtered by member_id.
+- **AccountsView manual create/update/delete** — FAB + per-row Edit and
+  Delete actions. AccountFormSheet supports username + password (create
+  only) + access_level + linked-member picker. Three-state member_id
+  arg lets edit-mode unlink a member. Superadmin tier hidden for
+  non-superadmin admins; member-link picker only shows unlinked
+  candidates (plus the current link in edit mode).
+- **SupportSubmitSheet attachment** — PhotosPicker single-image select,
+  4 MiB client cap matching server, magic-byte MIME sniff (JPEG/PNG/
+  WebP). Falls back to PNG re-encode for HEIC/unknown formats.
+  Submit packs into the `{ filename, contentType, base64Data }` shape
+  the server's `support.submit` expects.
+
+App Store readiness:
+- **Info.plist** — CFBundleDisplayName=SSAMAU,
+  NSPhotoLibraryUsageDescription (covers PhotosPicker for support
+  attachments + the existing avatar picker),
+  ITSAppUsesNonExemptEncryption=false (TLS only, exempt under EAR §740.17),
+  UILaunchScreen dict (cream background + SSAMLogo, safe-area aware) —
+  replaces Xcode's default white launch screen with a brand-aligned one.
+- **PrivacyInfo.xcprivacy** — declares NO tracking, NO third-party SDK
+  trackers, and the data categories we DO collect (email, phone, name,
+  photos, user ID, other user content, crash data — all linked to
+  identity, none used for tracking, all under
+  AppFunctionality/Authentication purposes). NSPrivacyAccessedAPITypes
+  empty since we don't touch any required-reason APIs.
+- **Strict-concurrency warnings cleared** — DateFormatter declarations
+  in MemberFieldMaps; AccountsView pre-computes the date string before
+  passing into String(format:). Zero warnings on Debug + Release builds.
+
+---
+
 ## [iOS] 2026-05-27 · Phase 3 + Phase 4 — head views, admin views, support, dev tools
 
 This is the autonomous AFK session — Phase 3 finished end-to-end,
