@@ -23,6 +23,109 @@ For web entries:
 
 ---
 
+## [iOS] 2026-05-27 · Phase 3 + Phase 4 — head views, admin views, support, dev tools
+
+This is the autonomous AFK session — Phase 3 finished end-to-end,
+Phase 4 (admin) shipped, plus the in-product support flow and dev-tools
+support inbox for the superadmin. Every screen builds clean and uses
+only existing edge-function actions — no web-side coordination needed.
+
+### Phase 3 — head views (committee-scoped)
+
+- **DashboardView** (`8f15b86`) — `head.dashboardSummary`. Header w/
+  committee name + gold rule; 2x2 KPI grid (members, open opportunities,
+  hours pending, pending applications); top 5 pending applications and
+  top 5 hours awaiting review.
+- **HoursApprovalView** (`fa29744`) — `hours.list` filtered to head's
+  committee. Approve / reject with reason. Mode enum supports both
+  `headQueue` (Draft → PrimaryApproved → FinalApproved) and
+  `adminFinalApproval` (admin's FinalApprove from PrimaryApproved).
+- **HeadMembersView** (`4a14708`) — `users.list` pivoted around member.
+  Three account states: noAccount / pendingInvite / active. Search bar
+  + filter chips. Invite-by-email or invite-by-PIN (shown ONCE with
+  copy button, 72h expiry). Revoke pending invites. `adminMode` flag
+  for the admin variant — same code, broader scope.
+- **HeadOpportunitiesView + AssignSheet** (`98adea2`) — `opportunities.list`
+  + per-row assign sheet with `assignments.list` + `interest.list`.
+  Role chips switch the filter for both panes. Per-assignee mark
+  attendance with optional hours-override (auto-creates a
+  FinalApproved hours row server-side).
+- **HeadProjectsView + ProjectFormSheet** (`47f70d8`) — `getProjects`
+  client-filtered to head's committee. `createProject` / `updateProject`.
+  Heads can only edit projects owned by their committee — UI disables
+  the tap + server enforces via `requireAdminScope`.
+- **AttendanceView** (`3b00af1`) — `head.attendance.list/record/delete`.
+  Mode picker (Project / Meeting) switches the form fields. Optional
+  credited hours roll into members.total_hours via server's recompute.
+  Delete only available on rows the current head recorded.
+- **ApplicationsView** (`66647dc`) — `applications.list` (server scopes
+  to head's queue). Detail sheet with applicant/contact/study/CV/about/
+  interested committees. Accept / requestInterview / reject (with reason).
+  Admin mode adds `assignCommittee` for PendingTriage rows.
+- **ThanksView** (`d16dd1b`) — `thanks.list/send/bulkSend`. Mode picker
+  switches between single (per-recipient) and bulk-by-project. Member
+  picker auto-fills email; bulk hides email and fans out to every
+  participant on the project.
+- **HeadCertsView** (`61a2ab3`) — `certs.list/issue/bulkIssue`. Same
+  pattern as ThanksView (single / bulk-by-project). Reuses the
+  existing Certificate model from the member-side CertificatesView.
+
+### Phase 4 — admin views (full club scope)
+
+`a5ecbd4`:
+
+- **AdminTabView** — 5 tabs + More menu. Wires every shared head view
+  with `adminMode: true` (broader scope, cross-committee where
+  applicable).
+- **AdminDashboardView** — `getDashboardStats`. KPI grid (active
+  members, total members, total projects, total hours, total
+  committees), top 10 volunteers, committee hours rollup, recent
+  projects.
+- **AccountsView** — same `users.list` source as AdminMembersView, but
+  the row card foregrounds account state (id, role, last login, badge)
+  and the tap opens an actions sheet for invite-by-email / invite-by-PIN.
+- **AdvisorsView + form sheet** — full CRUD against `getAdvisors` /
+  `createAdvisor` / `updateAdvisor` / `deleteAdvisor`. Shows total
+  hours per advisor.
+- **CommitteesView + form sheet** — `getCommittees` /
+  `createCommittee` / `updateCommittee`. Member count badge.
+- **InterestTriageView** — `interest.listAll` + `interest.markReviewed`
+  for cross-club triage. Filter chips for unreviewed/all; shows the
+  member's optional motivation text.
+- **AdminSupportView** — entry point to the standard SupportSubmitSheet.
+- **DevPagesView** (superadmin only) — `support.list` +
+  `support.updateStatus`. Status filter (all / open), detail sheet for
+  status change + resolution note.
+
+### Cross-cutting
+
+- **SupportSubmitSheet** — member-facing in-product "report an issue"
+  sheet. Category (Bug / Feature / Question), title, description,
+  optional repro steps (bug only). Submits via `support.submit` with
+  the iOS user agent + viewport stamped into the ticket. Added to
+  ProfileView between Language and Sign Out so every role can reach it.
+- **RootView** — admin-scope users now route to `AdminTabView` (was a
+  placeholder).
+- **AnyJSON** decoder — added to Models/APIResponse.swift. Tolerant
+  Decodable for action responses we don't need to read back (ack
+  shapes like `{ ok: true }` or `{ id, status }`).
+- **i18n** — `scripts/ios-only-strings.json` grew by 190+ keys for
+  every new screen; regenerated en/ar Localizable.strings catalogs.
+- **Web impact:** none. Every screen uses existing actions; the user
+  was AFK and explicitly asked to avoid web-side coordination.
+
+### Deferred
+
+- MemberProfileViewerView (#29): folded into the existing HeadMembersView
+  card-tap → invite sheet flow. A read-only viewer for heads/admins to
+  open a member's full profile (hours/assignments/certs) is a future polish.
+- Account create/update for the AccountsView (manual provisioning
+  outside the invite flow) — the existing flow covers the common case.
+- Bulk attachment upload for support tickets — would need PhotosPicker
+  + base64 encode; deferred.
+
+---
+
 ## [iOS] 2026-05-21 · Phase 1 — Signup-complete (token + PIN)
 
 Spec §4 first-login flows for both invite paths.
