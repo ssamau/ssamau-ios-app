@@ -62,12 +62,7 @@ struct APIClient {
     // Safe to ship in the client per spec + handoff.
     static let supabaseAnonKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBmaWJ4dndpdWx3aWl1d2VyYXdlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg1ODI2NzEsImV4cCI6MjA5NDE1ODY3MX0.A0_w-iQQK-ozDiRWBS62ho_THvxEhzHWO-zgBcvfk78"
 
-    static var appVersion: String {
-        let info = Bundle.main.infoDictionary
-        let short = info?["CFBundleShortVersionString"] as? String ?? "0.0.0"
-        let build = info?["CFBundleVersion"] as? String ?? "0"
-        return "\(short)+\(build)"
-    }
+    static var appVersion: String { AppInfo.serverVersion }
 
     let session: URLSession
 

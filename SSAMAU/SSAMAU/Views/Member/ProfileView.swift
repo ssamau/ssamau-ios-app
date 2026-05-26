@@ -197,11 +197,29 @@ struct ProfileView: View {
                     languageButton
                     supportButton
                     signOutButton
+                    versionFooter
                 }
             }
             .padding(.horizontal, 20)
             .padding(.vertical, 20)
         }
+    }
+
+    /// Version stamp at the very bottom of the profile screen. Tappable
+    /// to copy build info to the clipboard — useful when triaging a
+    /// support ticket the user just filed.
+    private var versionFooter: some View {
+        Button {
+            UIPasteboard.general.string = AppInfo.displayVersion
+            vm.toast = .info(ErrorLocalization.localize("common.copied"))
+        } label: {
+            Text(AppInfo.displayVersion)
+                .font(.ssTiny)
+                .foregroundStyle(Color.ssGrey)
+                .padding(.top, 24)
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel(Text("App version \(AppInfo.displayVersion)"))
     }
 
     // MARK: - Header

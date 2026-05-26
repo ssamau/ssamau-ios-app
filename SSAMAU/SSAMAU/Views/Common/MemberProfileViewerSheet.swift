@@ -1,23 +1,24 @@
 import SwiftUI
 
 /// Read-only member profile sheet for heads + admins. Tap a member in
-/// HeadMembersView / AccountsView and this sheet opens with the full
-/// profile rendered as labeled sections. Shows whatever fields users.list
-/// already returned — no extra round-trip, no risk of 403 from
-/// admin-only fields.
+/// HeadMembersView / AccountsView to open this sheet with the full
+/// profile rendered as labeled sections, plus the member's hours
+/// summary and recent assignments fetched in parallel.
 ///
-/// Intentionally read-only: edits to members go through the web admin
-/// (or are surfaced via separate flows like invite/revoke). This sheet
-/// is for triage + reference, not editing.
+/// Strictly read-only: edits go through the web admin OR the existing
+/// invite/PIN flow. This sheet is for triage + reference, not editing.
 struct MemberProfileViewerSheet: View {
     let row: MemberAccountRow
     @Binding var isPresented: Bool
+
+    @StateObject private var vm = MemberProfileViewerViewModel()
 
     var body: some View {
         NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: 18) {
                     header
+                    activitySummary
 
                     section(titleKey: "ap.apps.section_applicant", rows: [
                         ("apply.s1.preferred_name", row.memberPreferredName ?? "—"),
@@ -42,6 +43,9 @@ struct MemberProfileViewerSheet: View {
                                 MemberFieldMaps.displayDate(row.createdAt) ?? "—"),
                         ])
                     }
+
+                    recentAssignments
+                    recentHours
                 }
                 .padding(20)
                 .padding(.bottom, 40)
@@ -54,6 +58,9 @@ struct MemberProfileViewerSheet: View {
                     Button(LocalizedStringKey("common.close")) { isPresented = false }
                         .foregroundStyle(Color.ssGrey)
                 }
+            }
+            .task {
+                if let id = row.memberId { await vm.load(memberId: id) }
             }
         }
     }
@@ -74,6 +81,184 @@ struct MemberProfileViewerSheet: View {
             GoldRule(width: 32)
         }
     }
+
+    // MARK: - Activity summary (counts)
+
+    @ViewBuilder
+    private var activitySummary: some View {
+        if row.memberId != nil {
+            VStack(alignment: .leading, spacing: 8) {
+                HStack(spacing: 6) {
+                    Image(systemName: "chart.bar.fill").foregroundStyle(Color.ssGold)
+                    Text(LocalizedStringKey("hp.members.viewer_activity_title"))
+                        .font(.ssH2).foregroundStyle(Color.ssGreen)
+                }
+                if vm.isLoading {
+                    ProgressView().tint(Color.ssGreen)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 20)
+                } else {
+                    LazyVGrid(columns: [
+                        GridItem(.flexible(), spacing: 10),
+                        GridItem(.flexible(), spacing: 10),
+                    ], spacing: 10) {
+                        stat(value: String(format: "%.1f", vm.totalApprovedHours),
+                             unit: "hp.members.viewer_unit_hours",
+                             labelKey: "hp.members.viewer_stat_total_hours",
+                             icon: "clock.fill")
+                        stat(value: "\(vm.pendingHoursCount)",
+                             unit: "hp.members.viewer_unit_rows",
+                             labelKey: "hp.members.viewer_stat_pending_hours",
+                             icon: "clock.badge.exclamationmark")
+                        stat(value: "\(vm.assignments.count)",
+                             unit: "hp.members.viewer_unit_total",
+                             labelKey: "hp.members.viewer_stat_assignments",
+                             icon: "checklist")
+                        stat(value: "\(vm.upcomingAssignmentsCount)",
+                             unit: "hp.members.viewer_unit_open",
+                             labelKey: "hp.members.viewer_stat_upcoming",
+                             icon: "calendar.badge.clock")
+                    }
+                }
+            }
+            .padding(12)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(Color.ssPale)
+            .overlay(RoundedRectangle(cornerRadius: 12)
+                .stroke(Color.ssGold.opacity(0.4), lineWidth: 1))
+            .clipShape(RoundedRectangle(cornerRadius: 12))
+        }
+    }
+
+    private func stat(value: String, unit: String, labelKey: String, icon: String) -> some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Image(systemName: icon)
+                .font(.body).foregroundStyle(Color.ssGold)
+            HStack(alignment: .lastTextBaseline, spacing: 4) {
+                Text(value)
+                    .font(.ssH1).foregroundStyle(Color.ssGreen)
+                Text(LocalizedStringKey(unit))
+                    .font(.ssTiny).foregroundStyle(Color.ssGrey)
+            }
+            Text(LocalizedStringKey(labelKey))
+                .font(.ssTiny).foregroundStyle(Color.ssGrey)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .padding(10)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(Color.ssCream)
+        .clipShape(RoundedRectangle(cornerRadius: 8))
+    }
+
+    // MARK: - Recent assignments
+
+    @ViewBuilder
+    private var recentAssignments: some View {
+        let recent = Array(vm.assignments.prefix(5))
+        if !recent.isEmpty {
+            VStack(alignment: .leading, spacing: 8) {
+                Text(LocalizedStringKey("hp.members.viewer_recent_assignments"))
+                    .font(.ssH2).foregroundStyle(Color.ssGreen)
+                VStack(spacing: 4) {
+                    ForEach(recent) { a in
+                        assignmentRow(a)
+                    }
+                }
+                .padding(10)
+                .background(Color.ssPale)
+                .clipShape(RoundedRectangle(cornerRadius: 8))
+            }
+        }
+    }
+
+    private func assignmentRow(_ a: AssignmentRow) -> some View {
+        HStack(alignment: .top) {
+            VStack(alignment: .leading, spacing: 2) {
+                Text(a.projectName ?? "—")
+                    .font(.ssCaption).foregroundStyle(Color.ssCharcoal)
+                if let role = a.assignedRoleName ?? a.roleName {
+                    Text(role).font(.ssTiny).foregroundStyle(Color.ssGrey)
+                }
+            }
+            Spacer()
+            attendanceBadge(a.attendanceStatus ?? "Pending")
+        }
+        .padding(.vertical, 4)
+    }
+
+    private func attendanceBadge(_ status: String) -> some View {
+        let (color, key): (Color, String) = {
+            switch status {
+            case "Attended": return (.ssGreen, "hp.opps.att_attended")
+            case "Absent":   return (.red,     "hp.opps.att_absent")
+            case "Excused":  return (.ssGold,  "hp.opps.att_excused")
+            default:         return (.ssGrey,  "hp.opps.att_pending")
+            }
+        }()
+        return Text(LocalizedStringKey(key))
+            .font(.ssTiny.weight(.semibold))
+            .foregroundStyle(.white)
+            .padding(.horizontal, 6).padding(.vertical, 2)
+            .background(color)
+            .clipShape(Capsule())
+    }
+
+    // MARK: - Recent hours
+
+    @ViewBuilder
+    private var recentHours: some View {
+        let recent = Array(vm.hours.prefix(5))
+        if !recent.isEmpty {
+            VStack(alignment: .leading, spacing: 8) {
+                Text(LocalizedStringKey("hp.members.viewer_recent_hours"))
+                    .font(.ssH2).foregroundStyle(Color.ssGreen)
+                VStack(spacing: 4) {
+                    ForEach(recent) { h in
+                        hoursRow(h)
+                    }
+                }
+                .padding(10)
+                .background(Color.ssPale)
+                .clipShape(RoundedRectangle(cornerRadius: 8))
+            }
+        }
+    }
+
+    private func hoursRow(_ h: HoursAdminRow) -> some View {
+        HStack(alignment: .top) {
+            VStack(alignment: .leading, spacing: 2) {
+                Text(h.displayTitle)
+                    .font(.ssCaption).foregroundStyle(Color.ssCharcoal)
+                    .lineLimit(1)
+                hoursStatusBadge(h.approvalStatus)
+            }
+            Spacer()
+            Text(String(format: "%.1f h", h.totalHours))
+                .font(.ssCaption.weight(.semibold))
+                .foregroundStyle(Color.ssGold)
+        }
+        .padding(.vertical, 4)
+    }
+
+    private func hoursStatusBadge(_ status: String) -> some View {
+        let (color, key): (Color, String) = {
+            switch status {
+            case "Draft":           return (.ssGrey,  "mp.hours.status_draft")
+            case "PrimaryApproved": return (.ssGold,  "mp.hours.status_primary")
+            case "FinalApproved":   return (.ssGreen, "mp.hours.status_final")
+            case "Rejected":        return (.red,     "mp.hours.status_rejected")
+            default:                return (.ssGrey,  "")
+            }
+        }()
+        return Text(key.isEmpty ? status : NSLocalizedString(key, comment: ""))
+            .font(.ssTiny.weight(.semibold))
+            .foregroundStyle(.white)
+            .padding(.horizontal, 6).padding(.vertical, 1)
+            .background(color)
+            .clipShape(Capsule())
+    }
+
+    // MARK: - Shared
 
     private func stateBadge(_ state: MemberAccountRow.State) -> some View {
         let (color, key): (Color, String) = {

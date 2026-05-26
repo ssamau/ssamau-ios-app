@@ -5,52 +5,104 @@ import SwiftUI
 /// id, role, last login, account-state badge. Reuses MembersListViewModel
 /// for the invite/revoke actions.
 struct AccountsView: View {
+    @EnvironmentObject private var session: SessionStore
     @StateObject private var vm = MembersListViewModel()
     @State private var inviteSheetRow: MemberAccountRow?
     @State private var revokeConfirmRow: MemberAccountRow?
     @State private var viewerRow: MemberAccountRow?
+    @State private var creatingAccount: Bool = false
+    @State private var editingAccount: MemberAccountRow?
+    @State private var deleteConfirmAccount: MemberAccountRow?
 
     var body: some View {
-        content
-            .navigationTitle(LocalizedStringKey("ap.tabs.accounts"))
-            .navigationBarTitleDisplayMode(.inline)
-            .background(Color.ssCream)
-            .refreshable { await vm.load() }
-            .task { await vm.load() }
-            .ssToast($vm.toast)
-            .sheet(item: $inviteSheetRow) { row in
-                AccountActionsSheet(row: row, vm: vm) {
-                    inviteSheetRow = nil
-                }
-            }
-            .sheet(item: $vm.pinInviteResult) { result in
-                PinResultSheet(result: result, vm: vm)
-            }
-            .sheet(item: $viewerRow) { row in
-                MemberProfileViewerSheet(
-                    row: row,
-                    isPresented: Binding(
-                        get: { viewerRow != nil },
-                        set: { if !$0 { viewerRow = nil } }
-                    )
-                )
-            }
-            .confirmationDialog(
-                LocalizedStringKey("hp.members.revoke_confirm"),
-                isPresented: Binding(
-                    get: { revokeConfirmRow != nil },
-                    set: { if !$0 { revokeConfirmRow = nil } }
-                ),
-                titleVisibility: .visible
-            ) {
-                if let row = revokeConfirmRow {
-                    Button(LocalizedStringKey("hp.members.revoke_btn"),
-                           role: .destructive) {
-                        Task { await vm.revokeInvite(row) }
+        ZStack(alignment: .bottomTrailing) {
+            content
+                .navigationTitle(LocalizedStringKey("ap.tabs.accounts"))
+                .navigationBarTitleDisplayMode(.inline)
+                .background(Color.ssCream)
+                .refreshable { await vm.load() }
+                .task { await vm.load() }
+                .ssToast($vm.toast)
+                .sheet(item: $inviteSheetRow) { row in
+                    AccountActionsSheet(row: row, vm: vm) {
+                        inviteSheetRow = nil
                     }
                 }
-                Button(LocalizedStringKey("common.cancel"), role: .cancel) {}
+                .sheet(item: $vm.pinInviteResult) { result in
+                    PinResultSheet(result: result, vm: vm)
+                }
+                .sheet(item: $viewerRow) { row in
+                    MemberProfileViewerSheet(
+                        row: row,
+                        isPresented: Binding(
+                            get: { viewerRow != nil },
+                            set: { if !$0 { viewerRow = nil } }
+                        )
+                    )
+                }
+                .sheet(isPresented: $creatingAccount) {
+                    AccountFormSheet(
+                        existing: nil, vm: vm,
+                        isPresented: $creatingAccount,
+                        currentUserIsSuperadmin: session.currentUser?.isSuperadmin == true
+                    )
+                }
+                .sheet(item: $editingAccount) { row in
+                    AccountFormSheet(
+                        existing: row, vm: vm,
+                        isPresented: Binding(
+                            get: { editingAccount != nil },
+                            set: { if !$0 { editingAccount = nil } }
+                        ),
+                        currentUserIsSuperadmin: session.currentUser?.isSuperadmin == true
+                    )
+                }
+                .confirmationDialog(
+                    LocalizedStringKey("ap.accounts.delete_confirm"),
+                    isPresented: Binding(
+                        get: { deleteConfirmAccount != nil },
+                        set: { if !$0 { deleteConfirmAccount = nil } }
+                    ),
+                    titleVisibility: .visible
+                ) {
+                    if let row = deleteConfirmAccount, let accId = row.accountId {
+                        Button(LocalizedStringKey("common.delete"), role: .destructive) {
+                            Task {
+                                await vm.deleteAccount(accountId: accId)
+                                deleteConfirmAccount = nil
+                            }
+                        }
+                    }
+                    Button(LocalizedStringKey("common.cancel"), role: .cancel) {}
+                }
+
+            Button { creatingAccount = true } label: {
+                HStack(spacing: 6) {
+                    Image(systemName: "plus")
+                    Text(LocalizedStringKey("ap.accounts.add_btn"))
+                }
+                .font(.ssBodyBold).foregroundStyle(Color.ssCream)
+                .padding(.horizontal, 18).padding(.vertical, 12)
+                .background(Color.ssGreen).clipShape(Capsule()).shadow(radius: 4)
             }
+            .padding(20)
+        }
+        .confirmationDialog(
+            LocalizedStringKey("hp.members.revoke_confirm"),
+            isPresented: Binding(
+                get: { revokeConfirmRow != nil },
+                set: { if !$0 { revokeConfirmRow = nil } }
+            ),
+            titleVisibility: .visible
+        ) {
+            if let row = revokeConfirmRow {
+                Button(LocalizedStringKey("hp.members.revoke_btn"),
+                       role: .destructive) {
+                    Task { await vm.revokeInvite(row) }
+                }
+            }
+            Button(LocalizedStringKey("common.cancel"), role: .cancel) {}
+        }
     }
 
     @ViewBuilder
@@ -131,12 +183,44 @@ struct AccountsView: View {
             }
             .buttonStyle(.plain)
 
-            // Action button only shown when there's an invite to send/revoke.
-            if row.state != .active {
-                HStack {
-                    Spacer()
+            HStack(spacing: 8) {
+                Spacer()
+                // Edit + delete only when there's an account (accountId != nil).
+                // canEditAccount also blocks admins from editing superadmin rows.
+                if let _ = row.accountId, canEditAccount(row) {
+                    Button { editingAccount = row } label: {
+                        HStack(spacing: 4) {
+                            Image(systemName: "square.and.pencil")
+                            Text(LocalizedStringKey("common.edit"))
+                        }
+                        .font(.ssTiny.weight(.semibold))
+                        .foregroundStyle(Color.ssGreen)
+                        .padding(.horizontal, 8).padding(.vertical, 4)
+                        .background(Color.ssCream)
+                        .clipShape(Capsule())
+                        .overlay(Capsule().stroke(Color.ssGreen.opacity(0.4), lineWidth: 1))
+                    }
+                    .buttonStyle(.plain)
+                    Button(role: .destructive) {
+                        deleteConfirmAccount = row
+                    } label: {
+                        HStack(spacing: 4) {
+                            Image(systemName: "trash")
+                            Text(LocalizedStringKey("common.delete"))
+                        }
+                        .font(.ssTiny.weight(.semibold))
+                        .foregroundStyle(.red)
+                        .padding(.horizontal, 8).padding(.vertical, 4)
+                        .background(Color.ssCream)
+                        .clipShape(Capsule())
+                        .overlay(Capsule().stroke(.red.opacity(0.3), lineWidth: 1))
+                    }
+                    .buttonStyle(.plain)
+                }
+                // Invite / resend only when there's no active account.
+                if row.state != .active {
                     Button { inviteSheetRow = row } label: {
-                        HStack(spacing: 6) {
+                        HStack(spacing: 4) {
                             Image(systemName: row.state == .pendingInvite
                                   ? "arrow.clockwise"
                                   : "envelope.badge")
@@ -144,9 +228,9 @@ struct AccountsView: View {
                                 ? "hp.members.resend_invite"
                                 : "hp.members.invite_btn"))
                         }
-                        .font(.ssCaption.weight(.semibold))
+                        .font(.ssTiny.weight(.semibold))
                         .foregroundStyle(Color.ssGreen)
-                        .padding(.horizontal, 10).padding(.vertical, 6)
+                        .padding(.horizontal, 8).padding(.vertical, 4)
                         .background(Color.ssCream)
                         .clipShape(Capsule())
                         .overlay(Capsule().stroke(Color.ssGreen.opacity(0.4), lineWidth: 1))
@@ -161,6 +245,17 @@ struct AccountsView: View {
         .overlay(RoundedRectangle(cornerRadius: 12)
             .stroke(Color.ssGold.opacity(0.4), lineWidth: 1))
         .clipShape(RoundedRectangle(cornerRadius: 12))
+    }
+
+    /// Server: an admin can't touch a superadmin row. Mirror that on
+    /// the client so the buttons don't appear in the first place; the
+    /// server is still the authority and will 403 on bypass attempts.
+    private func canEditAccount(_ row: MemberAccountRow) -> Bool {
+        let target = row.accessLevel ?? "member"
+        if target == "superadmin" {
+            return session.currentUser?.isSuperadmin == true
+        }
+        return true
     }
 
     private func stateBadge(_ state: MemberAccountRow.State) -> some View {
@@ -339,5 +434,200 @@ private struct PinResultSheet: View {
             .ssToast(Binding(get: { vm.toast }, set: { vm.toast = $0 }))
         }
         .interactiveDismissDisabled(true)
+    }
+}
+
+// MARK: - Manual account create / update form
+
+/// Form for admin-driven account provisioning outside the invite flow.
+/// Create: username, password, optional member_id, access level.
+/// Edit: username, member_id (with unlink), access level (no password
+/// change — password reset goes through the dedicated reset flow).
+private struct AccountFormSheet: View {
+    let existing: MemberAccountRow?
+    @ObservedObject var vm: MembersListViewModel
+    @Binding var isPresented: Bool
+    let currentUserIsSuperadmin: Bool
+
+    @State private var username: String = ""
+    @State private var password: String = ""
+    @State private var memberId: String = ""
+    @State private var accessLevel: String = "member"
+    @State private var inFlight: Bool = false
+
+    /// Member candidates for the link picker. Only members WITHOUT an
+    /// active account show up in create mode — they're the ones who
+    /// can legitimately get a new account. In edit mode we also include
+    /// the currently-linked member so the picker preselects correctly.
+    private var memberCandidates: [MemberAccountRow] {
+        vm.rows.filter { row in
+            guard let mid = row.memberId else { return false }
+            if existing != nil && row.memberId == existing?.memberId { return true }
+            return row.accountId == nil
+        }.sorted { $0.displayName < $1.displayName }
+    }
+
+    private var canSubmit: Bool {
+        guard !username.trimmingCharacters(in: .whitespaces).isEmpty else { return false }
+        if existing == nil {
+            // Create needs a password (>= 6 chars per server rule).
+            return password.count >= 6
+        }
+        return true
+    }
+
+    var body: some View {
+        NavigationStack {
+            ScrollView {
+                VStack(alignment: .leading, spacing: 14) {
+                    field("ap.accounts.field_username") {
+                        TextField("", text: $username)
+                            .textInputAutocapitalization(.never)
+                            .autocorrectionDisabled(true)
+                            .padding(10).background(Color.ssPale)
+                            .clipShape(RoundedRectangle(cornerRadius: 8))
+                    }
+                    if existing == nil {
+                        field("ap.accounts.field_password") {
+                            SecureField("", text: $password)
+                                .padding(10).background(Color.ssPale)
+                                .clipShape(RoundedRectangle(cornerRadius: 8))
+                            Text(LocalizedStringKey("ap.accounts.field_password_hint"))
+                                .font(.ssTiny).foregroundStyle(Color.ssGrey)
+                        }
+                    } else {
+                        Text(LocalizedStringKey("ap.accounts.password_unchanged_hint"))
+                            .font(.ssTiny).foregroundStyle(Color.ssGrey)
+                    }
+                    field("ap.accounts.field_access_level") {
+                        Picker(selection: $accessLevel) {
+                            Text(LocalizedStringKey("ap.accounts.access_volunteer")).tag("volunteer")
+                            Text(LocalizedStringKey("ap.accounts.access_member")).tag("member")
+                            Text(LocalizedStringKey("ap.accounts.access_head")).tag("head")
+                            Text(LocalizedStringKey("ap.accounts.access_admin")).tag("admin")
+                            if currentUserIsSuperadmin {
+                                Text(LocalizedStringKey("ap.accounts.access_superadmin")).tag("superadmin")
+                            }
+                        } label: { EmptyView() }
+                        .pickerStyle(.menu)
+                        .tint(Color.ssGreen)
+                    }
+                    field("ap.accounts.field_member") {
+                        Menu {
+                            Button(LocalizedStringKey("ap.accounts.no_linked_member")) {
+                                memberId = ""
+                            }
+                            ForEach(memberCandidates) { m in
+                                if let mid = m.memberId {
+                                    Button(m.displayName) { memberId = mid }
+                                }
+                            }
+                        } label: {
+                            HStack {
+                                Text(selectedMemberDisplayName)
+                                    .font(.ssBody)
+                                    .foregroundStyle(memberId.isEmpty ? Color.ssGrey : Color.ssCharcoal)
+                                Spacer()
+                                Image(systemName: "chevron.down")
+                                    .font(.caption).foregroundStyle(Color.ssGrey)
+                            }
+                            .padding(10).background(Color.ssPale)
+                            .clipShape(RoundedRectangle(cornerRadius: 8))
+                        }
+                        Text(LocalizedStringKey("ap.accounts.member_link_hint"))
+                            .font(.ssTiny).foregroundStyle(Color.ssGrey)
+                    }
+
+                    Button { submit() } label: {
+                        HStack {
+                            if inFlight { ProgressView().tint(Color.ssCream) }
+                            Text(LocalizedStringKey("common.save")).font(.ssBodyBold)
+                        }
+                        .foregroundStyle(Color.ssCream)
+                        .frame(maxWidth: .infinity, minHeight: 48)
+                        .background(canSubmit ? Color.ssGreen : Color.ssGrey)
+                        .clipShape(RoundedRectangle(cornerRadius: 10))
+                    }
+                    .disabled(!canSubmit || inFlight)
+                }
+                .padding(20)
+            }
+            .background(Color.ssCream.ignoresSafeArea())
+            .navigationTitle(LocalizedStringKey(existing == nil
+                ? "ap.accounts.sheet_create_title"
+                : "ap.accounts.sheet_edit_title"))
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button(LocalizedStringKey("common.cancel")) { isPresented = false }
+                        .foregroundStyle(Color.ssGrey)
+                }
+            }
+            .ssToast(Binding(get: { vm.toast }, set: { vm.toast = $0 }))
+        }
+        .onAppear { prefill() }
+    }
+
+    private var selectedMemberDisplayName: String {
+        if memberId.isEmpty {
+            return NSLocalizedString("ap.accounts.no_linked_member", comment: "")
+        }
+        return vm.rows.first(where: { $0.memberId == memberId })?.displayName ?? memberId
+    }
+
+    private func prefill() {
+        guard let e = existing else {
+            accessLevel = "member"
+            return
+        }
+        username = e.username ?? ""
+        memberId = e.memberId ?? ""
+        accessLevel = e.accessLevel ?? "member"
+    }
+
+    private func submit() {
+        Task {
+            inFlight = true
+            defer { inFlight = false }
+            let u = username.trimmingCharacters(in: .whitespaces).lowercased()
+            if let existing, let accId = existing.accountId {
+                // Three-state member_id arg for the VM:
+                //   .none           — field wasn't touched, keep existing.
+                //   .some(.none)    — explicit unlink (sends NULL).
+                //   .some(.some(x)) — relink to member x.
+                let memberChanged = memberId != (existing.memberId ?? "")
+                let memberArg: String??
+                if memberChanged {
+                    let trimmed = memberId.trimmingCharacters(in: .whitespaces)
+                    memberArg = trimmed.isEmpty
+                        ? Optional<String>.none as String??
+                        : Optional<String>.some(trimmed) as String??
+                } else {
+                    memberArg = nil
+                }
+                let ok = await vm.updateAccount(
+                    accountId: accId,
+                    username: u == (existing.username ?? "") ? nil : u,
+                    memberId: memberArg,
+                    accessLevel: accessLevel == (existing.accessLevel ?? "") ? nil : accessLevel
+                )
+                if ok { isPresented = false }
+            } else {
+                let ok = await vm.createAccount(
+                    username: u,
+                    password: password,
+                    memberId: memberId.isEmpty ? nil : memberId,
+                    accessLevel: accessLevel
+                )
+                if ok { isPresented = false }
+            }
+        }
+    }
+
+    private func field<Content: View>(_ key: String, @ViewBuilder content: () -> Content) -> some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text(LocalizedStringKey(key)).font(.ssCaption).foregroundStyle(Color.ssGrey)
+            content()
+        }
     }
 }

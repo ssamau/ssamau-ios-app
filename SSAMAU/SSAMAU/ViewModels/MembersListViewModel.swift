@@ -144,6 +144,102 @@ final class MembersListViewModel: ObservableObject {
         }
     }
 
+    // MARK: - Admin: manual account create / update / delete
+
+    /// AccountsView uses these to provision accounts outside the
+    /// invite/PIN flow. Gated server-side: users.create / users.update
+    /// require admin tier, users.delete requires admin tier with
+    /// superadmin guards on cross-tier ops. Surfaces server errors
+    /// (e.g. err.business.username_taken) via toast.
+
+    @discardableResult
+    func createAccount(
+        username: String, password: String,
+        memberId: String?, accessLevel: String
+    ) async -> Bool {
+        guard !username.isEmpty, !password.isEmpty else { return false }
+        var data: [String: Any] = [
+            "username":     username,
+            "password":     password,
+            "access_level": accessLevel,
+        ]
+        if let m = memberId, !m.isEmpty { data["member_id"] = m }
+        do {
+            _ = try await APIClient.shared.call(
+                "users.create",
+                params: ["data": data],
+                as: AnyJSON.self
+            )
+            toast = .success(ErrorLocalization.localize("ap.accounts.created_ok"))
+            await load()
+            return true
+        } catch let apiError as APIError {
+            if apiError.isCancellation { return false }
+            toast = .error(apiError.localizedMessage)
+            return false
+        } catch {
+            toast = .error(ErrorLocalization.localize("err.unknown"))
+            return false
+        }
+    }
+
+    @discardableResult
+    func updateAccount(
+        accountId: Int, username: String?,
+        memberId: String??, accessLevel: String?
+    ) async -> Bool {
+        var data: [String: Any] = ["id": accountId]
+        if let u = username, !u.isEmpty { data["username"] = u }
+        if let a = accessLevel { data["access_level"] = a }
+        // Three-state member_id: not-supplied (keep existing),
+        // supplied non-nil (set), supplied nil (unlink).
+        if let memberWrapper = memberId {
+            if let m = memberWrapper, !m.isEmpty {
+                data["member_id"] = m
+            } else {
+                data["member_id"] = NSNull()
+            }
+        }
+        do {
+            _ = try await APIClient.shared.call(
+                "users.update",
+                params: ["data": data],
+                as: AnyJSON.self
+            )
+            toast = .success(ErrorLocalization.localize("ap.accounts.updated_ok"))
+            await load()
+            return true
+        } catch let apiError as APIError {
+            if apiError.isCancellation { return false }
+            toast = .error(apiError.localizedMessage)
+            return false
+        } catch {
+            toast = .error(ErrorLocalization.localize("err.unknown"))
+            return false
+        }
+    }
+
+    @discardableResult
+    func deleteAccount(accountId: Int) async -> Bool {
+        do {
+            _ = try await APIClient.shared.call(
+                "users.delete",
+                params: ["id": accountId],
+                as: AnyJSON.self
+            )
+            toast = .success(ErrorLocalization.localize("ap.accounts.deleted_ok"))
+            await load()
+            return true
+        } catch let apiError as APIError {
+            if apiError.isCancellation { return false }
+            toast = .error(apiError.localizedMessage)
+            return false
+        } catch {
+            toast = .error(ErrorLocalization.localize("err.unknown"))
+            return false
+        }
+    }
+
     private struct PinInviteResponse: Decodable {
         let pin: String
         let memberName: String?

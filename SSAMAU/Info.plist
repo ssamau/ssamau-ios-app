@@ -2,6 +2,8 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>CFBundleDisplayName</key>
+	<string>SSAMAU</string>
 	<key>CFBundleLocalizations</key>
 	<array>
 		<string>en</string>
@@ -19,5 +21,18 @@
 		<string>app-prefs</string>
 		<string>app-settings</string>
 	</array>
+	<!-- Photo library: ProfileView avatar upload + SupportSubmitSheet
+	     screenshot attachment. Read-only — we never write back to the
+	     library, just read the user-picked image once. PhotosPicker on
+	     iOS 16+ uses a sandboxed picker so the system also enforces
+	     "user-picked only" outside of our usage description. -->
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>SSAMAU uses your photo library to upload a profile picture or attach a screenshot to a support ticket. Photos are only read when you explicitly pick them.</string>
+	<!-- Skip the App Store export-compliance prompt: this build uses
+	     only Apple-standard https / TLS, which is exempt under
+	     §740.17(b) of the EAR (ENC). Flip to true (and submit the
+	     relevant docs) if we ever ship custom crypto. -->
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
 </dict>
 </plist>
