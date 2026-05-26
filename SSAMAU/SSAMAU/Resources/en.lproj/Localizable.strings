@@ -1034,7 +1034,7 @@
 "common.delete" = "Delete";  // ios-only
 "common.edit" = "Edit";  // ios-only
 "common.generic_error" = "Something went wrong. Try again.";
-"common.loading" = "Loading...";
+"common.loading" = "Loading…";  // ios-only
 "common.logout" = "Sign out";
 "common.network_error" = "Couldn’t reach the server. Try again.";
 "common.notes" = "Notes";  // ios-only

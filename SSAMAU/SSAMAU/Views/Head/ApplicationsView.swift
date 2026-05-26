@@ -141,6 +141,7 @@ private struct ApplicationDetailSheet: View {
     @State private var showingReject: Bool = false
     @State private var pickingCommittee: Bool = false
     @State private var selectedCommitteeId: String = ""
+    @State private var cvViewerURL: IdentifiableURL?
 
     var body: some View {
         NavigationStack {
@@ -165,7 +166,7 @@ private struct ApplicationDetailSheet: View {
                     ])
                     if let cv = application.cvUrl, !cv.isEmpty,
                        let cvURL = URL(string: cv) {
-                        Link(destination: cvURL) {
+                        Button { cvViewerURL = IdentifiableURL(cvURL) } label: {
                             HStack(spacing: 6) {
                                 Image(systemName: "doc")
                                 Text(LocalizedStringKey("hp.apps.cv_link"))
@@ -173,6 +174,7 @@ private struct ApplicationDetailSheet: View {
                             .font(.ssCaption.weight(.semibold))
                             .foregroundStyle(Color.ssGreen)
                         }
+                        .buttonStyle(.plain)
                     }
                     if let about = application.aboutSelf, !about.isEmpty {
                         VStack(alignment: .leading, spacing: 6) {
@@ -211,6 +213,12 @@ private struct ApplicationDetailSheet: View {
             .ssToast(Binding(get: { vm.toast }, set: { vm.toast = $0 }))
             .sheet(isPresented: $showingReject) { rejectSheet }
             .sheet(isPresented: $pickingCommittee) { committeePicker }
+            .sheet(item: $cvViewerURL) { wrapped in
+                RemoteFileViewer(
+                    url: wrapped.url,
+                    suggestedName: "\(application.displayName).pdf"
+                )
+            }
         }
     }
 

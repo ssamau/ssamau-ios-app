@@ -185,6 +185,7 @@
   "common.optional":                { "en": "Optional",         "ar": "اختياري" },
   "common.actions":                 { "en": "Actions",          "ar": "الإجراءات" },
   "common.confirm":                 { "en": "Confirm",          "ar": "تأكيد" },
+  "common.loading":                 { "en": "Loading…",         "ar": "جارٍ التحميل…" },
 
   "hp.opps.search_placeholder":     { "en": "Search project, role, committee", "ar": "ابحث: مشروع، دور، لجنة" },
   "hp.opps.filter_open":            { "en": "Active",           "ar": "النشطة" },
