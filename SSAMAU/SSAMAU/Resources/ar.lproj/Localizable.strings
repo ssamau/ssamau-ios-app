@@ -332,6 +332,7 @@
 "ap.eml.sum_total" = "إجمالي";
 "ap.eml.type_member" = "عضو";
 "ap.eml.type_volunteer" = "متطوع";
+"ap.hours.final_title" = "الاعتماد النهائي";  // ios-only
 "ap.hrs.add_btn" = "+ تسجيل ساعات";
 "ap.hrs.approver_final_label" = "نهائي:";
 "ap.hrs.approver_primary_label" = "أولي:";
@@ -1195,6 +1196,11 @@
 "hp.hours.action_primary" = "اعتماد أولي";
 "hp.hours.action_reject" = "رفض";
 "hp.hours.action_rollback" = "رفض / استرجاع";
+"hp.hours.approved_ok" = "تم اعتماد الساعات.";  // ios-only
+"hp.hours.btn_approve" = "اعتماد";  // ios-only
+"hp.hours.btn_final_approve" = "اعتماد نهائي";  // ios-only
+"hp.hours.btn_primary_approve" = "اعتماد أولي";  // ios-only
+"hp.hours.btn_reject" = "رفض";  // ios-only
 "hp.hours.card_title" = "⏱️ ساعات أعضاء لجنتك";
 "hp.hours.col_actions" = "إجراءات";
 "hp.hours.col_hours" = "الساعات";
@@ -1203,10 +1209,15 @@
 "hp.hours.col_status" = "الحالة";
 "hp.hours.confirm_final" = "اعتماد نهائي لهذه الساعات؟ ستُحتسب لرصيد العضو.";
 "hp.hours.confirm_primary" = "اعتماد أولي لهذه الساعات؟";
-"hp.hours.empty" = "لا توجد ساعات مسجّلة لأعضاء لجنتك بعد";
+"hp.hours.confirm_reject" = "تأكيد الرفض";  // ios-only
+"hp.hours.empty" = "تم — لا توجد ساعات بانتظار المراجعة.";  // ios-only
 "hp.hours.err_load" = "⚠️ تعذّر تحميل الساعات";
 "hp.hours.lead" = "الساعات المسجلة لأعضاء لجنتك. الاعتماد الأولي والنهائي يتم من هنا — أنت تملك المسار الكامل لاعتماد ساعات لجنتك.";
 "hp.hours.prompt_reject" = "سبب الرفض (اختياري):";
+"hp.hours.reject_reason_label" = "السبب (سيظهر للعضو)";  // ios-only
+"hp.hours.reject_reason_placeholder" = "لماذا ترفض هذه الساعات؟";  // ios-only
+"hp.hours.reject_sheet_title" = "رفض الساعات";  // ios-only
+"hp.hours.rejected_ok" = "تم رفض الساعات.";  // ios-only
 "hp.hours.success_final" = "✅ تم الاعتماد النهائي";
 "hp.hours.success_primary" = "✅ تم الاعتماد الأولي";
 "hp.hours.success_reject" = "تم رفض السجل";

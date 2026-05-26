@@ -31,19 +31,6 @@ struct HeadOpportunitiesView: View {
     }
 }
 
-struct HoursApprovalView: View {
-    var body: some View {
-        NavigationStack {
-            HeadComingSoon(
-                titleKey: "hp.tabs.hours",
-                systemImage: "clock.badge.checkmark"
-            )
-            .navigationTitle(LocalizedStringKey("hp.tabs.hours"))
-            .navigationBarTitleDisplayMode(.inline)
-        }
-    }
-}
-
 struct HeadProjectsView: View {
     var body: some View {
         HeadComingSoon(

@@ -41,7 +41,7 @@ struct HeadTabView: View {
                 }
                 .tag(Tab.opportunities)
 
-            HoursApprovalView()
+            HoursApprovalView(mode: .headQueue)
                 .tabItem {
                     Label(LocalizedStringKey("hp.tabs.hours"),
                           systemImage: "clock.badge.checkmark")

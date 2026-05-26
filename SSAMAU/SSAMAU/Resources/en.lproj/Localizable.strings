@@ -332,6 +332,7 @@
 "ap.eml.sum_total" = "Total";
 "ap.eml.type_member" = "Member";
 "ap.eml.type_volunteer" = "Volunteer";
+"ap.hours.final_title" = "Final approval";  // ios-only
 "ap.hrs.add_btn" = "+ Log hours";
 "ap.hrs.approver_final_label" = "Final:";
 "ap.hrs.approver_primary_label" = "Primary:";
@@ -1195,6 +1196,11 @@
 "hp.hours.action_primary" = "Primary approve";
 "hp.hours.action_reject" = "Reject";
 "hp.hours.action_rollback" = "Reject / rollback";
+"hp.hours.approved_ok" = "Hours approved.";  // ios-only
+"hp.hours.btn_approve" = "Approve";  // ios-only
+"hp.hours.btn_final_approve" = "Final approve";  // ios-only
+"hp.hours.btn_primary_approve" = "Primary approve";  // ios-only
+"hp.hours.btn_reject" = "Reject";  // ios-only
 "hp.hours.card_title" = "⏱️ Hours for your committee members";
 "hp.hours.col_actions" = "Actions";
 "hp.hours.col_hours" = "Hours";
@@ -1203,10 +1209,15 @@
 "hp.hours.col_status" = "Status";
 "hp.hours.confirm_final" = "Final-approve these hours? They’ll count toward the member’s total.";
 "hp.hours.confirm_primary" = "Primary-approve these hours?";
-"hp.hours.empty" = "No hours logged for your committee yet.";
+"hp.hours.confirm_reject" = "Confirm rejection";  // ios-only
+"hp.hours.empty" = "All caught up — no hours pending review.";  // ios-only
 "hp.hours.err_load" = "⚠️ Couldn’t load hours.";
 "hp.hours.lead" = "Hours logged by your committee members. Primary and final approval both live here — you own the full approval chain.";
 "hp.hours.prompt_reject" = "Reason for rejection (optional):";
+"hp.hours.reject_reason_label" = "Reason (will be shown to the member)";  // ios-only
+"hp.hours.reject_reason_placeholder" = "Why are you rejecting this?";  // ios-only
+"hp.hours.reject_sheet_title" = "Reject hours";  // ios-only
+"hp.hours.rejected_ok" = "Hours rejected.";  // ios-only
 "hp.hours.success_final" = "✅ Final approval recorded.";
 "hp.hours.success_primary" = "✅ Primary approval recorded.";
 "hp.hours.success_reject" = "Record rejected.";
