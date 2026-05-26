@@ -15,6 +15,7 @@ struct ResetPasswordView: View {
             VStack(spacing: 28) {
                 header
                 card
+                VersionFooter()
             }
             .padding(.horizontal, 24)
             .padding(.top, 32)

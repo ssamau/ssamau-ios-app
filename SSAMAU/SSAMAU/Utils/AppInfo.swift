@@ -39,3 +39,26 @@ enum AppInfo {
         "\(marketingVersion)+\(buildNumber)"
     }
 }
+
+import SwiftUI
+
+/// Small, low-contrast version stamp meant to live at the bottom of
+/// pre-auth screens (Login, Reset password, Signup) and any other
+/// screen the user might land on before they pick their portal.
+/// Tappable to copy the version to clipboard — useful when they
+/// screenshot the screen for a support ticket.
+struct VersionFooter: View {
+    var body: some View {
+        Button {
+            UIPasteboard.general.string = AppInfo.displayVersion
+        } label: {
+            Text(AppInfo.displayVersion)
+                .font(.ssTiny)
+                .foregroundStyle(Color.ssGrey)
+                .padding(.vertical, 8)
+                .frame(maxWidth: .infinity)
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel(Text("App version \(AppInfo.displayVersion)"))
+    }
+}

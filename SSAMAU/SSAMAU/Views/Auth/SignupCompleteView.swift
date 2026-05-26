@@ -36,6 +36,7 @@ struct SignupCompleteView: View {
                 // PIN was being rejected with "invalid credentials".
                 card
                     .environment(\.layoutDirection, .leftToRight)
+                VersionFooter()
             }
             .padding(.horizontal, 24)
             .padding(.top, 32)

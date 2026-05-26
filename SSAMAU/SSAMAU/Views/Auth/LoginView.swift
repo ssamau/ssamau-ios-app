@@ -17,6 +17,10 @@ struct LoginView: View {
                 VStack(spacing: 28) {
                     header
                     card
+                    // Version stamp at the bottom of pre-auth screens
+                    // so the team can read it off a support screenshot
+                    // before the user even logs in.
+                    VersionFooter()
                 }
                 .padding(.horizontal, 24)
                 .padding(.top, 48)
