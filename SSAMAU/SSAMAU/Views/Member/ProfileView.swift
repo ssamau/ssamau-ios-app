@@ -18,6 +18,7 @@ struct ProfileView: View {
     @State private var showCVPicker = false
     @State private var showDeletePhotoConfirm = false
     @State private var showDeleteCVConfirm = false
+    @State private var showSupportSheet = false
 
     var body: some View {
         if nestedInNavStack {
@@ -194,6 +195,7 @@ struct ProfileView: View {
 
                 if !vm.isEditing {
                     languageButton
+                    supportButton
                     signOutButton
                 }
             }
@@ -715,6 +717,29 @@ struct ProfileView: View {
                         .stroke(.red.opacity(0.4), lineWidth: 1)
                 )
                 .clipShape(RoundedRectangle(cornerRadius: 10))
+        }
+    }
+
+    private var supportButton: some View {
+        Button {
+            showSupportSheet = true
+        } label: {
+            HStack(spacing: 8) {
+                Image(systemName: "lifepreserver")
+                Text(LocalizedStringKey("support.tab_title"))
+            }
+            .font(.ssBodyBold)
+            .foregroundStyle(Color.ssGreen)
+            .frame(maxWidth: .infinity, minHeight: 48)
+            .background(Color.ssPale)
+            .overlay(
+                RoundedRectangle(cornerRadius: 10)
+                    .stroke(Color.ssGreen.opacity(0.4), lineWidth: 1)
+            )
+            .clipShape(RoundedRectangle(cornerRadius: 10))
+        }
+        .sheet(isPresented: $showSupportSheet) {
+            SupportSubmitSheet(isPresented: $showSupportSheet)
         }
     }
 

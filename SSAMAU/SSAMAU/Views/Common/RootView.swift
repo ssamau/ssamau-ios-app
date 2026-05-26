@@ -2,10 +2,6 @@ import SwiftUI
 
 /// Role-gated root. Switches on `SessionStore.state` to decide which tab
 /// bar (or login) to show. See spec §7.
-///
-/// Until Phase 3/4 ship the head + admin tab views, those roles fall
-/// back to a branded placeholder so the foundation can be exercised
-/// end-to-end without crashing on a missing view.
 struct RootView: View {
     @EnvironmentObject var session: SessionStore
 
@@ -15,11 +11,7 @@ struct RootView: View {
             LoginView()
         case .loggedIn(let user):
             if user.hasAdminScope {
-                PlaceholderView(
-                    latin: "Admin",
-                    title: "Admin",
-                    subtitle: "AdminTabView — signed in as \(user.displayName)"
-                )
+                AdminTabView()
             } else if user.isHead {
                 HeadTabView()
             } else {
