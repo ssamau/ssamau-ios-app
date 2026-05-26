@@ -5,19 +5,6 @@ import SwiftUI
 /// (tasks #20-#28). Until then they show a branded "coming soon" panel
 /// with the screen's icon + name so navigation is exercisable.
 
-struct DashboardView: View {
-    var body: some View {
-        NavigationStack {
-            HeadComingSoon(
-                titleKey: "hp.tabs.dashboard",
-                systemImage: "chart.bar"
-            )
-            .navigationTitle(LocalizedStringKey("hp.tabs.dashboard"))
-            .navigationBarTitleDisplayMode(.inline)
-        }
-    }
-}
-
 struct HeadMembersView: View {
     var body: some View {
         NavigationStack {

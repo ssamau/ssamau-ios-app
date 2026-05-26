@@ -1171,10 +1171,15 @@
 "hp.dash.fallback_head_name" = "رئيس اللجنة";
 "hp.dash.greeting" = "مرحباً";
 "hp.dash.greeting_named" = "مرحباً، {name}";
-"hp.dash.kpi_applications" = "طلبات بانتظار قرارك";
+"hp.dash.hours_pending_title" = "ساعات بانتظار المراجعة";  // ios-only
+"hp.dash.kpi_applications" = "طلبات بانتظار البت";  // ios-only
 "hp.dash.kpi_hours" = "ساعات بانتظار اعتمادك";
-"hp.dash.kpi_members" = "أعضاء اللجنة";
-"hp.dash.kpi_opportunities" = "فرص مفتوحة";
+"hp.dash.kpi_hours_pending" = "ساعات بانتظار المراجعة";  // ios-only
+"hp.dash.kpi_members" = "الأعضاء النشطون";  // ios-only
+"hp.dash.kpi_opportunities" = "الفرص المتاحة";  // ios-only
+"hp.dash.no_pending_apps" = "لا توجد طلبات معلّقة.";  // ios-only
+"hp.dash.no_pending_hours" = "لا توجد ساعات بانتظار المراجعة.";  // ios-only
+"hp.dash.pending_applications_title" = "طلبات الانضمام المعلّقة";  // ios-only
 "hp.dash.qa_card_title" = "⚡ إجراءات سريعة";
 "hp.dash.qa_event_sub" = "حدث جديد للجنتك (عبر الإدارة)";
 "hp.dash.qa_event_title" = "إنشاء فعالية";
@@ -1185,6 +1190,7 @@
 "hp.dash.queue_apps_title" = "📥 طلبات الانضمام للجنتك";
 "hp.dash.queue_hours_title" = "⏱️ ساعات بانتظار اعتمادك";
 "hp.dash.view_all" = "عرض الكل ←";
+"hp.dash.welcome" = "لوحة قيادة رئيس اللجنة";  // ios-only
 "hp.hours.action_final" = "اعتماد نهائي";
 "hp.hours.action_primary" = "اعتماد أولي";
 "hp.hours.action_reject" = "رفض";

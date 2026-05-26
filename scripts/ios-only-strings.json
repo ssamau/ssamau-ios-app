@@ -125,6 +125,16 @@
   "hp.tabs.profile":        { "en": "Profile",        "ar": "ملفي" },
   "hp.coming_soon":         { "en": "Coming soon in Phase 3.", "ar": "قريباً في المرحلة الثالثة." },
 
+  "hp.dash.welcome":              { "en": "Head Dashboard",      "ar": "لوحة قيادة رئيس اللجنة" },
+  "hp.dash.kpi_members":          { "en": "Active members",      "ar": "الأعضاء النشطون" },
+  "hp.dash.kpi_opportunities":    { "en": "Open opportunities",  "ar": "الفرص المتاحة" },
+  "hp.dash.kpi_hours_pending":    { "en": "Hours to review",     "ar": "ساعات بانتظار المراجعة" },
+  "hp.dash.kpi_applications":     { "en": "Pending applications","ar": "طلبات بانتظار البت" },
+  "hp.dash.hours_pending_title":  { "en": "ساعات بانتظار المراجعة",       "ar": "ساعات بانتظار المراجعة" },
+  "hp.dash.pending_applications_title": { "en": "طلبات الانضمام المعلّقة","ar": "طلبات الانضمام المعلّقة" },
+  "hp.dash.no_pending_hours":     { "en": "All caught up — no hours to review.",   "ar": "لا توجد ساعات بانتظار المراجعة." },
+  "hp.dash.no_pending_apps":      { "en": "No pending applications.",              "ar": "لا توجد طلبات معلّقة." },
+
   "mp.certs.empty":              { "en": "No certificates yet. Once your hours are final-approved and a project wraps, your certs appear here.", "ar": "لا توجد شهادات بعد. ستظهر شهاداتك هنا بعد اعتماد ساعاتك نهائياً وانتهاء المشاريع." },
   "mp.certs.detail_title":       { "en": "Certificate",      "ar": "الشهادة" },
   "mp.certs.cert_of_appreciation": { "en": "Certificate of Appreciation", "ar": "شهادة تقدير" },

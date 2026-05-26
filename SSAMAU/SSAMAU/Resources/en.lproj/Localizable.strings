@@ -1171,10 +1171,15 @@
 "hp.dash.fallback_head_name" = "Committee head";
 "hp.dash.greeting" = "Welcome";
 "hp.dash.greeting_named" = "Welcome, {name}";
-"hp.dash.kpi_applications" = "Applications awaiting your decision";
+"hp.dash.hours_pending_title" = "ساعات بانتظار المراجعة";  // ios-only
+"hp.dash.kpi_applications" = "Pending applications";  // ios-only
 "hp.dash.kpi_hours" = "Hours awaiting your approval";
-"hp.dash.kpi_members" = "Committee members";
-"hp.dash.kpi_opportunities" = "Open opportunities";
+"hp.dash.kpi_hours_pending" = "Hours to review";  // ios-only
+"hp.dash.kpi_members" = "Active members";  // ios-only
+"hp.dash.kpi_opportunities" = "Open opportunities";  // ios-only
+"hp.dash.no_pending_apps" = "No pending applications.";  // ios-only
+"hp.dash.no_pending_hours" = "All caught up — no hours to review.";  // ios-only
+"hp.dash.pending_applications_title" = "طلبات الانضمام المعلّقة";  // ios-only
 "hp.dash.qa_card_title" = "⚡ Quick actions";
 "hp.dash.qa_event_sub" = "New event for your committee (via admin)";
 "hp.dash.qa_event_title" = "Create event";
@@ -1185,6 +1190,7 @@
 "hp.dash.queue_apps_title" = "📥 Applications routed to your committee";
 "hp.dash.queue_hours_title" = "⏱️ Hours awaiting your approval";
 "hp.dash.view_all" = "View all →";
+"hp.dash.welcome" = "Head Dashboard";  // ios-only
 "hp.hours.action_final" = "Final approve";
 "hp.hours.action_primary" = "Primary approve";
 "hp.hours.action_reject" = "Reject";
