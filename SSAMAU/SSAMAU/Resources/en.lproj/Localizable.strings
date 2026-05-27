@@ -1037,6 +1037,7 @@
 "common.loading" = "Loading…";  // ios-only
 "common.logout" = "Sign out";
 "common.logout_confirm" = "Sign out of SSAMAU?";  // ios-only
+"common.logout_message" = "You'll need to sign in again to use the app.";  // ios-only
 "common.network_error" = "Couldn’t reach the server. Try again.";
 "common.notes" = "Notes";  // ios-only
 "common.ok" = "OK";  // ios-only

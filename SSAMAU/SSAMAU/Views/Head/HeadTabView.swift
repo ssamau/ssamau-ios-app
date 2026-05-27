@@ -146,15 +146,19 @@ private struct HeadMoreView: View {
                 case .profile:      ProfileView(nestedInNavStack: true)
                 }
             }
-            .confirmationDialog(
+            // Centered system-style alert — matches the iOS settings
+            // restart-prompt look (full overlay, centered modal card).
+            // See AdminTabView for the rationale.
+            .alert(
                 LocalizedStringKey("common.logout_confirm"),
-                isPresented: $showSignOutConfirm,
-                titleVisibility: .visible
+                isPresented: $showSignOutConfirm
             ) {
+                Button(LocalizedStringKey("common.cancel"), role: .cancel) {}
                 Button(LocalizedStringKey("common.logout"), role: .destructive) {
                     Task { await session.signOut() }
                 }
-                Button(LocalizedStringKey("common.cancel"), role: .cancel) {}
+            } message: {
+                Text(LocalizedStringKey("common.logout_message"))
             }
         }
     }

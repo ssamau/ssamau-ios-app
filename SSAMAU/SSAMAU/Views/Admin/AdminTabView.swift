@@ -152,15 +152,23 @@ private struct AdminMoreView: View {
                 case .profile:      ProfileView(nestedInNavStack: true)
                 }
             }
-            .confirmationDialog(
+            // System-style centered alert (NOT confirmationDialog —
+            // that one renders as a small bottom action sheet on
+            // iPhone and feels lightweight for a destructive action
+            // like sign out). The alert API gives us the same modal
+            // chrome iOS uses for "Applying this setting will restart
+            // your iPhone" — full overlay, centered card, dimmed
+            // background, side-by-side Cancel/destructive buttons.
+            .alert(
                 LocalizedStringKey("common.logout_confirm"),
-                isPresented: $showSignOutConfirm,
-                titleVisibility: .visible
+                isPresented: $showSignOutConfirm
             ) {
+                Button(LocalizedStringKey("common.cancel"), role: .cancel) {}
                 Button(LocalizedStringKey("common.logout"), role: .destructive) {
                     Task { await session.signOut() }
                 }
-                Button(LocalizedStringKey("common.cancel"), role: .cancel) {}
+            } message: {
+                Text(LocalizedStringKey("common.logout_message"))
             }
         }
     }
