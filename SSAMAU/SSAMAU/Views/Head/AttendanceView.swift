@@ -75,6 +75,11 @@ struct AttendanceView: View {
                         }
                     }
                 }
+                // Force full-width so the empty-state Text doesn't
+                // collapse the VStack to its intrinsic width — which
+                // also shifts the FAB inward via the bottomTrailing
+                // alignment of the parent ZStack.
+                .frame(maxWidth: .infinity)
                 .padding(.horizontal, 20)
                 .padding(.vertical, 16)
                 .padding(.bottom, 80)

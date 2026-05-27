@@ -101,6 +101,10 @@ struct CommitteesView: View {
                         }
                     }
                 }
+                // Force full-width — same fix as AttendanceView; without
+                // it the empty Text collapses the VStack and shifts the
+                // FAB inward.
+                .frame(maxWidth: .infinity)
                 .padding(.horizontal, 20)
                 .padding(.vertical, 16)
                 .padding(.bottom, 80)
