@@ -1,11 +1,42 @@
 import SwiftUI
 
-/// Head-mode tab bar — spec §7.
+/// Head-mode primary navigation — spec §7.
 ///
-/// Five tabs + a "More" sheet for the overflow. Real views land
-/// incrementally; everything starts as a stub view so navigation works
-/// from day one.
+/// Adaptive:
+///   - Compact width (iPhone, iPad in narrow Split View / Slide Over):
+///     bottom `TabView` with 5 primary tabs + a `More` tab whose
+///     navigation is reset on tab transitions via the
+///     `tabSelectionBinding` state machine below. **This iPhone path
+///     is byte-identical to build 75 and earlier** — the 9-iteration
+///     More-tab flicker fix is preserved unchanged.
+///   - Regular width (iPad fullscreen, Mac Catalyst): persistent left
+///     sidebar with all 11 destinations flat across two sections
+///     (primary + More) plus a destructive Sign Out row at the
+///     bottom. Detail column on the right shows whichever sidebar row
+///     is selected. No More tab needed — every destination is one
+///     tap away.
+///
+/// The two paths use separate @State for selection because the
+/// destination sets are different shapes (iPhone has 5 tabs incl.
+/// .more; iPad has 11 individual rows). Size-class transitions (e.g.
+/// rotating iPad or dragging into Split View) preserve state inside
+/// each branch but don't try to migrate it between branches — if a
+/// user is on iPad sidebar with Projects selected, then drags into
+/// narrow Split View, the iPhone path defaults back to .dashboard.
+/// Acceptable: rare gesture, no data loss.
 struct HeadTabView: View {
+    @Environment(\.horizontalSizeClass) private var hSizeClass
+
+    var body: some View {
+        if hSizeClass == .regular {
+            HeadIPadSidebarView()
+        } else {
+            iphoneTabBar
+        }
+    }
+
+    // MARK: - iPhone / compact: existing TabView (untouched)
+
     private enum Tab: Hashable {
         case dashboard, members, opportunities, hours, more
     }
@@ -18,7 +49,7 @@ struct HeadTabView: View {
     /// so you expect the menu when you come back.
     @State private var morePath = NavigationPath()
 
-    var body: some View {
+    private var iphoneTabBar: some View {
         TabView(selection: tabSelectionBinding) {
             DashboardView()
                 .tabItem {
@@ -94,6 +125,148 @@ struct HeadTabView: View {
                 }
             }
         )
+    }
+}
+
+// MARK: - iPad / regular: NavigationSplitView sidebar
+
+/// Flat sidebar destination — all 11 head screens are first-class
+/// items here, organised into two sections. Sign Out is handled as
+/// a separate `Button` outside the selectable list (it's an action,
+/// not a destination, so it doesn't belong in the selection enum).
+private enum HeadSidebarTab: Hashable {
+    case dashboard, members, opportunities, hours
+    case projects, attendance, applications, thanks, certs, profile
+}
+
+/// The iPad-only layout. Pulled out as its own struct so its
+/// @State (selection + sign-out alert) doesn't pollute HeadTabView
+/// and doesn't survive a size-class transition (which it shouldn't:
+/// iPhone has different selection state).
+private struct HeadIPadSidebarView: View {
+    @EnvironmentObject private var session: SessionStore
+    @State private var selection: HeadSidebarTab = .dashboard
+    @State private var showSignOutConfirm: Bool = false
+
+    /// Optional binding for List's selection. Same pattern as
+    /// AdaptiveTabSidebar — iOS's List(selection:) on a single value
+    /// needs an Optional binding even though we never want nil.
+    private var selectionBinding: Binding<HeadSidebarTab?> {
+        Binding(
+            get: { selection },
+            set: { newValue in
+                if let new = newValue { selection = new }
+            }
+        )
+    }
+
+    var body: some View {
+        NavigationSplitView {
+            sidebarList
+                .navigationTitle(LocalizedStringKey("brand.ssam_full"))
+                .scrollContentBackground(.hidden)
+                .background(Color.ssCream)
+        } detail: {
+            sidebarDetail
+        }
+        .tint(Color.ssGreen)
+        .alert(
+            LocalizedStringKey("common.logout_confirm"),
+            isPresented: $showSignOutConfirm
+        ) {
+            Button(LocalizedStringKey("common.cancel"), role: .cancel) {}
+            Button(LocalizedStringKey("common.logout"), role: .destructive) {
+                Task { await session.signOut() }
+            }
+        } message: {
+            Text(LocalizedStringKey("common.logout_message"))
+        }
+    }
+
+    private var sidebarList: some View {
+        List(selection: selectionBinding) {
+            // Primary section — no header, matches the original 4
+            // primary tabs on iPhone (Dashboard / Members / Opps /
+            // Hours).
+            Section {
+                row(.dashboard,     "hp.tabs.dashboard",     "chart.bar")
+                row(.members,       "hp.tabs.members",       "person.2")
+                row(.opportunities, "hp.tabs.opportunities", "list.bullet.rectangle")
+                row(.hours,         "hp.tabs.hours",         "clock.badge.checkmark")
+            }
+
+            // "More" section — what was hidden behind the More tab on
+            // iPhone is now visible as first-class sidebar items here.
+            Section {
+                row(.projects,     "hp.tabs.projects",     "folder.fill")
+                row(.attendance,   "hp.tabs.attendance",   "checkmark.rectangle")
+                row(.applications, "hp.tabs.applications", "doc.text.fill")
+                row(.thanks,       "hp.tabs.thanks",       "envelope.badge")
+                row(.certs,        "hp.tabs.certs",        "doc.badge.gearshape")
+                row(.profile,      "hp.tabs.profile",      "person.circle")
+            } header: {
+                Text(LocalizedStringKey("hp.tabs.more"))
+                    .font(.ssLatinLabel)
+                    .tracking(1.5)
+                    .foregroundStyle(Color.ssGold)
+            }
+
+            // Sign Out section — destructive action, not a selectable
+            // destination, so it's a Button instead of a tagged row.
+            // The alert is owned by the parent view so triggering it
+            // here works.
+            Section {
+                Button(role: .destructive) {
+                    showSignOutConfirm = true
+                } label: {
+                    Label {
+                        Text(LocalizedStringKey("common.logout"))
+                            .font(.ssBody)
+                            .foregroundStyle(.red)
+                    } icon: {
+                        Image(systemName: "rectangle.portrait.and.arrow.right")
+                            .foregroundStyle(.red)
+                    }
+                }
+                .ssHover()
+            }
+        }
+        .listStyle(.sidebar)
+    }
+
+    private func row(_ tag: HeadSidebarTab, _ key: String, _ icon: String) -> some View {
+        Label {
+            Text(LocalizedStringKey(key))
+                .font(.ssBody)
+                .foregroundStyle(Color.ssCharcoal)
+        } icon: {
+            Image(systemName: icon)
+                .foregroundStyle(Color.ssGold)
+        }
+        .tag(tag)
+        .ssHover()
+    }
+
+    /// Detail column. Each branch returns the same fully-wrapped view
+    /// the iPhone tab bar / More menu pushes. The Profile case uses
+    /// `nestedInNavStack: true` because the NavigationSplitView's
+    /// detail column already provides nav chrome — nesting another
+    /// NavigationStack would corrupt the destination registry (the
+    /// trap that was documented in the More-tab nav saga).
+    @ViewBuilder
+    private var sidebarDetail: some View {
+        switch selection {
+        case .dashboard:     DashboardView()
+        case .members:       HeadMembersView()
+        case .opportunities: HeadOpportunitiesView()
+        case .hours:         HoursApprovalView(mode: .headQueue)
+        case .projects:      HeadProjectsView()
+        case .attendance:    AttendanceView()
+        case .applications:  ApplicationsView()
+        case .thanks:        ThanksView()
+        case .certs:         HeadCertsView()
+        case .profile:       ProfileView(nestedInNavStack: true)
+        }
     }
 }
 
