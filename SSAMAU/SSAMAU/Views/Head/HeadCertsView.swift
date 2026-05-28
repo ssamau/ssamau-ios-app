@@ -262,6 +262,7 @@ private struct IssueCertSheet: View {
                     .disabled(vm.inFlight || !canSubmit)
                 }
                 .padding(20)
+                .ipadContentWidth(520)
             }
             .background(Color.ssCream.ignoresSafeArea())
             .navigationTitle(LocalizedStringKey("hp.certs.sheet_issue_title"))

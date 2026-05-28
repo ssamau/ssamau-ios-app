@@ -171,6 +171,7 @@ private struct CommitteeFormSheet: View {
                     .disabled(vm.inFlightId != nil || name.isEmpty)
                 }
                 .padding(20)
+                .ipadContentWidth(520)
             }
             .background(Color.ssCream.ignoresSafeArea())
             .navigationTitle(LocalizedStringKey(existing == nil

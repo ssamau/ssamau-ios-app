@@ -563,6 +563,7 @@ private struct AccountFormSheet: View {
                     .disabled(!canSubmit || inFlight)
                 }
                 .padding(20)
+                .ipadContentWidth(520)
             }
             .background(Color.ssCream.ignoresSafeArea())
             .navigationTitle(LocalizedStringKey(existing == nil

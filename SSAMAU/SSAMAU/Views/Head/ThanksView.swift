@@ -271,6 +271,7 @@ private struct SendThanksSheet: View {
                     .disabled(vm.inFlight || !canSubmit)
                 }
                 .padding(20)
+                .ipadContentWidth(520)
             }
             .background(Color.ssCream.ignoresSafeArea())
             .navigationTitle(LocalizedStringKey("hp.thanks.sheet_send_title"))

@@ -80,6 +80,7 @@ struct SupportSubmitSheet: View {
                     .disabled(inFlight || !canSubmit)
                 }
                 .padding(20)
+                .ipadContentWidth(520)
             }
             .background(Color.ssCream.ignoresSafeArea())
             .navigationTitle(LocalizedStringKey("support.sheet_title"))

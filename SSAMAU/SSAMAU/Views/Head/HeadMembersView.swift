@@ -361,6 +361,7 @@ struct HeadMembersView: View {
                 }
                 .padding(20)
                 .padding(.bottom, 80)
+                .ipadContentWidth(520)
             }
             .background(Color.ssCream.ignoresSafeArea())
             .ssToast(Binding(

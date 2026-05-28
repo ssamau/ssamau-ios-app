@@ -46,6 +46,7 @@ struct PickRoleSheet: View {
                 }
                 .padding(20)
                 .padding(.bottom, 80) // room for toast overlay
+                .ipadContentWidth(520)
             }
             .background(Color.ssCream.ignoresSafeArea())
             .ssToast(Binding(

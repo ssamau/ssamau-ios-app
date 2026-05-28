@@ -243,6 +243,7 @@ private struct AdvisorFormSheet: View {
                     .disabled(vm.inFlightId != nil || fullName.isEmpty)
                 }
                 .padding(20)
+                .ipadContentWidth(520)
             }
             .background(Color.ssCream.ignoresSafeArea())
             .navigationTitle(LocalizedStringKey(existing == nil

@@ -247,6 +247,7 @@ private struct RecordAttendanceSheet: View {
                     submitButton
                 }
                 .padding(20)
+                .ipadContentWidth(520)
             }
             .background(Color.ssCream.ignoresSafeArea())
             .navigationTitle(LocalizedStringKey("hp.attendance.sheet_title"))

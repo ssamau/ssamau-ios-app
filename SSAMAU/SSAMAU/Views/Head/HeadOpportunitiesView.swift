@@ -233,6 +233,7 @@ private struct AssignSheet: View {
                 }
                 .padding(20)
                 .padding(.bottom, 60)
+                .ipadContentWidth(520)
             }
             .background(Color.ssCream.ignoresSafeArea())
             .navigationTitle(LocalizedStringKey("hp.opps.assign_title"))
@@ -573,6 +574,7 @@ private struct AttendanceSheet: View {
                     .disabled(vm.inFlightAssignmentId != nil)
                 }
                 .padding(20)
+                .ipadContentWidth(520)
             }
             .background(Color.ssCream.ignoresSafeArea())
             .navigationTitle(LocalizedStringKey("hp.opps.att_sheet_title"))

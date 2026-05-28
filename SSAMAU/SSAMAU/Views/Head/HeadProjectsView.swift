@@ -369,6 +369,7 @@ private struct ProjectFormSheet: View {
                               name.trimmingCharacters(in: .whitespaces).isEmpty)
                 }
                 .padding(20)
+                .ipadContentWidth(520)
             }
             .background(Color.ssCream.ignoresSafeArea())
             .navigationTitle(LocalizedStringKey(
