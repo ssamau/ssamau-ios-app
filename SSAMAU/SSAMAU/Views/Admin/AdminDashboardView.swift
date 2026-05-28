@@ -3,6 +3,7 @@ import SwiftUI
 /// Admin landing — five KPIs + top volunteers + committee hours +
 /// recent projects. Mirrors the web admin's dashboard tab.
 struct AdminDashboardView: View {
+    @Environment(\.horizontalSizeClass) private var hSizeClass
     @StateObject private var vm = AdminDashboardViewModel()
 
     var body: some View {
@@ -82,6 +83,7 @@ struct AdminDashboardView: View {
                         }
                     }
                 }
+                .ipadContentWidth()
                 .padding(20)
             }
         } else {
@@ -90,10 +92,14 @@ struct AdminDashboardView: View {
     }
 
     private func kpis(_ counts: DashboardStats.Counts) -> some View {
-        LazyVGrid(columns: [
-            GridItem(.flexible(), spacing: 12),
-            GridItem(.flexible(), spacing: 12),
-        ], spacing: 12) {
+        // 2-up on iPhone (current behaviour), 4-up on iPad / Mac so
+        // the five KPI cards lay out as a wide single-row+spillover.
+        LazyVGrid(
+            columns: hSizeClass == .regular
+                ? SSAdaptiveColumns.kpi.regular
+                : SSAdaptiveColumns.kpi.compact,
+            spacing: 12
+        ) {
             kpi("ap.dash.active_members", value: "\(counts.activeMembers)", icon: "person.2.fill")
             kpi("ap.dash.total_members", value: "\(counts.totalMembers)", icon: "person.3")
             kpi("ap.dash.total_projects", value: "\(counts.totalProjects)", icon: "folder")

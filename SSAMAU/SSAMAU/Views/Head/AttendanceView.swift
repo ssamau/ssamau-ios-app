@@ -80,6 +80,7 @@ struct AttendanceView: View {
                 // also shifts the FAB inward via the bottomTrailing
                 // alignment of the parent ZStack.
                 .frame(maxWidth: .infinity)
+                .ipadContentWidth()
                 .padding(.horizontal, 20)
                 .padding(.vertical, 16)
                 .padding(.bottom, 80)

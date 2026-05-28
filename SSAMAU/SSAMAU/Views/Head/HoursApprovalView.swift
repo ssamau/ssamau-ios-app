@@ -52,6 +52,7 @@ struct HoursApprovalView: View {
                     rowCard(row)
                 }
             }
+            .ipadContentWidth()
             .padding(.horizontal, 20)
             .padding(.vertical, 16)
         }

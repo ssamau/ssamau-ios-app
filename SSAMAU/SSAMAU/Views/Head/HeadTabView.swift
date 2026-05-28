@@ -126,6 +126,7 @@ private struct HeadMoreView: View {
                     // dev/admin sessions where Profile won't load.
                     signOutRow
                 }
+                .ipadContentWidth()
                 .padding(.horizontal, 20)
                 .padding(.vertical, 16)
             }
@@ -173,6 +174,7 @@ private struct HeadMoreView: View {
                          tint: Color.ssGold, textColor: Color.ssCharcoal)
         }
         .buttonStyle(.plain)
+        .ssHover()
     }
 
     private var signOutRow: some View {
@@ -186,6 +188,7 @@ private struct HeadMoreView: View {
                          borderColor: .red.opacity(0.35))
         }
         .buttonStyle(.plain)
+        .ssHover()
     }
 
     private func menuRowLabel(

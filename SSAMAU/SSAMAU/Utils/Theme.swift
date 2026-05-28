@@ -75,3 +75,46 @@ struct GoldRule: View {
             .frame(width: width, height: height)
     }
 }
+
+// MARK: - Adaptive layout helpers (iPad / Mac Catalyst)
+
+extension View {
+    /// Caps the content at `max` points wide and centers it horizontally
+    /// inside the available space. On iPhone the device is always
+    /// narrower than the cap so this is a no-op; on iPad the content
+    /// gets readable margins instead of stretching across the full
+    /// 1024pt+ canvas, and on Mac Catalyst windows it keeps layouts
+    /// from feeling like a phone in a desktop window.
+    ///
+    /// Apply to the inside of a ScrollView so the scroll surface still
+    /// fills the screen while the content sits in a centered column.
+    func ipadContentWidth(_ max: CGFloat = 800) -> some View {
+        self
+            .frame(maxWidth: max)
+            .frame(maxWidth: .infinity)
+    }
+
+    /// Brand-aligned pointer hover treatment. No-op on iPhone (no
+    /// pointer); subtle highlight on iPad with trackpad/mouse and on
+    /// Mac via Catalyst. Apply to any tappable row/card so the pointer
+    /// gets feedback over the same surface that responds to tap.
+    func ssHover() -> some View {
+        self.hoverEffect(.highlight)
+    }
+}
+
+/// Adaptive `LazyVGrid` column count that uses `compact` on iPhone
+/// portrait / Split View narrow, `regular` everywhere else. Pass any
+/// pair of layouts; the caller decides the columns + spacing.
+struct SSAdaptiveColumns {
+    let compact: [GridItem]
+    let regular: [GridItem]
+
+    /// Two-column compact, four-column regular — the default for KPI
+    /// dashboards.
+    static let kpi = SSAdaptiveColumns(
+        compact: [GridItem(.flexible(), spacing: 12),
+                  GridItem(.flexible(), spacing: 12)],
+        regular: Array(repeating: GridItem(.flexible(), spacing: 12), count: 4)
+    )
+}

@@ -43,6 +43,7 @@ struct CertificatesView: View {
                     row(cert)
                 }
             }
+            .ipadContentWidth()
             .padding(.horizontal, 20)
             .padding(.vertical, 16)
         }

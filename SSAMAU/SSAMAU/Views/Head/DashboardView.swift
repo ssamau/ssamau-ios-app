@@ -6,6 +6,7 @@ import SwiftUI
 /// applications, hours pending head action, open opportunities), top
 /// 5 pending applications, top 5 hours rows awaiting primary review.
 struct DashboardView: View {
+    @Environment(\.horizontalSizeClass) private var hSizeClass
     @StateObject private var vm = HeadDashboardViewModel()
 
     var body: some View {
@@ -61,6 +62,7 @@ struct DashboardView: View {
                     }
                 }
             }
+            .ipadContentWidth()
             .padding(.horizontal, 20)
             .padding(.vertical, 16)
         }
@@ -87,7 +89,15 @@ struct DashboardView: View {
     // MARK: - KPI grid
 
     private func kpiGrid(_ counts: HeadDashboardCounts) -> some View {
-        LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
+        // 2 columns on iPhone / compact, 4 columns on iPad / regular.
+        // 4-up reads at-a-glance on a wide canvas; 2-up keeps each
+        // value comfortably tappable on iPhone.
+        LazyVGrid(
+            columns: hSizeClass == .regular
+                ? SSAdaptiveColumns.kpi.regular
+                : SSAdaptiveColumns.kpi.compact,
+            spacing: 12
+        ) {
             kpiCard(value: counts.membersCount,
                     labelKey: "hp.dash.kpi_members",
                     systemImage: "person.2.fill")

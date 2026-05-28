@@ -68,6 +68,7 @@ struct ThanksView: View {
                         }
                     }
                 }
+                .ipadContentWidth()
                 .padding(.horizontal, 20)
                 .padding(.vertical, 16)
                 .padding(.bottom, 80)

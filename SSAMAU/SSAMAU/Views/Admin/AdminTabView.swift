@@ -130,6 +130,7 @@ private struct AdminMoreView: View {
                     // the session.
                     signOutRow
                 }
+                .ipadContentWidth()
                 .padding(.horizontal, 20)
                 .padding(.vertical, 16)
             }
@@ -179,6 +180,7 @@ private struct AdminMoreView: View {
                          tint: Color.ssGold, textColor: Color.ssCharcoal)
         }
         .buttonStyle(.plain)
+        .ssHover()
     }
 
     private var signOutRow: some View {
@@ -192,6 +194,7 @@ private struct AdminMoreView: View {
                          borderColor: .red.opacity(0.35))
         }
         .buttonStyle(.plain)
+        .ssHover()
     }
 
     /// Shared row chrome — extracted so Sign Out can reuse the same

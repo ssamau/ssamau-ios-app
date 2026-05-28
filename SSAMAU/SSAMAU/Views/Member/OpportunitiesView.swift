@@ -55,6 +55,7 @@ struct OpportunitiesView: View {
                     }
                 }
             }
+            .ipadContentWidth()
             .padding(.horizontal, 20)
             .padding(.vertical, 16)
         }

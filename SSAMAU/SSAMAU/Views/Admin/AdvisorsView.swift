@@ -94,6 +94,7 @@ struct AdvisorsView: View {
                 // it the empty Text collapses the VStack and shifts the
                 // FAB inward.
                 .frame(maxWidth: .infinity)
+                .ipadContentWidth()
                 .padding(.horizontal, 20)
                 .padding(.vertical, 16)
                 .padding(.bottom, 80)

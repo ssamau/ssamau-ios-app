@@ -200,6 +200,7 @@ struct ProfileView: View {
                     versionFooter
                 }
             }
+            .ipadContentWidth()
             .padding(.horizontal, 20)
             .padding(.vertical, 20)
         }
