@@ -1,9 +1,41 @@
 import SwiftUI
 
-/// Admin-mode tab bar — spec §10. Five tabs + a "More" menu for the
-/// long tail (Projects, Attendance, Applications, Thanks, Certs,
-/// Committees, Advisors, Accounts, Interest, Support, Dev, Profile).
+/// Admin-mode primary navigation — spec §10.
+///
+/// Adaptive:
+///   - Compact width (iPhone, iPad in narrow Split View / Slide Over):
+///     bottom `TabView` with 5 primary tabs + a `More` tab whose
+///     navigation is reset on tab transitions via the
+///     `tabSelectionBinding` state machine below. **This iPhone path
+///     is byte-identical to build 76 and earlier** — the 9-iteration
+///     More-tab flicker fix is preserved unchanged.
+///   - Regular width (iPad fullscreen, Mac Catalyst): persistent left
+///     sidebar with all destinations flat across two sections
+///     (primary + More) plus a destructive Sign Out row at the
+///     bottom. Dev row only appears for superadmins, same as the
+///     iPhone More menu.
+///
+/// Same shape as HeadTabView — see that file's header for the
+/// rationale on why the two paths use separate @State (different
+/// destination shapes; size-class transitions don't migrate state).
+///
+/// Attendance is intentionally absent from admin nav in both layouts:
+/// `head.attendance.*` server scopes are head-or-superadmin only, so
+/// the admin (presidency) hits 403. Heads handle attendance per
+/// committee; cross-club review goes through the web for now.
 struct AdminTabView: View {
+    @Environment(\.horizontalSizeClass) private var hSizeClass
+
+    var body: some View {
+        if hSizeClass == .regular {
+            AdminIPadSidebarView()
+        } else {
+            iphoneTabBar
+        }
+    }
+
+    // MARK: - iPhone / compact: existing TabView (untouched from build 76)
+
     @EnvironmentObject private var session: SessionStore
 
     private enum Tab: Hashable {
@@ -13,7 +45,7 @@ struct AdminTabView: View {
     @State private var selection: Tab = .dashboard
     @State private var morePath = NavigationPath()
 
-    var body: some View {
+    private var iphoneTabBar: some View {
         TabView(selection: tabSelectionBinding) {
             // AdminDashboardView is the only view here that doesn't wrap
             // itself in a NavigationStack — wrap it so the title + chrome
@@ -85,7 +117,165 @@ struct AdminTabView: View {
     }
 }
 
-// MARK: - More menu
+// MARK: - iPad / regular: NavigationSplitView sidebar
+
+/// Flat sidebar destination — all admin screens are first-class
+/// items, organised into two sections. Dev appears only when the
+/// signed-in user is a superadmin, gated at row-render time so the
+/// enum case can exist universally. Sign Out is a Button outside
+/// the selection set (action, not destination).
+private enum AdminSidebarTab: Hashable {
+    case dashboard, members, opportunities, hours
+    case projects, applications, thanks, certs, interest
+    case committees, advisors, accounts, support, dev, profile
+}
+
+/// The iPad-only admin layout. Same shape as HeadIPadSidebarView —
+/// see that struct's docs for the Optional-binding pattern and the
+/// nestedInNavStack: true rationale for Profile.
+private struct AdminIPadSidebarView: View {
+    @EnvironmentObject private var session: SessionStore
+    @State private var selection: AdminSidebarTab = .dashboard
+    @State private var showSignOutConfirm: Bool = false
+
+    private var selectionBinding: Binding<AdminSidebarTab?> {
+        Binding(
+            get: { selection },
+            set: { newValue in
+                if let new = newValue { selection = new }
+            }
+        )
+    }
+
+    var body: some View {
+        NavigationSplitView {
+            sidebarList
+                .navigationTitle(LocalizedStringKey("brand.ssam_full"))
+                .scrollContentBackground(.hidden)
+                .background(Color.ssCream)
+        } detail: {
+            sidebarDetail
+        }
+        .tint(Color.ssGreen)
+        .alert(
+            LocalizedStringKey("common.logout_confirm"),
+            isPresented: $showSignOutConfirm
+        ) {
+            Button(LocalizedStringKey("common.cancel"), role: .cancel) {}
+            Button(LocalizedStringKey("common.logout"), role: .destructive) {
+                Task { await session.signOut() }
+            }
+        } message: {
+            Text(LocalizedStringKey("common.logout_message"))
+        }
+    }
+
+    private var sidebarList: some View {
+        List(selection: selectionBinding) {
+            // Primary — matches the 4 primary tabs on iPhone (Dashboard
+            // / Members / Opps / Hours).
+            Section {
+                row(.dashboard,     "ap.tabs.dashboard",     "chart.bar")
+                row(.members,       "ap.tabs.members",       "person.2")
+                row(.opportunities, "ap.tabs.opportunities", "list.bullet.rectangle")
+                row(.hours,         "ap.tabs.hours",         "checkmark.seal")
+            }
+
+            // "More" — order matches AdminMoreView's iPhone row order so
+            // muscle memory survives the size-class transition.
+            // Attendance intentionally absent (see file header).
+            Section {
+                row(.projects,     "ap.tabs.projects",     "folder.fill")
+                row(.applications, "ap.tabs.applications", "doc.text.fill")
+                row(.thanks,       "ap.tabs.thanks",       "envelope.badge")
+                row(.certs,        "ap.tabs.certs",        "rosette")
+                row(.interest,     "ap.tabs.interest",     "hand.raised")
+                row(.committees,   "ap.tabs.committees",   "building.2")
+                row(.advisors,     "ap.tabs.advisors",     "person.2.crop.square.stack")
+                row(.accounts,     "ap.tabs.accounts",     "key.fill")
+                row(.support,      "ap.tabs.support",      "lifepreserver")
+                if session.currentUser?.isSuperadmin == true {
+                    row(.dev,      "ap.tabs.dev",          "wrench.and.screwdriver")
+                }
+                row(.profile,      "hp.tabs.profile",      "person.circle")
+            } header: {
+                Text(LocalizedStringKey("ap.tabs.more"))
+                    .font(.ssLatinLabel)
+                    .tracking(1.5)
+                    .foregroundStyle(Color.ssGold)
+            }
+
+            // Sign Out — destructive, not selectable.
+            Section {
+                Button(role: .destructive) {
+                    showSignOutConfirm = true
+                } label: {
+                    Label {
+                        Text(LocalizedStringKey("common.logout"))
+                            .font(.ssBody)
+                            .foregroundStyle(.red)
+                    } icon: {
+                        Image(systemName: "rectangle.portrait.and.arrow.right")
+                            .foregroundStyle(.red)
+                    }
+                }
+                .ssHover()
+            }
+        }
+        .listStyle(.sidebar)
+    }
+
+    private func row(_ tag: AdminSidebarTab, _ key: String, _ icon: String) -> some View {
+        Label {
+            Text(LocalizedStringKey(key))
+                .font(.ssBody)
+                .foregroundStyle(Color.ssCharcoal)
+        } icon: {
+            Image(systemName: icon)
+                .foregroundStyle(Color.ssGold)
+        }
+        .tag(tag)
+        .ssHover()
+    }
+
+    /// Detail column. Each branch returns the same fully-wrapped view
+    /// the iPhone tab bar / More menu pushes. Profile uses
+    /// `nestedInNavStack: true` because NavigationSplitView's detail
+    /// column already provides nav chrome.
+    ///
+    /// If the user was on .dev when their superadmin flag flipped off
+    /// (e.g. role demotion mid-session) the switch falls through to the
+    /// EmptyView default — they then can't navigate back to it because
+    /// the row hides. Acceptable: extremely rare, recoverable by tapping
+    /// any other row.
+    @ViewBuilder
+    private var sidebarDetail: some View {
+        switch selection {
+        case .dashboard:     NavigationStack { AdminDashboardView() }
+        case .members:       HeadMembersView(adminMode: true)
+        case .opportunities: HeadOpportunitiesView()
+        case .hours:         HoursApprovalView(mode: .adminFinalApproval)
+        case .projects:      HeadProjectsView(adminMode: true)
+        case .applications:  ApplicationsView(adminMode: true)
+        case .thanks:        ThanksView(adminMode: true)
+        case .certs:         HeadCertsView(adminMode: true)
+        case .interest:      InterestTriageView()
+        case .committees:    CommitteesView()
+        case .advisors:      AdvisorsView()
+        case .accounts:      AccountsView()
+        case .support:       AdminSupportView()
+        case .dev:
+            if session.currentUser?.isSuperadmin == true {
+                DevPagesView()
+            } else {
+                EmptyView()
+            }
+        case .profile:       ProfileView(nestedInNavStack: true)
+        }
+    }
+}
+
+// MARK: - "More" tab — iPhone path (unchanged)
 
 enum AdminMoreDestination: Hashable {
     case projects, attendance, applications, thanks, certs
