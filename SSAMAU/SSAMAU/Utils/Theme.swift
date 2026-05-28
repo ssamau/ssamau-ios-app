@@ -126,8 +126,18 @@ extension View {
     }
 }
 
-/// Sheet-size buckets. Picked to fit iPad mini portrait (744pt wide
-/// minus inset) at xlarge, with smaller tiers stepping down by ~140pt.
+/// Sheet-size buckets. Widths capped at 680 to stay under iPad mini
+/// portrait's formSheet threshold (~684pt safe area). Above that
+/// threshold UIKit silently escalates the presentation from formSheet
+/// to fullscreen — losing the sidebar dim, the rounded corners, and
+/// the "modal-ness" — which is what build 79 hit when xlarge was
+/// 760pt wide.
+///
+/// Heights are advisory only; build 80 dropped the height enforcement
+/// because forcing minHeight clipped sheet toolbars in landscape iPad
+/// mini with the sidebar visible. The values are kept here for
+/// reference and so sub-phase 3B can re-apply per-form inner sizing
+/// if needed (e.g. ScrollView cap).
 enum SSIPadSheetSize {
     /// Confirmations, pin-result, role pickers. Single decision, no
     /// scrolling expected.
@@ -137,9 +147,12 @@ enum SSIPadSheetSize {
     /// Multi-section form or rich detail viewer: project form, advisor
     /// form, application detail with CV preview, member viewer.
     case large
-    /// Very wide form or list-driven sheet: account form, record-attendance,
-    /// bulk thanks/certs. Maxes out iPad mini portrait while still leaving
-    /// the system dim margin visible.
+    /// Wide form or list-driven sheet: account form, record-attendance,
+    /// CV PDF preview. Currently the same physical width as large
+    /// (680) because going wider triggers iPad mini portrait
+    /// fullscreen escalation; the enum case is kept so we can
+    /// differentiate intent if a future change re-introduces
+    /// height/style overrides.
     case xlarge
 
     fileprivate var dims: CGSize {
@@ -147,7 +160,7 @@ enum SSIPadSheetSize {
         case .small:  return CGSize(width: 380, height: 460)
         case .medium: return CGSize(width: 540, height: 640)
         case .large:  return CGSize(width: 680, height: 780)
-        case .xlarge: return CGSize(width: 760, height: 860)
+        case .xlarge: return CGSize(width: 680, height: 860)
         }
     }
 }
