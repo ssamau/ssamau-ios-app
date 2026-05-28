@@ -49,7 +49,7 @@ struct OpportunitiesView: View {
                 if vm.filteredOpportunities.isEmpty {
                     emptyState
                 } else {
-                    LazyVStack(spacing: 12) {
+                    LazyVGrid(columns: SSAdaptiveColumns.cards, spacing: 12) {
                         ForEach(vm.filteredOpportunities) { opp in
                             row(opp)
                         }

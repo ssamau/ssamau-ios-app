@@ -85,7 +85,7 @@ struct AdvisorsView: View {
                             .font(.ssCaption).foregroundStyle(Color.ssGrey)
                             .padding(.vertical, 60)
                     } else {
-                        LazyVStack(spacing: 10) {
+                        LazyVGrid(columns: SSAdaptiveColumns.cards, spacing: 10) {
                             ForEach(vm.rows) { a in
                                 rowCard(a)
                             }

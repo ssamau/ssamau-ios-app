@@ -89,7 +89,7 @@ struct HeadMembersView: View {
                         .foregroundStyle(Color.ssGrey)
                         .padding(.vertical, 40)
                 } else {
-                    LazyVStack(spacing: 10) {
+                    LazyVGrid(columns: SSAdaptiveColumns.cards, spacing: 10) {
                         ForEach(vm.filteredRows) { row in
                             rowCard(row)
                         }

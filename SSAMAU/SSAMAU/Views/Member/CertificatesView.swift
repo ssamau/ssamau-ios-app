@@ -39,7 +39,7 @@ struct CertificatesView: View {
 
     private var list: some View {
         ScrollView {
-            LazyVStack(spacing: 12) {
+            LazyVGrid(columns: SSAdaptiveColumns.cards, spacing: 12) {
                 ForEach(vm.certificates) { cert in
                     row(cert)
                 }

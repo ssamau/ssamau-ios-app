@@ -230,4 +230,27 @@ struct SSAdaptiveColumns {
                   GridItem(.flexible(), spacing: 12)],
         regular: [GridItem(.adaptive(minimum: 160), spacing: 12)]
     )
+
+    /// List-row card grid. Single column on narrow widths (iPhone,
+    /// iPad mini portrait with sidebar visible — ~520pt detail), two
+    /// columns wherever there's room for two 340pt cards plus
+    /// spacing (~700pt+ available, hit on iPad mini landscape with
+    /// sidebar, iPad Air+ everywhere, iPad in fullscreen). Use for
+    /// primary list views (members, opportunities, projects,
+    /// applications, accounts, certs etc.) so the extra horizontal
+    /// space on iPad shows MORE rows per screen instead of stretching
+    /// each row to 700pt with whitespace.
+    ///
+    /// Single static (not a SSAdaptiveColumns instance) because the
+    /// `.adaptive` GridItem already does the right thing at any
+    /// available width — no need to branch on horizontalSizeClass at
+    /// the call site.
+    ///
+    /// 340pt is the practical minimum for our cards: a member-row
+    /// card with name + role/committee + last-login + state badge +
+    /// chevron + action buttons fits comfortably, and it's wide
+    /// enough that a localised Arabic name doesn't truncate.
+    static let cards: [GridItem] = [
+        GridItem(.adaptive(minimum: 340), spacing: 10)
+    ]
 }

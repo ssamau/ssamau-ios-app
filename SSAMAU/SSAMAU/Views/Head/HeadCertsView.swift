@@ -65,7 +65,7 @@ struct HeadCertsView: View {
                             .font(.ssCaption).foregroundStyle(Color.ssGrey)
                             .padding(.vertical, 60)
                     } else {
-                        LazyVStack(spacing: 8) {
+                        LazyVGrid(columns: SSAdaptiveColumns.cards, spacing: 8) {
                             ForEach(vm.filteredRows) { row in
                                 rowCard(row)
                             }
