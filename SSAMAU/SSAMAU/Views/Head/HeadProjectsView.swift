@@ -28,6 +28,7 @@ struct HeadProjectsView: View {
                         defaultCommittee: session.currentUser?.committeeId,
                         isPresented: $creatingNew
                     )
+                    .iPadSheet(.large)
                 }
                 .sheet(item: $editTarget) { project in
                     ProjectFormSheet(
@@ -39,6 +40,7 @@ struct HeadProjectsView: View {
                             set: { if !$0 { editTarget = nil } }
                         )
                     )
+                    .iPadSheet(.large)
                 }
 
             // Floating action button (only when we have a committee to scope to;

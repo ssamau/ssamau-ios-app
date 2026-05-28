@@ -26,6 +26,7 @@ struct HoursApprovalView: View {
                 .ssToast($vm.toast)
                 .sheet(item: $rejectTarget) { row in
                     rejectSheet(for: row)
+                        .iPadSheet(.medium)
                 }
         }
     }

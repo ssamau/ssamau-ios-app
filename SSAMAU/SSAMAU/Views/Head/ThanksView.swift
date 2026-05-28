@@ -25,6 +25,7 @@ struct ThanksView: View {
                     SendThanksSheet(vm: vm, isPresented: $sending) {
                         await refresh()
                     }
+                    .iPadSheet(.large)
                 }
             Button { sending = true } label: {
                 HStack(spacing: 6) {

@@ -17,6 +17,7 @@ struct CertificatesView: View {
                     CertificateDetailSheet(certificate: cert) {
                         presented = nil
                     }
+                    .iPadSheet(.large)
                 }
         }
     }

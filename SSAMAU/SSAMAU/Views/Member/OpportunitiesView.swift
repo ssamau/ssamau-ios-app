@@ -23,6 +23,7 @@ struct OpportunitiesView: View {
                             set: { if !$0 { presentingOpportunity = nil } }
                         )
                     )
+                    .iPadSheet(.medium)
                 }
         }
     }

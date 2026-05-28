@@ -24,6 +24,7 @@ struct DevPagesView: View {
                         set: { if !$0 { selected = nil } }
                     )
                 )
+                .iPadSheet(.large)
             }
     }
 

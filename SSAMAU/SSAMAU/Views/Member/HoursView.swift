@@ -18,9 +18,11 @@ struct HoursView: View {
                 .ssToast($vm.toast)
                 .sheet(isPresented: $showLogSheet) {
                     LogHoursSheet(viewModel: vm, isPresented: $showLogSheet)
+                        .iPadSheet(.medium)
                 }
                 .sheet(item: $detailRow) { row in
                     HoursDetailSheet(row: row) { detailRow = nil }
+                        .iPadSheet(.medium)
                 }
         }
     }

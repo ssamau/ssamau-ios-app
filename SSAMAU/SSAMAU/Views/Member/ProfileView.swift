@@ -759,6 +759,7 @@ struct ProfileView: View {
         }
         .sheet(isPresented: $showSupportSheet) {
             SupportSubmitSheet(isPresented: $showSupportSheet)
+                .iPadSheet(.medium)
         }
     }
 

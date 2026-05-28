@@ -27,9 +27,11 @@ struct AccountsView: View {
                     AccountActionsSheet(row: row, vm: vm) {
                         inviteSheetRow = nil
                     }
+                    .iPadSheet(.large)
                 }
                 .sheet(item: $vm.pinInviteResult) { result in
                     PinResultSheet(result: result, vm: vm)
+                        .iPadSheet(.small)
                 }
                 .sheet(item: $viewerRow) { row in
                     MemberProfileViewerSheet(
@@ -39,6 +41,7 @@ struct AccountsView: View {
                             set: { if !$0 { viewerRow = nil } }
                         )
                     )
+                    .iPadSheet(.large)
                 }
                 .sheet(isPresented: $creatingAccount) {
                     AccountFormSheet(
@@ -46,6 +49,7 @@ struct AccountsView: View {
                         isPresented: $creatingAccount,
                         currentUserIsSuperadmin: session.currentUser?.isSuperadmin == true
                     )
+                    .iPadSheet(.xlarge)
                 }
                 .sheet(item: $editingAccount) { row in
                     AccountFormSheet(
@@ -56,6 +60,7 @@ struct AccountsView: View {
                         ),
                         currentUserIsSuperadmin: session.currentUser?.isSuperadmin == true
                     )
+                    .iPadSheet(.xlarge)
                 }
                 .confirmationDialog(
                     LocalizedStringKey("ap.accounts.delete_confirm"),

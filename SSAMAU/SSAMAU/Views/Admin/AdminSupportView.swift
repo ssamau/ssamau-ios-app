@@ -36,6 +36,7 @@ struct AdminSupportView: View {
         .navigationBarTitleDisplayMode(.inline)
         .sheet(isPresented: $submitting) {
             SupportSubmitSheet(isPresented: $submitting)
+                .iPadSheet(.medium)
         }
     }
 }

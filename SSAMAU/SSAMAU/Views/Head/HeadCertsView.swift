@@ -28,6 +28,7 @@ struct HeadCertsView: View {
                         // know which mode it's in.
                         await refresh()
                     }
+                    .iPadSheet(.large)
                 }
             Button { issuing = true } label: {
                 HStack(spacing: 6) {

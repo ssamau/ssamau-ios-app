@@ -22,6 +22,7 @@ struct AttendanceView: View {
                     RecordAttendanceSheet(vm: vm, isPresented: $recording) {
                         await vm.load(committeeId: session.currentUser?.committeeId)
                     }
+                    .iPadSheet(.xlarge)
                 }
                 .confirmationDialog(
                     LocalizedStringKey("hp.attendance.delete_confirm"),

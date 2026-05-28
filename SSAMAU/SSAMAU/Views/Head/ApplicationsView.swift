@@ -27,6 +27,7 @@ struct ApplicationsView: View {
                         set: { if !$0 { selected = nil } }
                     )
                 )
+                .iPadSheet(.large)
             }
     }
 
@@ -212,13 +213,18 @@ private struct ApplicationDetailSheet: View {
                 }
             }
             .ssToast(Binding(get: { vm.toast }, set: { vm.toast = $0 }))
-            .sheet(isPresented: $showingReject) { rejectSheet }
-            .sheet(isPresented: $pickingCommittee) { committeePicker }
+            .sheet(isPresented: $showingReject) {
+                rejectSheet.iPadSheet(.medium)
+            }
+            .sheet(isPresented: $pickingCommittee) {
+                committeePicker.iPadSheet(.medium)
+            }
             .sheet(item: $cvViewerURL) { wrapped in
                 RemoteFileViewer(
                     url: wrapped.url,
                     suggestedName: "\(application.displayName).pdf"
                 )
+                .iPadSheet(.xlarge)
             }
         }
     }

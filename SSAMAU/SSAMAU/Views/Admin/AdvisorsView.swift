@@ -28,6 +28,7 @@ struct AdvisorsView: View {
                 .ssToast($vm.toast)
                 .sheet(isPresented: $creatingNew) {
                     AdvisorFormSheet(existing: nil, vm: vm, isPresented: $creatingNew)
+                        .iPadSheet(.large)
                 }
                 .sheet(item: $editTarget) { advisor in
                     AdvisorFormSheet(
@@ -37,6 +38,7 @@ struct AdvisorsView: View {
                             set: { if !$0 { editTarget = nil } }
                         )
                     )
+                    .iPadSheet(.large)
                 }
                 .confirmationDialog(
                     LocalizedStringKey("ap.advisors.delete_confirm"),

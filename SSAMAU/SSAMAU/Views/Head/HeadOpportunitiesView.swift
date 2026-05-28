@@ -23,6 +23,7 @@ struct HeadOpportunitiesView: View {
                     AssignSheet(opportunity: opp, vm: vm) {
                         presentingOpportunity = nil
                     }
+                    .iPadSheet(.large)
                 }
         }
     }
@@ -254,6 +255,7 @@ private struct AssignSheet: View {
                         set: { if !$0 { attendanceTarget = nil } }
                     )
                 )
+                .iPadSheet(.medium)
             }
         }
     }

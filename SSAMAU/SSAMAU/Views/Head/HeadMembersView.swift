@@ -26,9 +26,11 @@ struct HeadMembersView: View {
                 .ssToast($vm.toast)
                 .sheet(item: $inviteSheetRow) { row in
                     inviteSheet(for: row)
+                        .iPadSheet(.large)
                 }
                 .sheet(item: $vm.pinInviteResult) { result in
                     pinResultSheet(result)
+                        .iPadSheet(.small)
                 }
                 .sheet(item: $viewerRow) { row in
                     MemberProfileViewerSheet(
@@ -38,6 +40,7 @@ struct HeadMembersView: View {
                             set: { if !$0 { viewerRow = nil } }
                         )
                     )
+                    .iPadSheet(.large)
                 }
                 .confirmationDialog(
                     LocalizedStringKey("hp.members.revoke_confirm"),

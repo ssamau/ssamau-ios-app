@@ -101,6 +101,74 @@ extension View {
     func ssHover() -> some View {
         self.hoverEffect(.highlight)
     }
+
+    /// iPad-friendly sheet sizing. Apply to the sheet's outer-most view
+    /// to make the iPad formSheet render at a size appropriate for the
+    /// content instead of the system default (~540×620 regardless of
+    /// content).
+    ///
+    /// How it works: on iPad regular width, sets `.frame(minWidth:,
+    /// minHeight:)` which SwiftUI propagates to the UIHostingController's
+    /// `preferredContentSize`, which UIKit's formSheet uses to size
+    /// itself. iPhone (compact width) keeps the existing default
+    /// pageSheet behaviour — the frame would otherwise force horizontal
+    /// scroll on narrow iPhones.
+    ///
+    /// Sizes are categorical (small / medium / large / xlarge) rather
+    /// than per-sheet so we can re-tune the four tiers globally without
+    /// hunting down every call site.
+    ///
+    /// iOS 16+ compatible; doesn't depend on iOS 17's
+    /// `.presentationContentSize` or iOS 18's `.presentationSizing`,
+    /// both of which we'd love to use eventually.
+    func iPadSheet(_ size: SSIPadSheetSize) -> some View {
+        modifier(SSIPadSheetSizeModifier(size: size))
+    }
+}
+
+/// Sheet-size buckets. Picked to fit iPad mini portrait (744pt wide
+/// minus inset) at xlarge, with smaller tiers stepping down by ~140pt.
+enum SSIPadSheetSize {
+    /// Confirmations, pin-result, role pickers. Single decision, no
+    /// scrolling expected.
+    case small
+    /// Single-purpose form: log hours, send thanks, issue cert, attendance row.
+    case medium
+    /// Multi-section form or rich detail viewer: project form, advisor
+    /// form, application detail with CV preview, member viewer.
+    case large
+    /// Very wide form or list-driven sheet: account form, record-attendance,
+    /// bulk thanks/certs. Maxes out iPad mini portrait while still leaving
+    /// the system dim margin visible.
+    case xlarge
+
+    fileprivate var dims: CGSize {
+        switch self {
+        case .small:  return CGSize(width: 380, height: 460)
+        case .medium: return CGSize(width: 540, height: 640)
+        case .large:  return CGSize(width: 680, height: 780)
+        case .xlarge: return CGSize(width: 760, height: 860)
+        }
+    }
+}
+
+private struct SSIPadSheetSizeModifier: ViewModifier {
+    let size: SSIPadSheetSize
+    @Environment(\.horizontalSizeClass) private var hSizeClass
+
+    func body(content: Content) -> some View {
+        if hSizeClass == .regular {
+            // minWidth/minHeight is what SwiftUI uses to compute the
+            // hosting controller's preferredContentSize. Using min
+            // (not fixed) means content can still grow if a localised
+            // string makes a field taller than expected.
+            content
+                .frame(minWidth: size.dims.width,
+                       minHeight: size.dims.height)
+        } else {
+            content
+        }
+    }
 }
 
 /// Adaptive `LazyVGrid` column count that uses `compact` on iPhone

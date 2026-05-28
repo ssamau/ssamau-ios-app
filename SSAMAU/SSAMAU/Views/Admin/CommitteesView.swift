@@ -26,6 +26,7 @@ struct CommitteesView: View {
                 .ssToast($vm.toast)
                 .sheet(isPresented: $creatingNew) {
                     CommitteeFormSheet(existing: nil, vm: vm, isPresented: $creatingNew)
+                        .iPadSheet(.large)
                 }
                 .sheet(item: $editTarget) { committee in
                     CommitteeFormSheet(
@@ -35,6 +36,7 @@ struct CommitteesView: View {
                             set: { if !$0 { editTarget = nil } }
                         )
                     )
+                    .iPadSheet(.large)
                 }
 
             if canMutate {

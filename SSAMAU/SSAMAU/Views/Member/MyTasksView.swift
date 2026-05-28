@@ -17,6 +17,7 @@ struct MyTasksView: View {
                     AssignmentDetailSheet(assignment: a) {
                         detail = nil
                     }
+                    .iPadSheet(.medium)
                 }
         }
     }
