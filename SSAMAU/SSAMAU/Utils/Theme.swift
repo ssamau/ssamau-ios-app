@@ -110,11 +110,28 @@ struct SSAdaptiveColumns {
     let compact: [GridItem]
     let regular: [GridItem]
 
-    /// Two-column compact, four-column regular — the default for KPI
-    /// dashboards.
+    /// Two-column compact, width-adaptive regular — the default for
+    /// KPI dashboards.
+    ///
+    /// Regular uses `.adaptive(minimum: 160)` instead of a fixed 4-col
+    /// flexible grid so the dashboard works at any detail-column width
+    /// the iPad NavigationSplitView can produce:
+    ///   - Stage Manager narrow window with sidebar visible (~480pt
+    ///     detail) → 2 cols, cells stay ~220pt wide and content reads
+    ///     cleanly.
+    ///   - iPad mini portrait with sidebar (~520pt detail) → 3 cols.
+    ///   - iPad landscape / iPad Pro (~700-900pt detail) → 4-5 cols,
+    ///     same density as before.
+    ///
+    /// The previous fixed 4-col layout cramped cells to ~100pt in
+    /// narrow detail widths. The "Total members" KPI showed the bug
+    /// worst: `person.3` (outlined, intrinsically wider than the
+    /// filled `person.2.fill` used on "Active members") + single-digit
+    /// values pushed to the far edge by `Spacer()` made the
+    /// asymmetric layout visually obvious.
     static let kpi = SSAdaptiveColumns(
         compact: [GridItem(.flexible(), spacing: 12),
                   GridItem(.flexible(), spacing: 12)],
-        regular: Array(repeating: GridItem(.flexible(), spacing: 12), count: 4)
+        regular: [GridItem(.adaptive(minimum: 160), spacing: 12)]
     )
 }
