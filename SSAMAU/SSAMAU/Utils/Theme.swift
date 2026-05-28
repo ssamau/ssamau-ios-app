@@ -158,13 +158,28 @@ private struct SSIPadSheetSizeModifier: ViewModifier {
 
     func body(content: Content) -> some View {
         if hSizeClass == .regular {
-            // minWidth/minHeight is what SwiftUI uses to compute the
-            // hosting controller's preferredContentSize. Using min
-            // (not fixed) means content can still grow if a localised
-            // string makes a field taller than expected.
-            content
-                .frame(minWidth: size.dims.width,
-                       minHeight: size.dims.height)
+            // Width-only sizing. Setting minWidth propagates to the
+            // hosting controller's preferredContentSize.width, which
+            // UIKit's formSheet uses to widen itself. Width is safe
+            // to force because Text wraps and controls shrink — narrow
+            // windows clamp gracefully without clipping.
+            //
+            // Height is INTENTIONALLY natural-content-driven. The first
+            // pass forced minHeight too, which clipped the sheet
+            // toolbar (title + Cancel + segmented controls) above the
+            // visible area in landscape iPad mini with sidebar
+            // visible: window height 744pt < forced sheet height
+            // 860pt, so the formSheet's safe-area clamping cut the
+            // top while SwiftUI continued laying out for 860pt.
+            // Vertical content has no built-in scroll fallback the
+            // way horizontal content has Text-wrapping, so clipping
+            // is silent and destructive there.
+            //
+            // The trade-off: small sheets (PinResultSheet etc.) render
+            // at the system's default formSheet height (~620pt) rather
+            // than a tighter 460pt. Acceptable — a slightly oversized
+            // formSheet is far better than a clipped toolbar.
+            content.frame(minWidth: size.dims.width)
         } else {
             content
         }
