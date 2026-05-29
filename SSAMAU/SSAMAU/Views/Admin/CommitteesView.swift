@@ -52,6 +52,11 @@ struct CommitteesView: View {
                 .padding(20)
             }
         }
+        // ⌘N opens the create sheet (iPad keyboard / Mac Catalyst),
+        // gated on the same permission as the FAB.
+        .ssKeyboardShortcuts(
+            canMutate ? [SSKeyboardShortcut("n") { creatingNew = true }] : []
+        )
     }
 
     @ViewBuilder

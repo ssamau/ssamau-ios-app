@@ -41,7 +41,7 @@ struct CertificatesView: View {
         ScrollView {
             LazyVGrid(columns: SSAdaptiveColumns.cards, spacing: 12) {
                 ForEach(vm.certificates) { cert in
-                    row(cert)
+                    row(cert).ssHover()
                 }
             }
             .ipadContentWidth()

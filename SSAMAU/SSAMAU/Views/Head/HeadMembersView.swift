@@ -91,7 +91,7 @@ struct HeadMembersView: View {
                 } else {
                     LazyVGrid(columns: SSAdaptiveColumns.cards, spacing: 10) {
                         ForEach(vm.filteredRows) { row in
-                            rowCard(row)
+                            rowCard(row).ssHover()
                         }
                     }
                 }

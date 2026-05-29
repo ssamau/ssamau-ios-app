@@ -44,6 +44,9 @@ struct HeadCertsView: View {
             }
             .padding(20)
         }
+        // ⌘N opens the issue-certificate sheet (iPad keyboard / Mac
+        // Catalyst), mirroring the issue FAB.
+        .ssKeyboardShortcuts([SSKeyboardShortcut("n") { issuing = true }])
     }
 
     private func refresh() async {
@@ -67,7 +70,7 @@ struct HeadCertsView: View {
                     } else {
                         LazyVGrid(columns: SSAdaptiveColumns.cards, spacing: 8) {
                             ForEach(vm.filteredRows) { row in
-                                rowCard(row)
+                                rowCard(row).ssHover()
                             }
                         }
                     }

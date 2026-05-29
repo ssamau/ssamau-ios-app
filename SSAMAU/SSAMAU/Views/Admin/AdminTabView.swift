@@ -147,6 +147,18 @@ private struct AdminIPadSidebarView: View {
         )
     }
 
+    /// Sidebar order for ⌘-number shortcuts — matches the visual row
+    /// order in `sidebarList`. Admin has more than 10 destinations, so
+    /// only the first 10 get a shortcut (the `numbered` helper stops at
+    /// ⌘0); the top-10 are the highest-traffic, and `dev` / `profile`
+    /// (the tail) stay click-only. `dev` is omitted here so numbering is
+    /// identical for superadmins and regular admins.
+    private let orderedTabs: [AdminSidebarTab] = [
+        .dashboard, .members, .opportunities, .hours,
+        .projects, .applications, .thanks, .certs, .interest,
+        .committees, .advisors, .accounts, .support, .profile,
+    ]
+
     var body: some View {
         NavigationSplitView {
             sidebarList
@@ -157,6 +169,12 @@ private struct AdminIPadSidebarView: View {
             sidebarDetail
         }
         .tint(Color.ssGreen)
+        // ⌘1…⌘9/⌘0 jump to the first 10 sidebar destinations (iPad with
+        // a hardware keyboard / Mac Catalyst). iPhone TabView path is
+        // untouched — this struct only renders at regular width.
+        .ssKeyboardShortcuts(
+            SSKeyboardShortcut.numbered(orderedTabs) { selection = $0 }
+        )
         .alert(
             LocalizedStringKey("common.logout_confirm"),
             isPresented: $showSignOutConfirm

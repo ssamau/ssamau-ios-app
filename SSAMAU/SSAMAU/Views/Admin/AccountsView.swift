@@ -108,6 +108,9 @@ struct AccountsView: View {
             }
             Button(LocalizedStringKey("common.cancel"), role: .cancel) {}
         }
+        // ⌘N opens the create-account sheet (iPad keyboard / Mac
+        // Catalyst), mirroring the always-available FAB.
+        .ssKeyboardShortcuts([SSKeyboardShortcut("n") { creatingAccount = true }])
     }
 
     @ViewBuilder
@@ -140,7 +143,7 @@ struct AccountsView: View {
                     } else {
                         LazyVGrid(columns: SSAdaptiveColumns.cards, spacing: 8) {
                             ForEach(vm.filteredRows) { row in
-                                rowCard(row)
+                                rowCard(row).ssHover()
                             }
                         }
                     }

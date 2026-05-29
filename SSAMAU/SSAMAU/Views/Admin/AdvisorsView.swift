@@ -69,6 +69,11 @@ struct AdvisorsView: View {
                 .padding(20)
             }
         }
+        // ⌘N opens the create sheet (iPad keyboard / Mac Catalyst),
+        // gated on the same permission as the FAB.
+        .ssKeyboardShortcuts(
+            canMutate ? [SSKeyboardShortcut("n") { creatingNew = true }] : []
+        )
     }
 
     @ViewBuilder
@@ -87,7 +92,7 @@ struct AdvisorsView: View {
                     } else {
                         LazyVGrid(columns: SSAdaptiveColumns.cards, spacing: 10) {
                             ForEach(vm.rows) { a in
-                                rowCard(a)
+                                rowCard(a).ssHover()
                             }
                         }
                     }
