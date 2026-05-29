@@ -151,7 +151,6 @@ private struct IssueCertSheet: View {
     @State private var recipientName: String = ""
     @State private var recipientEmail: String = ""
     @State private var role: String = ""
-    @State private var hoursText: String = ""
 
     enum Mode: String, CaseIterable, Identifiable {
         case single, bulk
@@ -170,7 +169,13 @@ private struct IssueCertSheet: View {
 
                     field("hp.certs.field_project") {
                         Menu {
-                            ForEach(vm.projects) { p in
+                            // Only Completed projects are eligible — the
+                            // server (certs.ts) rejects issuance for any
+                            // other status with err.business.project_not_complete
+                            // (cross-repo cert gate, 2026-05-28). Filtering
+                            // here keeps the picker honest so the head
+                            // doesn't pick an ineligible project and hit a 409.
+                            ForEach(completedProjects) { p in
                                 Button(p.name) { selectedProjectId = p.id }
                             }
                         } label: {
@@ -218,15 +223,13 @@ private struct IssueCertSheet: View {
                                 .background(Color.ssPale)
                                 .clipShape(RoundedRectangle(cornerRadius: 8))
                         }
-                        field("hp.certs.field_hours") {
-                            TextField("0.0", text: $hoursText)
-                                .font(.ssBody)
-                                .foregroundStyle(Color.ssCharcoal)
-                                .keyboardType(.decimalPad)
-                                .padding(10)
-                                .background(Color.ssPale)
-                                .clipShape(RoundedRectangle(cornerRadius: 8))
-                        }
+                        // Hours field removed: the server now DERIVES cert
+                        // hours from the member's FinalApproved hours for the
+                        // project and ignores any client-sent value (cert
+                        // governance fix, ticket SUP_3RT6RJRC, web commit
+                        // 266046d). A free-type field here would be a no-op
+                        // that misleads the issuer, so it's gone — the issued
+                        // certificate shows the authoritative server figure.
                     }
                     field("hp.certs.field_role") {
                         TextField("", text: $role)
@@ -247,7 +250,9 @@ private struct IssueCertSheet: View {
                                     recipientName: recipientName.trimmingCharacters(in: .whitespaces),
                                     recipientEmail: recipientEmail.trimmingCharacters(in: .whitespaces),
                                     role: role.trimmingCharacters(in: .whitespaces),
-                                    hours: Double(hoursText)
+                                    // Hours are server-derived now; the client
+                                    // value is ignored, so send nil.
+                                    hours: nil
                                 )
                             } else {
                                 ok = await vm.issueBulk(
@@ -286,6 +291,13 @@ private struct IssueCertSheet: View {
             }
             .ssToast(Binding(get: { vm.toast }, set: { vm.toast = $0 }))
         }
+    }
+
+    /// Cert-eligible projects: only those whose status is the canonical
+    /// finished value ("Completed"). Mirrors the server cert gate so the
+    /// picker never offers a project that issuance would 409 on.
+    private var completedProjects: [Project] {
+        vm.projects.filter { $0.projectStatus == "Completed" }
     }
 
     private var canSubmit: Bool {
