@@ -282,9 +282,18 @@ private struct IssueCertSheet: View {
 
     private var canSubmit: Bool {
         guard !selectedProjectId.isEmpty else { return false }
-        // Bulk mode just needs the project — the server iterates
-        // participants. Single mode needs a recipient identity: either
-        // a picked member, or a manually-typed name + email.
+        // Ticket SUP_BNYPAHUK: never issue a certificate without a role —
+        // it must always state the person's role (their committee role or
+        // a specific one). Enforced for both single and bulk here so the
+        // Issue button stays disabled until a role is entered. NOTE: this
+        // is a client-side guard only; the server (certs.ts) still inserts
+        // `role || null` without validation, so the authoritative rule
+        // should also be added web-side (reject empty role) to cover the
+        // web client and any other caller.
+        guard !role.trimmingCharacters(in: .whitespaces).isEmpty else { return false }
+        // Bulk mode just needs the project (+ role above) — the server
+        // iterates participants. Single mode needs a recipient identity:
+        // either a picked member, or a manually-typed name + email.
         if mode == .bulk { return true }
         if !selectedMemberId.isEmpty { return true }
         let nameOk = !recipientName.trimmingCharacters(in: .whitespaces).isEmpty
