@@ -13,7 +13,7 @@ struct Project: Codable, Identifiable, Equatable {
     let endTime: String?
     let location: String?
     let owningCommitteeId: String?
-    let projectStatus: String?           // "Planned" | "Active" | "Done" | "Cancelled"
+    let projectStatus: String?           // "Planned" | "Active" | "Completed" | "Cancelled" (canonical; legacy rows may still read "Done")
     let notes: String?
     let participantCount: Int
 

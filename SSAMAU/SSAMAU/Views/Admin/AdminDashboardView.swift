@@ -151,7 +151,8 @@ struct AdminDashboardView: View {
         switch raw ?? "" {
         case "Planned":   return NSLocalizedString("hp.projects.status_planned", comment: "")
         case "Active":    return NSLocalizedString("hp.projects.status_active", comment: "")
-        case "Done":      return NSLocalizedString("hp.projects.status_done", comment: "")
+        // "Completed" canonical; "Done" kept for legacy-row display only.
+        case "Completed", "Done": return NSLocalizedString("ap.prj.status_completed", comment: "")
         case "Cancelled": return NSLocalizedString("hp.projects.status_cancelled", comment: "")
         default:          return raw ?? "—"
         }

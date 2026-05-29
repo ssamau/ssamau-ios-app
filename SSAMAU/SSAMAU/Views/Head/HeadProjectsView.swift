@@ -192,7 +192,11 @@ struct HeadProjectsView: View {
         let (color, key): (Color, String) = {
             switch status {
             case "Active":    return (.ssGreen, "hp.projects.status_active")
-            case "Done":      return (.ssGrey,  "hp.projects.status_done")
+            // "Completed" is the canonical finished value (cross-repo
+            // alignment 2026-05-28; web cert gate keys on it). "Done" is
+            // legacy drift — still mapped here so any pre-alignment row
+            // displays sensibly, but the form only ever writes "Completed".
+            case "Completed", "Done": return (.ssGrey, "ap.prj.status_completed")
             case "Cancelled": return (.red,     "hp.projects.status_cancelled")
             default:          return (.ssGold,  "hp.projects.status_planned")
             }
@@ -284,7 +288,7 @@ private struct ProjectFormSheet: View {
                             Picker(selection: $status) {
                                 Text(LocalizedStringKey("hp.projects.status_planned")).tag("Planned")
                                 Text(LocalizedStringKey("hp.projects.status_active")).tag("Active")
-                                Text(LocalizedStringKey("hp.projects.status_done")).tag("Done")
+                                Text(LocalizedStringKey("ap.prj.status_completed")).tag("Completed")
                                 Text(LocalizedStringKey("hp.projects.status_cancelled")).tag("Cancelled")
                             } label: { EmptyView() }
                             .pickerStyle(.menu)
@@ -409,7 +413,11 @@ private struct ProjectFormSheet: View {
         }
         name        = p.name
         projectType = p.projectType ?? "Event"
-        status      = p.projectStatus ?? "Planned"
+        // Map any legacy "Done" row onto the canonical "Completed" so the
+        // picker (which now offers only Completed) preselects correctly
+        // and re-saving normalises the value.
+        let loadedStatus = p.projectStatus ?? "Planned"
+        status      = (loadedStatus == "Done") ? "Completed" : loadedStatus
         if let parsed = MemberFieldMaps.parseServerDate(p.eventDate) {
             eventDate = parsed
             hasEventDate = true
