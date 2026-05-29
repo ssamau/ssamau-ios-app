@@ -163,9 +163,18 @@ struct SupportSubmitSheet: View {
         }
     }
 
-    /// Decode the PhotosPicker item into raw bytes + MIME. Falls back
-    /// to PNG when the data type is exotic (HEIC) — the server only
-    /// accepts JPEG/PNG/WebP so we re-encode to PNG before upload.
+    /// Decode the PhotosPicker item into raw bytes + MIME.
+    ///
+    /// Bug fix (ticket SUP_BNYPAHUK, "error when uploading images"): the
+    /// previous version re-encoded any non-JPEG/PNG/WebP pick to **PNG**.
+    /// The iPhone camera default is HEIC, so almost every photo took the
+    /// re-encode path — and a 12MP photo as lossless PNG is ~10-30 MiB,
+    /// blowing straight past the server's 4 MiB cap and surfacing the
+    /// "too large" error for ordinary photos. Now we re-encode to
+    /// **JPEG** (with downscale) instead, which keeps normal photos well
+    /// under the cap. We also recover allowed-MIME originals that happen
+    /// to be over the cap by re-encoding them the same way, instead of
+    /// rejecting outright.
     private func loadPickerItem(_ item: PhotosPickerItem?) async {
         attachmentSizeError = false
         guard let item else {
@@ -178,32 +187,68 @@ struct SupportSubmitSheet: View {
             attachmentMime = nil
             return
         }
-        // Detect MIME from magic bytes; if not one of the accepted
-        // server-side types, re-encode the UIImage to PNG.
+        // Fast path: already an accepted type AND already under the cap →
+        // upload the original bytes untouched (no quality loss).
         let detectedMime = Self.sniffMime(data)
-        if let mime = detectedMime, Self.allowedMimes.contains(mime) {
-            if data.count > Self.attachmentSizeCap {
-                attachmentSizeError = true
-                attachmentData = nil
-                attachmentMime = nil
-                return
-            }
+        if let mime = detectedMime,
+           Self.allowedMimes.contains(mime),
+           data.count <= Self.attachmentSizeCap {
             attachmentData = data
             attachmentMime = mime
-        } else if let ui = UIImage(data: data),
-                  let png = ui.pngData() {
-            if png.count > Self.attachmentSizeCap {
-                attachmentSizeError = true
-                attachmentData = nil
-                attachmentMime = nil
-                return
-            }
-            attachmentData = png
-            attachmentMime = "image/png"
+            return
+        }
+        // Everything else — exotic type (HEIC) OR an accepted type that's
+        // over the cap — gets normalised to a downscaled JPEG that fits.
+        if let ui = UIImage(data: data),
+           let jpeg = Self.downscaledJPEG(ui, maxBytes: Self.attachmentSizeCap) {
+            attachmentData = jpeg
+            attachmentMime = "image/jpeg"
         } else {
+            // Couldn't decode/encode the image at all — surface the size
+            // error so the user knows to pick a different file.
+            attachmentSizeError = true
             attachmentData = nil
             attachmentMime = nil
         }
+    }
+
+    /// Re-encodes a UIImage as JPEG that fits under `maxBytes`. Tries the
+    /// image at its current size first; if the JPEG is still too big it
+    /// progressively downscales (each pass halves the longest edge) and
+    /// drops quality, until it fits or bottoms out. For real-world phone
+    /// photos the first or second pass already clears the 4 MiB cap.
+    private static func downscaledJPEG(_ image: UIImage, maxBytes: Int) -> Data? {
+        var current = image
+        // Cap the starting dimension too — a 4032px photo doesn't need
+        // full resolution for a bug-report screenshot.
+        let startMax: CGFloat = 2400
+        if max(current.size.width, current.size.height) > startMax {
+            current = resize(current, maxDimension: startMax) ?? current
+        }
+        for quality in [CGFloat(0.8), 0.6, 0.45, 0.3] {
+            if let d = current.jpegData(compressionQuality: quality), d.count <= maxBytes {
+                return d
+            }
+        }
+        // Still too big at low quality — shrink dimensions and retry once more.
+        for dim in [CGFloat(1600), 1200, 900, 600] {
+            guard let smaller = resize(current, maxDimension: dim) else { continue }
+            if let d = smaller.jpegData(compressionQuality: 0.6), d.count <= maxBytes {
+                return d
+            }
+        }
+        return nil
+    }
+
+    /// Aspect-preserving resize so the longest edge is `maxDimension`.
+    private static func resize(_ image: UIImage, maxDimension: CGFloat) -> UIImage? {
+        let w = image.size.width, h = image.size.height
+        guard w > 0, h > 0 else { return nil }
+        let scale = min(1, maxDimension / max(w, h))
+        if scale >= 1 { return image }
+        let newSize = CGSize(width: w * scale, height: h * scale)
+        let renderer = UIGraphicsImageRenderer(size: newSize)
+        return renderer.image { _ in image.draw(in: CGRect(origin: .zero, size: newSize)) }
     }
 
     /// Cheap MIME sniff for the three accepted formats — checks the
