@@ -201,12 +201,16 @@ private struct IssueCertSheet: View {
                         }
                         field("hp.certs.field_recipient") {
                             TextField("", text: $recipientName)
+                                .font(.ssBody)
+                                .foregroundStyle(Color.ssCharcoal)
                                 .padding(10)
                                 .background(Color.ssPale)
                                 .clipShape(RoundedRectangle(cornerRadius: 8))
                         }
                         field("hp.certs.field_email") {
                             TextField("", text: $recipientEmail)
+                                .font(.ssBody)
+                                .foregroundStyle(Color.ssCharcoal)
                                 .keyboardType(.emailAddress)
                                 .textInputAutocapitalization(.never)
                                 .autocorrectionDisabled(true)
@@ -216,6 +220,8 @@ private struct IssueCertSheet: View {
                         }
                         field("hp.certs.field_hours") {
                             TextField("0.0", text: $hoursText)
+                                .font(.ssBody)
+                                .foregroundStyle(Color.ssCharcoal)
                                 .keyboardType(.decimalPad)
                                 .padding(10)
                                 .background(Color.ssPale)
@@ -224,6 +230,8 @@ private struct IssueCertSheet: View {
                     }
                     field("hp.certs.field_role") {
                         TextField("", text: $role)
+                            .font(.ssBody)
+                            .foregroundStyle(Color.ssCharcoal)
                             .padding(10)
                             .background(Color.ssPale)
                             .clipShape(RoundedRectangle(cornerRadius: 8))
