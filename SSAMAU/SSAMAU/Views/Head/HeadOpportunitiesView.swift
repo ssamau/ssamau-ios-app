@@ -51,7 +51,7 @@ struct HeadOpportunitiesView: View {
                 } else {
                     LazyVGrid(columns: SSAdaptiveColumns.cards, spacing: 10) {
                         ForEach(vm.filteredOpportunities) { opp in
-                            rowCard(opp)
+                            rowCard(opp).ssHover()
                         }
                     }
                 }

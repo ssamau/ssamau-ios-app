@@ -160,6 +160,13 @@ private struct HeadIPadSidebarView: View {
         )
     }
 
+    /// Sidebar order — must match the visual row order in `sidebarList`
+    /// so ⌘1…⌘0 line up with what the user sees top-to-bottom.
+    private let orderedTabs: [HeadSidebarTab] = [
+        .dashboard, .members, .opportunities, .hours,
+        .projects, .attendance, .applications, .thanks, .certs, .profile,
+    ]
+
     var body: some View {
         NavigationSplitView {
             sidebarList
@@ -170,6 +177,12 @@ private struct HeadIPadSidebarView: View {
             sidebarDetail
         }
         .tint(Color.ssGreen)
+        // ⌘1…⌘9/⌘0 jump straight to a sidebar destination (iPad with a
+        // hardware keyboard / Mac Catalyst). iPhone TabView path is
+        // untouched — this struct only renders at regular width.
+        .ssKeyboardShortcuts(
+            SSKeyboardShortcut.numbered(orderedTabs) { selection = $0 }
+        )
         .alert(
             LocalizedStringKey("common.logout_confirm"),
             isPresented: $showSignOutConfirm

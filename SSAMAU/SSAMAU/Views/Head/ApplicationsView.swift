@@ -48,7 +48,7 @@ struct ApplicationsView: View {
                     } else {
                         LazyVGrid(columns: SSAdaptiveColumns.cards, spacing: 10) {
                             ForEach(vm.filteredRows) { app in
-                                rowCard(app)
+                                rowCard(app).ssHover()
                             }
                         }
                     }

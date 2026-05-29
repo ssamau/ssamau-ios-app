@@ -41,6 +41,9 @@ struct ThanksView: View {
             }
             .padding(20)
         }
+        // ⌘N opens the send-thanks sheet (iPad keyboard / Mac
+        // Catalyst), mirroring the send FAB.
+        .ssKeyboardShortcuts([SSKeyboardShortcut("n") { sending = true }])
     }
 
     private func refresh() async {
@@ -64,7 +67,7 @@ struct ThanksView: View {
                     } else {
                         LazyVGrid(columns: SSAdaptiveColumns.cards, spacing: 8) {
                             ForEach(vm.filteredRows) { row in
-                                rowCard(row)
+                                rowCard(row).ssHover()
                             }
                         }
                     }

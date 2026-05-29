@@ -53,6 +53,9 @@ struct AttendanceView: View {
             }
             .padding(20)
         }
+        // ⌘N opens the record-attendance sheet (iPad keyboard / Mac
+        // Catalyst), mirroring the record FAB.
+        .ssKeyboardShortcuts([SSKeyboardShortcut("n") { recording = true }])
     }
 
     @ViewBuilder
@@ -71,7 +74,7 @@ struct AttendanceView: View {
                     } else {
                         LazyVGrid(columns: SSAdaptiveColumns.cards, spacing: 8) {
                             ForEach(vm.rows) { row in
-                                rowCard(row)
+                                rowCard(row).ssHover()
                             }
                         }
                     }

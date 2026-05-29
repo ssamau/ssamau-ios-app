@@ -50,7 +50,7 @@ struct InterestTriageView: View {
                     } else {
                         LazyVGrid(columns: SSAdaptiveColumns.cards, spacing: 8) {
                             ForEach(vm.filteredRows) { row in
-                                rowCard(row)
+                                rowCard(row).ssHover()
                             }
                         }
                     }

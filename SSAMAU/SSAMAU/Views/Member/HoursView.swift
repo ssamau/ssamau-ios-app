@@ -50,7 +50,7 @@ struct HoursView: View {
                 } else {
                     LazyVGrid(columns: SSAdaptiveColumns.cards, spacing: 10) {
                         ForEach(vm.rows) { row in
-                            rowView(row)
+                            rowView(row).ssHover()
                         }
                     }
                 }

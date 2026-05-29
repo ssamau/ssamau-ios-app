@@ -55,7 +55,7 @@ struct DevPagesView: View {
                     LazyVGrid(columns: SSAdaptiveColumns.cards, spacing: 8) {
                         ForEach(vm.filteredRows) { t in
                             Button { selected = t } label: {
-                                rowCard(t)
+                                rowCard(t).ssHover()
                             }
                             .buttonStyle(.plain)
                         }

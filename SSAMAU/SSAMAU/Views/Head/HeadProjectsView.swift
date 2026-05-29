@@ -63,6 +63,11 @@ struct HeadProjectsView: View {
                 .padding(20)
             }
         }
+        // ⌘N opens the create sheet (iPad keyboard / Mac Catalyst),
+        // mirroring the FAB and gated on the same permission.
+        .ssKeyboardShortcuts(
+            canCreate ? [SSKeyboardShortcut("n") { creatingNew = true }] : []
+        )
     }
 
     private var canCreate: Bool {
@@ -101,7 +106,7 @@ struct HeadProjectsView: View {
                 } else {
                     LazyVGrid(columns: SSAdaptiveColumns.cards, spacing: 10) {
                         ForEach(vm.filteredProjects) { project in
-                            rowCard(project)
+                            rowCard(project).ssHover()
                         }
                     }
                 }

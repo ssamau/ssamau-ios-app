@@ -50,7 +50,7 @@ struct HoursApprovalView: View {
         ScrollView {
             LazyVGrid(columns: SSAdaptiveColumns.cards, spacing: 12) {
                 ForEach(vm.rows) { row in
-                    rowCard(row)
+                    rowCard(row).ssHover()
                 }
             }
             .ipadContentWidth()

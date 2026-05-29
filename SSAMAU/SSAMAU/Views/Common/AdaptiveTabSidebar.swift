@@ -115,6 +115,13 @@ struct AdaptiveTabSidebar<Selection: Hashable, Detail: View>: View {
             detail(selection)
         }
         .tint(Color.ssGreen)
+        // ⌘1…⌘9/⌘0 jump straight to a sidebar destination. Regular
+        // width only — the compact TabView path is left byte-identical.
+        .ssKeyboardShortcuts(
+            SSKeyboardShortcut.numbered(allItems.map(\.tag)) { tag in
+                selection = tag
+            }
+        )
     }
 
     /// One sidebar row: gold icon, brand-aligned label, .ssHover for

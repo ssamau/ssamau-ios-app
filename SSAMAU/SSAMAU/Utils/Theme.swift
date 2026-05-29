@@ -102,6 +102,33 @@ extension View {
         self.hoverEffect(.highlight)
     }
 
+    /// Attaches one or more hardware-keyboard shortcuts to a view
+    /// without rendering any visible UI. Each shortcut is backed by a
+    /// zero-size, fully transparent `Button` placed in a background
+    /// overlay so it joins the responder chain (required for the
+    /// shortcut to fire) but contributes nothing to layout.
+    ///
+    /// No-op in practice on an iPhone with no hardware keyboard; active
+    /// on iPad with a Magic Keyboard / Smart Keyboard / Bluetooth
+    /// keyboard, and on Mac via Catalyst (where the shortcuts also
+    /// surface in the menu bar's discoverability HUD on ⌘-hold).
+    ///
+    /// iOS 16+ — uses plain `.keyboardShortcut`, no `.commands` scene
+    /// menu (which is Mac-menu oriented and wouldn't help on iPad).
+    func ssKeyboardShortcuts(_ shortcuts: [SSKeyboardShortcut]) -> some View {
+        background(
+            ZStack {
+                ForEach(Array(shortcuts.enumerated()), id: \.offset) { _, sc in
+                    Button(action: sc.action) { EmptyView() }
+                        .keyboardShortcut(sc.key, modifiers: sc.modifiers)
+                }
+            }
+            .frame(width: 0, height: 0)
+            .opacity(0)
+            .accessibilityHidden(true)
+        )
+    }
+
     /// iPad-friendly sheet sizing. Apply to the sheet's outer-most view
     /// to make the iPad formSheet render at a size appropriate for the
     /// content instead of the system default (~540×620 regardless of
@@ -161,6 +188,37 @@ enum SSIPadSheetSize {
         case .medium: return CGSize(width: 540, height: 640)
         case .large:  return CGSize(width: 680, height: 780)
         case .xlarge: return CGSize(width: 680, height: 860)
+        }
+    }
+}
+
+/// One hardware-keyboard shortcut: a key + modifiers + the action to
+/// run. Used with `View.ssKeyboardShortcuts(_:)`. Default modifier is
+/// Command, matching the platform convention for app-level shortcuts.
+struct SSKeyboardShortcut {
+    let key: KeyEquivalent
+    let modifiers: EventModifiers
+    let action: () -> Void
+
+    init(_ key: KeyEquivalent,
+         modifiers: EventModifiers = .command,
+         action: @escaping () -> Void) {
+        self.key = key
+        self.modifiers = modifiers
+        self.action = action
+    }
+
+    /// Builds ⌘1…⌘9 then ⌘0 (for a 10th) shortcuts from an ordered
+    /// list of selection values, each setting `select(value)`. Used by
+    /// the three portal sidebars to give every destination a number
+    /// shortcut. Anything past the 10th item gets no shortcut (we run
+    /// out of single digits) — acceptable, the long tail is reachable
+    /// by click and the most-used destinations sit at the top.
+    static func numbered<T>(_ values: [T],
+                            select: @escaping (T) -> Void) -> [SSKeyboardShortcut] {
+        let digits: [Character] = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "0"]
+        return zip(values, digits).map { value, digit in
+            SSKeyboardShortcut(KeyEquivalent(digit)) { select(value) }
         }
     }
 }
