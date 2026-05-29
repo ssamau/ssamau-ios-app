@@ -47,5 +47,28 @@
 		<key>UIImageRespectsSafeAreaInsets</key>
 		<true/>
 	</dict>
+	<!-- Multi-window support (iPad Split View / Slide Over / two
+	     instances side by side, and separate Mac windows under
+	     Catalyst). Pure SwiftUI lifecycle: the @main App's WindowGroup
+	     vends each scene, so no UISceneConfigurations / SceneDelegate
+	     entries are needed — SupportsMultipleScenes = true is enough
+	     for SwiftUI to allow new windows.
+
+	     Each scene instantiates RootView fresh, so per-window
+	     navigation state (sidebar selection, nav paths) is independent,
+	     while SessionStore.shared is injected into every scene as the
+	     same instance so auth / signed-in user is shared. A head can
+	     open two windows and drive each committee view independently
+	     without re-logging in.
+
+	     INFOPLIST_KEY_UIApplicationSceneManifest_Generation is set to
+	     NO in build settings so this explicit manifest (with
+	     SupportsMultipleScenes = true) is used instead of the
+	     generator's default, which sets it to false. -->
+	<key>UIApplicationSceneManifest</key>
+	<dict>
+		<key>UIApplicationSupportsMultipleScenes</key>
+		<true/>
+	</dict>
 </dict>
 </plist>
